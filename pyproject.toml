@@ -26,7 +26,8 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-                "numpy >= 1.26.1",
-                "scipy >= 1.11.3",
-                "pytest >= 7.4.3",
+                "numpy>=1.26.1",
+                "scipy>=1.11.3",
+                "pytest>=7.4.3",
+                "black>=23.11.0",
                ]
