@@ -22,4 +22,10 @@ class LinearConstraint:
     def violates(self, bundle: List[BaseItem]):
         ind = indicator(self.feature, bundle)
 
-        return np.prod((self.A @ ind <= self.b).toarray().flatten())
+        product = self.A @ ind
+
+        # apparently <= is much less efficient than using < and != separately
+        less_than = np.prod((product < self.b).toarray().flatten())
+        equal_to = not np.prod((product != self.b).toarray().flatten())
+
+        return less_than or equal_to
