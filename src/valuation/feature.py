@@ -1,3 +1,11 @@
+class DomainError(Exception):
+    pass
+
+
+class FeatureError(Exception):
+    pass
+
+
 class BaseFeature:
     def __init__(self, name: str, domain: list):
         self.name = name
