@@ -2,6 +2,14 @@
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
+[pytest]
+testpaths = "tests"
+
+[tool.pytest.ini_options]
+addopts = [
+    "--import-mode=importlib",
+]
+
 [project]
 name = "valuation"
 version = "0.0.1"
@@ -20,4 +28,5 @@ classifiers = [
 dependencies = [
                 "numpy >= 1.26.1",
                 "scipy >= 1.11.3",
+                "pytest >= 7.4.3",
                ]

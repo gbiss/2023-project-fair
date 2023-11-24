@@ -5,3 +5,9 @@
 ```bash
 pip install -e .
 ```
+
+## Testing
+
+```bash
+pytest
+```
