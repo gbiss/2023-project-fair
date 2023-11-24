@@ -1,8 +1,8 @@
 import numpy as np
 from scipy.sparse import dok_array
-from valuation.constraint import indicator, LinearConstraint
-from valuation.feature import Course
-from valuation.item import ScheduleItem
+from agent.constraint import indicator, LinearConstraint
+from agent.feature import Course
+from agent.item import ScheduleItem
 
 
 def test_indicator():

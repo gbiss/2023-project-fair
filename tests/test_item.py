@@ -1,6 +1,6 @@
 import pytest
-from valuation.item import ScheduleItem, DomainError, FeatureError
-from valuation.feature import Course
+from agent.item import ScheduleItem, DomainError, FeatureError
+from agent.feature import Course
 
 
 def test_good_schedule():

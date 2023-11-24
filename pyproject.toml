@@ -11,13 +11,13 @@ addopts = [
 ]
 
 [project]
-name = "valuation"
+name = "agent"
 version = "0.0.1"
 authors = [
   { name="David Thibodeau", email="dpthibodeau@umass.edu" },
   { name="George Bissias", email="gbiss@cs.umass.edu" },
 ]
-description = "Item / bundle valuation"
+description = "Agent valuation tools"
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [
