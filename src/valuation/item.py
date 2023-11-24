@@ -19,6 +19,10 @@ class BaseItem:
         except IndexError:
             raise DomainError(f"invalid value '{value}' for feature '{feature}'")
 
+    def __repr__(self):
+        return f"{self.name}: {[feature for feature in self.features]}"
+
+
 class ScheduleItem(BaseItem):
     def __init__(self, features: List[BaseFeature], values: List[Any]):
         super().__init__("schedule", features)

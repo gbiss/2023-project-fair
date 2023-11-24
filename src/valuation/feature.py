@@ -11,6 +11,9 @@ class BaseFeature:
         self.name = name
         self.domain = domain
 
+    def __repr__(self):
+        return f"{self.name}: [{self.domain[0]} ... {self.domain[-1]}]"
+
 
 class Course(BaseFeature):
     def __init__(self, domain):
