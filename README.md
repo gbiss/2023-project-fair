@@ -1,1 +1,7 @@
-# 2023-project-valuation
+# Item / Bundle Valuation
+
+## Setup
+
+```bash
+pip install -e .
+```
