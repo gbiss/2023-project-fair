@@ -22,7 +22,7 @@ class Schedule(BaseItem):
             if value not in feature.domain:
                 raise DomainError(f"invalid value for feature {feature}")
 
-    def value(self, feature):
+    def value(self, feature: BaseFeature):
         try:
             return self.values[self.features.index(feature)]
         except IndexError:
