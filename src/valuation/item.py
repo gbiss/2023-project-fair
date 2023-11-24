@@ -7,8 +7,19 @@ class BaseItem:
         self.name = name
         self.features = features
 
+    def value(self, feature: BaseFeature):
+        try:
+            return self.values[self.features.index(feature)]
+        except IndexError:
+            raise FeatureError("feature unknown for this item")
 
-class Schedule(BaseItem):
+    def index(self, feature: BaseFeature, value: Any):
+        try:
+            return feature.domain.index(value)
+        except IndexError:
+            raise DomainError(f"invalid value '{value}' for feature '{feature}'")
+
+class ScheduleItem(BaseItem):
     def __init__(self, features: List[BaseFeature], values: List[Any]):
         super().__init__("schedule", features)
         self.values = values
@@ -20,10 +31,4 @@ class Schedule(BaseItem):
         # validate domain
         for feature, value in zip(self.features, self.values):
             if value not in feature.domain:
-                raise DomainError(f"invalid value for feature {feature}")
-
-    def value(self, feature: BaseFeature):
-        try:
-            return self.values[self.features.index(feature)]
-        except IndexError:
-            raise FeatureError("feature unknown for this item")
+                raise DomainError(f"invalid value for feature '{feature}'")
