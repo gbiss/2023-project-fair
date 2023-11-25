@@ -23,6 +23,11 @@ class BaseItem:
     def __repr__(self):
         return f"{self.name}: {[feature for feature in self.features]}"
 
+    def __hash__(self):
+        features_hash = sum([hash(feature) for feature in self.features])
+
+        return hash(self.name) + features_hash
+
 
 class ScheduleItem(BaseItem):
     def __init__(self, features: List[BaseFeature], values: List[Any]):

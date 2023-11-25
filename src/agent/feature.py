@@ -14,6 +14,9 @@ class BaseFeature:
     def __repr__(self):
         return f"{self.name}: [{self.domain[0]} ... {self.domain[-1]}]"
 
+    def __hash__(self):
+        return hash(self.name) + hash(tuple(self.domain))
+
 
 class Course(BaseFeature):
     def __init__(self, domain):

@@ -4,6 +4,10 @@ from agent.feature import Course
 from agent.item import DomainError, FeatureError, ScheduleItem
 
 
+def item_hash(schedule_item250):
+    hash(schedule_item250)
+
+
 def test_good_schedule(
     domain: list[int], course: Course, schedule_item250: ScheduleItem
 ):
