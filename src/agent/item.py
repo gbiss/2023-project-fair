@@ -26,6 +26,9 @@ class BaseItem:
     def __hash__(self):
         return hash(self.name) ^ hash(tuple(self.features))
 
+    def __lt__(self, other):
+        return self.__hash__() < hash(other)
+
 
 class ScheduleItem(BaseItem):
     def __init__(self, features: List[BaseFeature], values: List[Any]):
