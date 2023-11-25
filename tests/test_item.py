@@ -1,6 +1,7 @@
 import pytest
+
 from agent.feature import Course
-from agent.item import ScheduleItem, DomainError, FeatureError
+from agent.item import DomainError, FeatureError, ScheduleItem
 
 
 def test_good_schedule(
@@ -16,7 +17,7 @@ def test_bad_feature_list_schedule(course: Course):
         ScheduleItem([course], [250, 301])
 
 
-def test_bad_feature_list_schedule(course: Course):
+def test_bad_value_schedule(course: Course):
     # value outside feature domain
     with pytest.raises(DomainError):
         ScheduleItem([course], [101])

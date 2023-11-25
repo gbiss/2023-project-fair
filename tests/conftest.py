@@ -1,6 +1,7 @@
+import pytest
+
 from agent.feature import Course
 from agent.item import ScheduleItem
-import pytest
 
 
 @pytest.fixture

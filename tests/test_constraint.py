@@ -19,4 +19,4 @@ def test_linear_constraint(
     b = dok_array((1, 1), dtype=np.bool_)
     b = b + True
 
-    assert not LinearConstraint(A, b, course).violates(bundle)
+    assert not LinearConstraint(A, b, course).satisfies(bundle)
