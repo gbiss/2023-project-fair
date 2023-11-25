@@ -1,22 +1,22 @@
 import pytest
-from agent.item import ScheduleItem, DomainError, FeatureError
 from agent.feature import Course
+from agent.item import ScheduleItem, DomainError, FeatureError
 
 
-def test_good_schedule():
-    domain = [250, 301, 611]
-    course = Course(domain)
-    schedule = ScheduleItem([course], [250])
-
-    assert schedule.value(course) == 250
-    assert schedule.index(course, 250) == domain.index(250)
+def test_good_schedule(
+    domain: list[int], course: Course, schedule_item250: ScheduleItem
+):
+    assert schedule_item250.value(course) == 250
+    assert schedule_item250.index(course, 250) == domain.index(250)
 
 
-def test_bad_feature_list_schedule():
+def test_bad_feature_list_schedule(course: Course):
+    # more values than features
     with pytest.raises(FeatureError):
-        ScheduleItem([Course([250, 301, 611])], [250, 301])
+        ScheduleItem([course], [250, 301])
 
 
-def test_bad_feature_list_schedule():
+def test_bad_feature_list_schedule(course: Course):
+    # value outside feature domain
     with pytest.raises(DomainError):
-        ScheduleItem([Course([250, 301, 611])], [101])
+        ScheduleItem([course], [101])
