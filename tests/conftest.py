@@ -1,5 +1,6 @@
 import pytest
 
+from agent.constraint import LinearConstraint
 from agent.feature import Course
 from agent.item import ScheduleItem
 
@@ -32,6 +33,13 @@ def schedule_item611(course: Course):
 @pytest.fixture
 def bundle(schedule_item250: ScheduleItem, schedule_item301: ScheduleItem):
     return [schedule_item250, schedule_item301]
+
+
+@pytest.fixture
+def linear_constraint(
+    course: Course, bundle: list[ScheduleItem], all_items: list[ScheduleItem]
+):
+    return LinearConstraint.from_lists([all_items], [2], course)
 
 
 @pytest.fixture
