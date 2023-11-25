@@ -24,9 +24,7 @@ class BaseItem:
         return f"{self.name}: {[feature for feature in self.features]}"
 
     def __hash__(self):
-        features_hash = sum([hash(feature) for feature in self.features])
-
-        return hash(self.name) + features_hash
+        return hash(self.name) ^ hash(tuple(self.features))
 
 
 class ScheduleItem(BaseItem):
