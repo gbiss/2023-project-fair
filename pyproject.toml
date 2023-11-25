@@ -30,4 +30,5 @@ dependencies = [
                 "scipy>=1.11.3",
                 "pytest>=7.4.3",
                 "black>=23.11.0",
+                "isort>=5.12.0",
                ]
