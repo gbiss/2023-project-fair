@@ -1,8 +1,8 @@
-from agent.constraint import indicator, LinearConstraint
+import numpy as np
+
+from agent.constraint import LinearConstraint, indicator
 from agent.feature import Course
 from agent.item import ScheduleItem
-import numpy as np
-from scipy.sparse import dok_array
 
 
 def test_indicator(course: Course, bundle: list[ScheduleItem]):
@@ -12,11 +12,8 @@ def test_indicator(course: Course, bundle: list[ScheduleItem]):
 
 
 def test_linear_constraint(
-    domain: list[int], course: Course, bundle: list[ScheduleItem]
+    course: Course, bundle: list[ScheduleItem], all_items: list[ScheduleItem]
 ):
-    A = dok_array((1, len(domain)), dtype=np.int_)
-    A = A + True
-    b = dok_array((1, 1), dtype=np.bool_)
-    b = b + True
+    constraint = LinearConstraint.from_lists([all_items], [1], course)
 
-    assert not LinearConstraint(A, b, course).satisfies(bundle)
+    assert not constraint.satisfies(bundle)

@@ -1,5 +1,6 @@
-from .feature import BaseFeature, DomainError, FeatureError
 from typing import Any, List
+
+from .feature import BaseFeature, DomainError, FeatureError
 
 
 class BaseItem:
@@ -30,7 +31,7 @@ class ScheduleItem(BaseItem):
 
         # validate cardinality
         if len(self.values) != len(self.features):
-            raise ValueError("values must correspond to features 1:1")
+            raise FeatureError("values must correspond to features 1:1")
 
         # validate domain
         for feature, value in zip(self.features, self.values):
