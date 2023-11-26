@@ -40,6 +40,7 @@ class LinearConstraint(BaseConstraint):
         return LinearConstraint(A, b, feature)
 
     def __init__(self, A: dok_array, b: dok_array, feature: BaseFeature):
+        self.constraint_ct = A.shape[0]
         self.A = A
         self.b = b
         self.feature = feature
