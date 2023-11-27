@@ -38,35 +38,7 @@ class MemoableValuation:
         self._value_memo[hashable_bundle]
 
 
-class MatroidValuation(MemoableValuation):
-    def __init__(self, constraints: List[BaseConstraint]):
-        super().__init__(constraints)
-        self._distortion = {}
-
-    def marginal(self, bundle: List[BaseItem]):
-        marginal = self._marginal(bundle)
-
-        if marginal > 0:
-            return marginal
-
-        # set bundle + e to 0 for all e in domain - bundle
-        hashable_bundle = tuple(sorted(bundle))
-        base_distortion = self._distortion[hashable_bundle]
-        bundle_values = {item.value for item in bundle}
-        for constraint in self.constraints:
-            domain_values = set(constraint.feature.domain)
-            for value in domain_values - bundle_values:
-                hashable_bundle = tuple(sorted(bundle + [value]))
-                self._marginal_memo[hashable_bundle] = 0
-                self._distortion[hashable_bundle] = base_distortion + 1
-
-        return self._marginal(bundle)
-
-    def distortion(self):
-        return max(self._distortion.values())
-
-
-class ConstraintSatifactionValuation(MatroidValuation):
+class ConstraintSatifactionValuation(MemoableValuation):
     def __init__(self, constraints: List[BaseConstraint]):
         super().__init__(constraints)
 
