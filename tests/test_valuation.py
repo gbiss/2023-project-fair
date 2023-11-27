@@ -8,4 +8,4 @@ def test_valid_constraint_valuation(
 ):
     valuation = ConstraintSatifactionValuation([linear_constraint])
 
-    assert valuation.marginal(bundle) == 1
+    assert valuation.independent(bundle) == 1

@@ -12,19 +12,19 @@ class BaseValuation:
 class MemoableValuation:
     def __init__(self, constraints: List[BaseConstraint]):
         self.constraints = constraints
-        self._marginal_memo = {}
+        self._independent_memo = {}
         self._value_memo = {}
 
-    def _marginal(self, bundle: List[BaseItem]):
+    def _independent(self, bundle: List[BaseItem]):
         raise NotImplementedError
 
-    def marginal(self, bundle: List[BaseItem]):
+    def independent(self, bundle: List[BaseItem]):
         hashable_bundle = tuple(sorted(bundle))
 
-        if hashable_bundle not in self._marginal_memo:
-            self._marginal_memo[hashable_bundle] = self._marginal(bundle)
+        if hashable_bundle not in self._independent_memo:
+            self._independent_memo[hashable_bundle] = self._independent(bundle)
 
-        return self._marginal_memo[hashable_bundle]
+        return self._independent_memo[hashable_bundle]
 
     def _value(self, bundle: List[BaseItem]):
         raise NotImplementedError
@@ -42,7 +42,7 @@ class ConstraintSatifactionValuation(MemoableValuation):
     def __init__(self, constraints: List[BaseConstraint]):
         super().__init__(constraints)
 
-    def _marginal(self, bundle: List[BaseItem]):
+    def _independent(self, bundle: List[BaseItem]):
         satisfies = True
         for constraint in self.constraints:
             satisfies *= constraint.satisfies(bundle)
@@ -53,6 +53,6 @@ class ConstraintSatifactionValuation(MemoableValuation):
         submarginal = 0
         for i in range(len(bundle)):
             subbundle = bundle[:i] + bundle[i + 1 :]
-            submarginal = max(submarginal, self.marginal(subbundle))
+            submarginal = max(submarginal, self.independent(subbundle))
 
         return submarginal
