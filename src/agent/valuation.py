@@ -35,7 +35,7 @@ class MemoableValuation:
         if hashable_bundle not in self._value_memo:
             self._value_memo[hashable_bundle] = self._value(bundle)
 
-        self._value_memo[hashable_bundle]
+        return self._value_memo[hashable_bundle]
 
 
 class ConstraintSatifactionValuation(MemoableValuation):
@@ -50,9 +50,9 @@ class ConstraintSatifactionValuation(MemoableValuation):
         return satisfies
 
     def _value(self, bundle: List[BaseItem]):
-        submarginal = 0
+        value = 0
         for i in range(len(bundle)):
             subbundle = bundle[:i] + bundle[i + 1 :]
-            submarginal = max(submarginal, self.independent(subbundle))
+            value = max(value, self.value(subbundle) + self.independent(subbundle))
 
-        return submarginal
+        return value
