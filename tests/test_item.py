@@ -21,10 +21,10 @@ def test_item_eq(course: Course):
 
 
 def test_good_schedule(
-    domain: list[int], course: Course, schedule_item250: ScheduleItem
+    course_domain: list[int], course: Course, schedule_item250: ScheduleItem
 ):
     assert schedule_item250.value(course) == 250
-    assert schedule_item250.index(course, 250) == domain.index(250)
+    assert schedule_item250.index(course, 250) == course_domain.index(250)
 
 
 def test_bad_feature_list_schedule(course: Course):
