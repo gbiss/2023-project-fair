@@ -57,9 +57,9 @@ def marginal_contribution(
 
 class BaseAgent:
     def __init__(self, valuation: BaseValuation):
-        self.valuation
+        self.valuation = valuation
 
-    def valuation(self, bundle: List[BaseItem]):
+    def value(self, bundle: List[BaseItem]):
         return self.valuation.value(bundle)
 
 
