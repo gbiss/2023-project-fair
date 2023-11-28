@@ -4,8 +4,20 @@ from agent.feature import Course
 from agent.item import DomainError, FeatureError, ScheduleItem
 
 
-def item_hash(schedule_item250):
+def test_item_hash(schedule_item250: ScheduleItem):
     hash(schedule_item250)
+
+
+def test_item_lt(schedule_item250: ScheduleItem, schedule_item301: ScheduleItem):
+    h250 = hash(schedule_item250)
+    h301 = hash(schedule_item301)
+    assert (schedule_item250 < schedule_item301) == (h250 < h301)
+
+
+def test_item_eq(course: Course):
+    sch1 = ScheduleItem([course], [250])
+    sch2 = ScheduleItem([course], [250])
+    assert sch1 == sch2
 
 
 def test_good_schedule(
