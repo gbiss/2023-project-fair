@@ -14,7 +14,6 @@ def exchange_contribution(
     Determine whether the agent can exchange original_item for new_item and keep the same utility
     """
     og_val = valuation.value(bundle)
-    print("og_value", og_val)
 
     for i in range(len(bundle)):
         if bundle[i] == new_item:
@@ -33,7 +32,6 @@ def exchange_contribution(
     T0.append(new_item)
 
     new_val = valuation.value(T0)
-    print("new_val", new_val)
     if og_item == new_item:
         return False
     if og_val == new_val:
