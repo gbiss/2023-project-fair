@@ -21,3 +21,13 @@ class BaseFeature:
 class Course(BaseFeature):
     def __init__(self, domain):
         super().__init__("course", domain)
+
+
+class Slot(BaseFeature):
+    def __init__(self, domain):
+        super().__init__("slot", domain)
+
+
+class Section(BaseFeature):
+    def __init__(self, domain):
+        super().__init__("section", domain)
