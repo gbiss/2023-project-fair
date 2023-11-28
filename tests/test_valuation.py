@@ -4,9 +4,9 @@ from agent.valuation import ConstraintSatifactionValuation
 
 
 def test_valid_constraint_valuation(
-    bundle: list[ScheduleItem], linear_constraint: LinearConstraint
+    bundle_250_301: list[ScheduleItem], linear_constraint: LinearConstraint
 ):
     valuation = ConstraintSatifactionValuation([linear_constraint])
 
-    assert valuation.independent(bundle) == 1
-    assert valuation.value(bundle) == 2
+    assert valuation.independent(bundle_250_301) == 1
+    assert valuation.value(bundle_250_301) == 2

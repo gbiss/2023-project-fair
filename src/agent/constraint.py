@@ -22,19 +22,22 @@ class BaseConstraint:
 class LinearConstraint(BaseConstraint):
     @staticmethod
     def from_lists(
-        items: List[List[BaseItem]], limits: List[int], feature: BaseFeature
+        constraints: List[List[BaseItem]], limits: List[int], feature: BaseFeature
     ):
-        if len(items) != len(limits):
+        if len(constraints) != len(limits):
             raise IndexError("item and limit lists must have the same length")
 
-        item_ct = len(items)
+        constraint_ct = len(constraints)
         domain = feature.domain
-        A = dok_array((item_ct, len(domain)), dtype=np.int_)
-        b = dok_array((item_ct, 1), dtype=np.int_)
+        A = dok_array((constraint_ct, len(domain)), dtype=np.int_)
+        b = dok_array((constraint_ct, 1), dtype=np.int_)
 
-        for i in range(item_ct):
-            for j in range(len(domain)):
-                A[i, items[i][j].index(feature, items[i][j].value(feature))] = 1
+        for i in range(constraint_ct):
+            for j in range(len(constraints[i])):
+                A[
+                    i,
+                    constraints[i][j].index(feature, constraints[i][j].value(feature)),
+                ] = 1
             b[i, 0] = limits[i]
 
         return LinearConstraint(A, b, feature)
