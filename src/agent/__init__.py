@@ -61,3 +61,8 @@ class BaseAgent:
 
     def valuation(self, bundle: List[BaseItem]):
         return self.valuation.value(bundle)
+
+
+class Student(BaseAgent):
+    def __init__(self, valuation: BaseValuation):
+        super().__init__(valuation)
