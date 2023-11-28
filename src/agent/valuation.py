@@ -50,9 +50,12 @@ class ConstraintSatifactionValuation(MemoableValuation):
         return satisfies
 
     def _value(self, bundle: List[BaseItem]):
+        if self.independent(bundle):
+            return len(bundle)
+
         value = 0
         for i in range(len(bundle)):
             subbundle = bundle[:i] + bundle[i + 1 :]
-            value = max(value, self.value(subbundle) + self.independent(subbundle))
+            value = max(value, self.value(subbundle))
 
         return value

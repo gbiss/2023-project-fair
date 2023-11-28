@@ -65,7 +65,5 @@ def all_items(
 
 
 @pytest.fixture
-def course_valuation(
-    linear_constraint_250_301: LinearConstraint, all_items: list[ScheduleItem]
-):
+def course_valuation(linear_constraint_250_301: LinearConstraint):
     return ConstraintSatifactionValuation([linear_constraint_250_301])
