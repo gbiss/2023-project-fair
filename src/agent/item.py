@@ -21,10 +21,12 @@ class BaseItem:
             raise DomainError(f"invalid value '{value}' for feature '{feature}'")
 
     def __repr__(self):
-        return f"{self.name}: {[feature for feature in self.features]}"
+        return f"{self.name}: {[self.value(feature) for feature in self.features]}"
 
     def __hash__(self):
-        return hash(self.name) ^ hash(tuple(self.features))
+        return hash(self.name) ^ hash(
+            tuple([self.value(feature) for feature in self.features])
+        )
 
     def __lt__(self, other):
         return self.__hash__() < hash(other)
