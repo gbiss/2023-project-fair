@@ -59,3 +59,8 @@ class ConstraintSatifactionValuation(MemoableValuation):
             value = max(value, self.value(subbundle))
 
         return value
+
+
+class StudentValuation(ConstraintSatifactionValuation):
+    def __init__(self, constraints: List[BaseConstraint]):
+        super().__init__(constraints)
