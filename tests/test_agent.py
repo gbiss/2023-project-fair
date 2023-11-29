@@ -35,16 +35,16 @@ def test_marginal_contribution(
 
 
 def test_student():
-    course = Course([250, 301, 611])
+    course = Course(["250", "301", "611"])
     time = Slot(["10am", "12pm", "2pm"])
     section = Section([1, 2, 3])
     features = [course, time, section]
     items = [
-        ScheduleItem(features, [250, "10am", 1]),
-        ScheduleItem(features, [250, "12pm", 2]),
-        ScheduleItem(features, [301, "12pm", 1]),
-        ScheduleItem(features, [301, "2pm", 2]),
-        ScheduleItem(features, [611, "2pm", 1]),
+        ScheduleItem(features, ["250", "10am", 1]),
+        ScheduleItem(features, ["250", "12pm", 2]),
+        ScheduleItem(features, ["301", "12pm", 1]),
+        ScheduleItem(features, ["301", "2pm", 2]),
+        ScheduleItem(features, ["611", "2pm", 1]),
     ]
     preferred_constr = CoursePreferrenceConstraint.from_lists(
         [[items[0], items[2], items[4]]], [2], course

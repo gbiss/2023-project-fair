@@ -8,7 +8,7 @@ from agent.valuation import ConstraintSatifactionValuation
 
 @pytest.fixture
 def course_domain():
-    return [250, 301, 611]
+    return ["250", "301", "611"]
 
 
 @pytest.fixture
@@ -23,17 +23,17 @@ def slot():
 
 @pytest.fixture
 def schedule_item250(course: Course, slot: Slot):
-    return ScheduleItem([course, slot], [250, "10am"])
+    return ScheduleItem([course, slot], ["250", "10am"])
 
 
 @pytest.fixture
 def schedule_item301(course: Course, slot: Slot):
-    return ScheduleItem([course, slot], [301, "10am"])
+    return ScheduleItem([course, slot], ["301", "10am"])
 
 
 @pytest.fixture
 def schedule_item611(course: Course, slot: Slot):
-    return ScheduleItem([course, slot], [611, "12pm"])
+    return ScheduleItem([course, slot], ["611", "12pm"])
 
 
 @pytest.fixture
