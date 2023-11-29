@@ -58,4 +58,8 @@
 		   }
 	 },
 	 "isort.args": ["--profile", "black"],
+	 "autoDocstring.docstringFormat": "google",
+	 "autoDocstring.generateDocstringOnEnter": true,
+	 "autoDocstring.includeExtendedSummary": true,
+	 "autoDocstring.guessTypes": true,
 }

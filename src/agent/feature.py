@@ -7,7 +7,14 @@ class FeatureError(Exception):
 
 
 class BaseFeature:
+    """A named, typed, and ordered space"""
+
     def __init__(self, name: str, domain: list):
+        """
+        Args:
+            name (str): Feature name
+            domain (list): Exhaustive, ordered list of possible feature values
+        """
         self.name = name
         self.domain = domain
 
@@ -19,15 +26,33 @@ class BaseFeature:
 
 
 class Course(BaseFeature):
+    """Ordered space of courses"""
+
     def __init__(self, domain):
+        """
+        Args:
+            domain (_type_): Exhaustive, ordered list of possible feature values
+        """
         super().__init__("course", domain)
 
 
 class Slot(BaseFeature):
+    """Ordered space of time slots"""
+
     def __init__(self, domain):
+        """
+        Args:
+            domain (_type_): Exhaustive, ordered list of possible feature values
+        """
         super().__init__("slot", domain)
 
 
 class Section(BaseFeature):
+    """Ordered space of course sections"""
+
     def __init__(self, domain):
+        """
+        Args:
+            domain (_type_): Exhaustive, ordered list of possible feature values
+        """
         super().__init__("section", domain)
