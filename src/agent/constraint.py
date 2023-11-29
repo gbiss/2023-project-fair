@@ -3,7 +3,7 @@ from typing import List
 import numpy as np
 from scipy.sparse import dok_array
 
-from .feature import BaseFeature, Course, Slot
+from .feature import BaseFeature, Course, Section, Slot
 from .item import BaseItem, ScheduleItem
 
 
@@ -80,3 +80,22 @@ class CourseTimeConstraint(LinearConstraint):
             b[i, 0] = 1
 
         return LinearConstraint(A, b, [course, slot])
+
+
+class CourseSectionConstraint(LinearConstraint):
+    @staticmethod
+    def one_section_per_course(
+        items: List[ScheduleItem], course: Course, section: Section
+    ):
+        rows = len(course.domain)
+        cols = len(course.domain) * len(section.domain)
+        A = dok_array((rows, cols), dtype=np.int_)
+        b = dok_array((rows, 1), dtype=np.int_)
+
+        for i, crs in enumerate(course.domain):
+            items_for_course = [item for item in items if item.value(course) == crs]
+            for item in items_for_course:
+                A[i, item.index([course, section])] = 1
+            b[i, 0] = 1
+
+        return LinearConstraint(A, b, [course, section])
