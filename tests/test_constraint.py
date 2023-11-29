@@ -43,5 +43,5 @@ def test_time_constraint(
 ):
     constraint = CourseTimeConstraint.mutually_exclusive_slots(all_items, course, slot)
 
-    # assert not constraint.satisfies(bundle_250_301)
+    assert not constraint.satisfies(bundle_250_301)
     assert constraint.satisfies(bundle_301_611)
