@@ -2,10 +2,11 @@ import numpy as np
 
 from agent.constraint import (
     CoursePreferrenceConstraint,
+    CourseSectionConstraint,
     CourseTimeConstraint,
     indicator,
 )
-from agent.feature import Course, Slot
+from agent.feature import Course, Section, Slot
 from agent.item import ScheduleItem
 
 
@@ -45,3 +46,18 @@ def test_time_constraint(
 
     assert not constraint.satisfies(bundle_250_301)
     assert constraint.satisfies(bundle_301_611)
+
+
+def test_section_constraint(
+    items_repeat_section: list[ScheduleItem],
+    bundle_250_301: list[ScheduleItem],
+    bundle_250_250_2: list[ScheduleItem],
+    course: Course,
+    section: Section,
+):
+    constraint = CourseSectionConstraint.one_section_per_course(
+        items_repeat_section, course, section
+    )
+
+    assert constraint.satisfies(bundle_250_301)
+    assert not constraint.satisfies(bundle_250_250_2)
