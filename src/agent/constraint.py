@@ -67,7 +67,6 @@ class CoursePreferrenceConstraint(LinearConstraint):
 class CourseTimeConstraint(LinearConstraint):
     @staticmethod
     def mutually_exclusive_slots(items: List[ScheduleItem], course: Course, slot: Slot):
-        domain = slot.domain
         rows = len(slot.domain)
         cols = len(course.domain) * len(slot.domain)
         A = dok_array((rows, cols), dtype=np.int_)
