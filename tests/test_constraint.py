@@ -18,7 +18,9 @@ def test_indicator(course: Course, bundle_250_301: list[ScheduleItem]):
 def test_linear_constraint(
     course: Course, bundle_250_301: list[ScheduleItem], all_items: list[ScheduleItem]
 ):
-    constraint = CoursePreferrenceConstraint.from_lists([all_items], [1], course)
+    constraint = CoursePreferrenceConstraint.from_course_lists(
+        [["250", "301", "611"]], [1], course
+    )
 
     assert not constraint.satisfies(bundle_250_301)
 

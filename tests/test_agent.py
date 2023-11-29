@@ -46,8 +46,8 @@ def test_student():
         ScheduleItem(features, ["301", "2pm", 2]),
         ScheduleItem(features, ["611", "2pm", 1]),
     ]
-    preferred_constr = CoursePreferrenceConstraint.from_lists(
-        [[items[0], items[2], items[4]]], [2], course
+    preferred_constr = CoursePreferrenceConstraint.from_course_lists(
+        [["250", "301", "611"]], [2], course
     )
     course_time_constr = CourseTimeConstraint.mutually_exclusive_slots(
         items, course, time

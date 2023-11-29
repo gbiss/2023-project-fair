@@ -50,14 +50,16 @@ def bundle_301_611(schedule_item301: ScheduleItem, schedule_item611: ScheduleIte
 def linear_constraint(
     course: Course, bundle_250_301: list[ScheduleItem], all_items: list[ScheduleItem]
 ):
-    return CoursePreferrenceConstraint.from_lists([all_items], [2], course)
+    return CoursePreferrenceConstraint.from_course_lists(
+        [["250", "301", "611"]], [2], course
+    )
 
 
 @pytest.fixture
 def linear_constraint_250_301(
     course: Course, bundle_250_301: list[ScheduleItem], all_items: list[ScheduleItem]
 ):
-    return CoursePreferrenceConstraint.from_lists([all_items[:-1]], [1], course)
+    return CoursePreferrenceConstraint.from_course_lists([["250", "301"]], [1], course)
 
 
 @pytest.fixture

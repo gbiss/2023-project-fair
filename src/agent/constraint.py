@@ -52,22 +52,22 @@ class LinearConstraint(BaseConstraint):
 
 class CoursePreferrenceConstraint(LinearConstraint):
     @staticmethod
-    def from_lists(
-        constraints: List[List[ScheduleItem]], limits: List[int], course: Course
+    def from_course_lists(
+        preferred_courses: List[List[str]], limits: List[int], course: Course
     ):
-        if len(constraints) != len(limits):
+        if len(preferred_courses) != len(limits):
             raise IndexError("item and limit lists must have the same length")
 
-        constraint_ct = len(constraints)
+        constraint_ct = len(preferred_courses)
         domain = course.domain
         A = dok_array((constraint_ct, len(domain)), dtype=np.int_)
         b = dok_array((constraint_ct, 1), dtype=np.int_)
 
         for i in range(constraint_ct):
-            for j in range(len(constraints[i])):
+            for j in range(len(preferred_courses[i])):
                 A[
                     i,
-                    constraints[i][j].index(course, constraints[i][j].value(course)),
+                    domain.index(preferred_courses[i][j]),
                 ] = 1
             b[i, 0] = limits[i]
 
