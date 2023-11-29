@@ -7,21 +7,11 @@ from .feature import BaseFeature, Course, Slot
 from .item import BaseItem, ScheduleItem
 
 
-def index_for_item(item: BaseItem, features: List[BaseFeature]):
-    mult = 1
-    idx = 0
-    for feature in features:
-        idx += feature.domain.index(item.value(feature)) * mult
-        mult *= len(feature.domain)
-
-    return idx
-
-
 def indicator(features: List[BaseFeature], bundle: List[BaseItem]):
     rows = np.prod([len(feature.domain) for feature in features])
     ind = dok_array((rows, 1), dtype=np.int_)
     for item in bundle:
-        ind[index_for_item(item, features), 0] = True
+        ind[item.index(features), 0] = True
 
     return ind
 
@@ -86,7 +76,7 @@ class CourseTimeConstraint(LinearConstraint):
         for i, slt in enumerate(slot.domain):
             items_in_slot = [item for item in items if item.value(slot) == slt]
             for item in items_in_slot:
-                A[i, index_for_item(item, [course, slot])] = 1
+                A[i, item.index([course, slot])] = 1
             b[i, 0] = 1
 
         return LinearConstraint(A, b, [course, slot])

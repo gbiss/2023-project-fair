@@ -14,11 +14,17 @@ class BaseItem:
         except IndexError:
             raise FeatureError("feature unknown for this item")
 
-    def index(self, feature: BaseFeature, value: Any):
-        try:
-            return feature.domain.index(value)
-        except IndexError:
-            raise DomainError(f"invalid value '{value}' for feature '{feature}'")
+    def index(self, features: List[BaseFeature] = None):
+        features = self.features if features is None else features
+        mult = 1
+        idx = 0
+        for feature in features:
+            if feature not in self.features:
+                raise FeatureError(f"feature {feature} not valid for {self}")
+            idx += feature.domain.index(self.value(feature)) * mult
+            mult *= len(feature.domain)
+
+        return idx
 
     def __repr__(self):
         return f"{self.name}: {[self.value(feature) for feature in self.features]}"
