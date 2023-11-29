@@ -39,9 +39,6 @@ class LinearConstraint(BaseConstraint):
     def satisfies(self, bundle: List[BaseItem]):
         ind = indicator(self.features, bundle)
         product = self.A @ ind
-        print("A", self.A)
-        print("B", self.b)
-        print("ind", ind)
 
         # apparently <= is much less efficient than using < and != separately
         less_than = np.prod((product < self.b).toarray().flatten())
