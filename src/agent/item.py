@@ -6,14 +6,28 @@ from .feature import BaseFeature, DomainError, FeatureError
 class BaseItem:
     """Item defined over multiple features"""
 
-    def __init__(self, name: str, features: List[BaseFeature]):
+    def __init__(self, name: str, features: List[BaseFeature], values: List[Any]):
         """
         Args:
-            name (str): Item name
             features (List[BaseFeature]): Features revelvant for this item
+            values (List[Any]): Value of each feature from its domain
+
+        Raises:
+            FeatureError: Values and features must correspond 1:1
+            DomainError: Features can only take values from their domain
         """
         self.name = name
         self.features = features
+        self.values = values
+
+        # validate cardinality
+        if len(self.values) != len(self.features):
+            raise FeatureError("values must correspond to features 1:1")
+
+        # validate domain
+        for feature, value in zip(self.features, self.values):
+            if value not in feature.domain:
+                raise DomainError(f"invalid value for feature '{feature}'")
 
     def value(self, feature: BaseFeature):
         """Value associated with a given feature
@@ -77,23 +91,4 @@ class ScheduleItem(BaseItem):
     """An item representing a class in a schedule"""
 
     def __init__(self, features: List[BaseFeature], values: List[Any]):
-        """
-        Args:
-            features (List[BaseFeature]): Features revelvant for this item
-            values (List[Any]): Value of each feature from its domain
-
-        Raises:
-            FeatureError: Values and features must correspond 1:1
-            DomainError: Features can only take values from their domain
-        """
-        super().__init__("schedule", features)
-        self.values = values
-
-        # validate cardinality
-        if len(self.values) != len(self.features):
-            raise FeatureError("values must correspond to features 1:1")
-
-        # validate domain
-        for feature, value in zip(self.features, self.values):
-            if value not in feature.domain:
-                raise DomainError(f"invalid value for feature '{feature}'")
+        super().__init__("schedule", features, values)
