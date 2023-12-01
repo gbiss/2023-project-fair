@@ -10,8 +10,19 @@ def exchange_contribution(
     og_item: BaseItem,
     new_item: BaseItem,
 ):
-    """
+    """Check for improvement in utility
+
     Determine whether the agent can exchange original_item for new_item and keep the same utility
+
+
+    Args:
+        valuation (BaseValuation): Valuation object to be used for comparison
+        bundle (List[BaseItem]): Original set of items
+        og_item (BaseItem): Item to be removed
+        new_item (BaseItem): Item to be added
+
+    Returns:
+        bool: True if utility can be improved; False otherwise
     """
     og_val = valuation.value(bundle)
 
@@ -43,10 +54,19 @@ def exchange_contribution(
 def marginal_contribution(
     valuation: BaseValuation, bundle: List[BaseItem], item: BaseItem
 ):
-    """
-    Compute the marginal utility the agent gets form adding a particular item to a particular bundle of items
-    """
+    """Marginal change in utility
 
+    Compute the marginal utility the agent gets form adding a particular item to a particular bundle of items
+
+
+    Args:
+        valuation (BaseValuation): Valuation object to be used for computing utility
+        bundle (List[BaseItem]): Initial set of items
+        item (BaseItem): Item to be added
+
+    Returns:
+        Any: Change in value
+    """
     T = bundle.copy()
     current_val = valuation.value(T)
     T.append(item)
@@ -56,13 +76,29 @@ def marginal_contribution(
 
 
 class BaseAgent:
+    """A wrapper class for apply a valuation to bundles of items"""
+
     def __init__(self, valuation: BaseValuation):
+        """
+        Args:
+            valuation (BaseValuation): Valuation object to apply to bundles
+        """
         self.valuation = valuation
 
     def value(self, bundle: List[BaseItem]):
+        """Apply valuation to bundle
+
+        Args:
+            bundle (List[BaseItem]): Items to evaluate
+
+        Returns:
+            Any: Value of bundle
+        """
         return self.valuation.value(bundle)
 
 
 class Student(BaseAgent):
+    """A student agent
+    """
     def __init__(self, valuation: BaseValuation):
         super().__init__(valuation)
