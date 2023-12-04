@@ -98,7 +98,42 @@ class BaseAgent:
 
 
 class Student(BaseAgent):
-    """A student agent
-    """
+    """A student agent"""
+
     def __init__(self, valuation: BaseValuation):
         super().__init__(valuation)
+
+
+class LegacyStudent:
+    """A student compatible with https://github.com/cheerstopaula/Allocation"""
+
+    def __init__(self, valuation: BaseValuation):
+        self.agent = Student(valuation)
+
+    def valuation(self, bundle: List[BaseItem]):
+        """Delegate to value function
+        Args:
+            bundle (List[BaseItem]): Items to evaluate
+        """
+        return self.agent.value(bundle)
+
+    def marginal_contribution(self, bundle: List[BaseItem], item: BaseItem):
+        """Delegate to marginal_contribution function
+
+        Args:
+            bundle (List[BaseItem]): Initial set of items
+            item (BaseItem): Item to be added
+        """
+        return marginal_contribution(self.agent.valuation, bundle, item)
+
+    def exchange_contribution(
+        self, bundle: List[BaseItem], og_item: BaseItem, new_item: BaseItem
+    ):
+        """Delegate to exchange_contribution function
+
+        Args:
+            bundle (List[BaseItem]): Initial set of items
+            og_item (BaseItem): Item to be removed
+            new_item (BaseItem): Item to be added
+        """
+        exchange_contribution(self.agent.valuation, bundle, og_item, new_item)

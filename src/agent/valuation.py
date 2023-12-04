@@ -6,7 +6,11 @@ from .constraint import BaseConstraint
 
 
 class BaseValuation:
-    pass
+    def independent(self, bundle: List[BaseItem]):
+        raise NotImplemented
+
+    def value(self, bundle: List[BaseItem]):
+        raise NotImplemented
 
 
 class MemoableValuation:

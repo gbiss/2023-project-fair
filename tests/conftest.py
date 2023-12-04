@@ -99,3 +99,16 @@ def items_repeat_section(
 @pytest.fixture
 def course_valuation(linear_constraint_250_301: CoursePreferrenceConstraint):
     return ConstraintSatifactionValuation([linear_constraint_250_301])
+
+
+@pytest.fixture
+def schedule(course: Course, slot: Slot, section: Section):
+    features = [course, slot, section]
+    items = [
+        ScheduleItem(features, ["250", "10am", 1]),
+        ScheduleItem(features, ["250", "12pm", 2]),
+        ScheduleItem(features, ["301", "12pm", 1]),
+        ScheduleItem(features, ["301", "2pm", 2]),
+        ScheduleItem(features, ["611", "2pm", 1]),
+    ]
+    return items
