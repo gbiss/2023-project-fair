@@ -6,11 +6,18 @@ from .feature import BaseFeature, DomainError, FeatureError
 class BaseItem:
     """Item defined over multiple features"""
 
-    def __init__(self, name: str, features: List[BaseFeature], values: List[Any]):
+    def __init__(
+        self,
+        name: str,
+        features: List[BaseFeature],
+        values: List[Any],
+        capacity: int = 1,
+    ):
         """
         Args:
             features (List[BaseFeature]): Features revelvant for this item
             values (List[Any]): Value of each feature from its domain
+            capacity (int): Number of times item can be allocated
 
         Raises:
             FeatureError: Values and features must correspond 1:1
@@ -19,6 +26,7 @@ class BaseItem:
         self.name = name
         self.features = features
         self.values = values
+        self.capacity = capacity
 
         # validate cardinality
         if len(self.values) != len(self.features):
