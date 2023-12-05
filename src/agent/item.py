@@ -122,7 +122,11 @@ class ScheduleItem(BaseItem):
         """
         with open(path, "rb") as fd:
             df = pd.read_excel(fd)
-        df = df[["Catalog", "Section", "Mtg Time", "CICScapacity"]].dropna()
+        df = df[
+            df.columns.intersection(
+                ["Catalog", "Section", "Mtg Time", "CICScapacity", "Categories"]
+            )
+        ].dropna()
 
         course = Course(df["Catalog"].unique())
         section = Section(df["Section"].unique())
@@ -137,13 +141,33 @@ class ScheduleItem(BaseItem):
                 slots_for_time_range(row["Mtg Time"], time_slots),
             ]
             try:
-                items.append(ScheduleItem(features, values, int(row["CICScapacity"])))
+                items.append(
+                    ScheduleItem(
+                        features,
+                        values,
+                        int(row["CICScapacity"]),
+                        row["Categories"] if "Categories" in df else None,
+                    )
+                )
             except DomainError:
                 pass
 
         return items
 
     def __init__(
-        self, features: List[BaseFeature], values: List[Any], capacity: int = 1
+        self,
+        features: List[BaseFeature],
+        values: List[Any],
+        capacity: int = 1,
+        category: str = None,
     ):
+        """An Item appropriate for course scheduling
+
+        Args:
+            features (List[BaseFeature]): Features revelvant for this item
+            values (List[Any]): Value of each feature from its domain
+            capacity (int): Number of times item can be allocated. Defaults to 1.
+            category (str, optional): Topic for course. Defaults to None.
+        """
         super().__init__("schedule", features, values, capacity)
+        self.category = category

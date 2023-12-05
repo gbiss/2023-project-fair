@@ -121,3 +121,10 @@ def excel_schedule_path():
     return os.path.join(
         os.path.dirname(__file__), "../resources/fall2023schedule-2.xlsx"
     )
+
+
+@pytest.fixture
+def excel_schedule_path_with_cats():
+    return os.path.join(
+        os.path.dirname(__file__), "../resources/fall2023schedule-2-cat.xlsx"
+    )

@@ -39,5 +39,7 @@ def test_bad_value_schedule(course: Course):
         ScheduleItem([course], ["101"])
 
 
-def test_schedule_excel_import(excel_schedule_path: str):
-    schedule_items = ScheduleItem.parse_excel(excel_schedule_path)
+def test_schedule_excel_import(excel_schedule_path_with_cats: str):
+    schedule_items = ScheduleItem.parse_excel(excel_schedule_path_with_cats)
+
+    assert None not in [sched.category for sched in schedule_items]
