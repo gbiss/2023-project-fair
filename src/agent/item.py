@@ -1,6 +1,8 @@
 from typing import Any, List
 
-from .feature import BaseFeature, DomainError, FeatureError
+import pandas as pd
+
+from .feature import BaseFeature, Course, DomainError, FeatureError, Section, Slot
 
 
 class BaseItem:
@@ -98,5 +100,34 @@ class BaseItem:
 class ScheduleItem(BaseItem):
     """An item representing a class in a schedule"""
 
-    def __init__(self, features: List[BaseFeature], values: List[Any]):
-        super().__init__("schedule", features, values)
+    @staticmethod
+    def parse_excel(path: str):
+        """Read and parse schedule items from excel file
+
+        Args:
+            path (str): Full path to excel file
+
+        Returns:
+            List[ScheduleItem]: All items that could be extracted from excel file
+        """
+        with open(path, "rb") as fd:
+            df = pd.read_excel(fd)
+
+        course = Course(df["Catalog"].unique())
+        section = Section(df["Section"].unique())
+        time = Slot(df["Mtg Time"].unique())
+        features = [course, section, time]
+        items = []
+        for _, row in df.iterrows():
+            values = [row["Catalog"], row["Section"], row["Mtg Time"]]
+            try:
+                items.append(ScheduleItem(features, values, int(row["CICScapacity"])))
+            except DomainError:
+                pass
+
+        return items
+
+    def __init__(
+        self, features: List[BaseFeature], values: List[Any], capacity: int = 1
+    ):
+        super().__init__("schedule", features, values, capacity)

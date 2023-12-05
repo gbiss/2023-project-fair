@@ -1,3 +1,5 @@
+import os
+
 import pytest
 
 from agent.constraint import CoursePreferrenceConstraint
@@ -112,3 +114,10 @@ def schedule(course: Course, slot: Slot, section: Section):
         ScheduleItem(features, ["611", "2pm", 1]),
     ]
     return items
+
+
+@pytest.fixture
+def excel_schedule_path():
+    return os.path.join(
+        os.path.dirname(__file__), "../resources/fall2023schedule-2.xlsx"
+    )
