@@ -60,10 +60,10 @@ class LinearConstraint(BaseConstraint):
         product = self.A @ ind
 
         # apparently <= is much less efficient than using < and != separately
-        less_than = np.prod((product < self.b).toarray().flatten())
-        equal_to = not np.prod((product != self.b).toarray().flatten())
+        less_than = (product < self.b).toarray().flatten()
+        equal_to = ~(product != self.b).toarray().flatten()
 
-        return less_than or equal_to
+        return np.prod([lt or eq for lt, eq in zip(less_than, equal_to)])
 
 
 class CoursePreferrenceConstraint(LinearConstraint):
@@ -119,19 +119,19 @@ class CourseTimeConstraint(LinearConstraint):
         Args:
             items (List[ScheduleItem]): Possibly time-conflicting items
             course (Course): Feature for course
-            slot (Slot): feature for time slots
+            slot (Slot): Feature for time slots
 
         Returns:
             CourseTimeConstraint: A: (time slots x course domain), b: (time slots x 1)
         """
-        rows = len(slot.domain)
+        rows = len(slot.times)
         cols = len(course.domain) * len(slot.domain)
         A = dok_array((rows, cols), dtype=np.int_)
         b = dok_array((rows, 1), dtype=np.int_)
 
-        for i, slt in enumerate(slot.domain):
-            items_in_slot = [item for item in items if item.value(slot) == slt]
-            for item in items_in_slot:
+        for i, tm in enumerate(slot.times):
+            items_at_time = [item for item in items if tm in item.value(slot)]
+            for item in items_at_time:
                 A[i, item.index([course, slot])] = 1
             b[i, 0] = 1
 

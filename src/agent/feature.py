@@ -1,5 +1,5 @@
 import datetime
-from typing import Any, List
+from typing import Any, List, Tuple
 
 import pandas as pd
 
@@ -118,14 +118,16 @@ class Slot(BaseFeature):
             item_slots = slots_for_time_range(rng, time_slots)
             domain.append(item_slots)
 
-        return Slot(domain)
+        return Slot(time_slots, domain)
 
-    def __init__(self, domain):
+    def __init__(self, times: List[datetime.time], domain: List[Tuple[datetime.time]]):
         """
         Args:
-            domain (_type_): Exhaustive, ordered list of possible feature values
+            times (List[datetime.time]): All valid time slots
+            domain (List[Tuple[datetime.time]]): Exhaustive, ordered list of all possible time slots ranges
         """
         super().__init__("slot", domain)
+        self.times = times
 
 
 class Section(BaseFeature):

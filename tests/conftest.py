@@ -20,7 +20,7 @@ def course(course_domain: list[int]):
 
 @pytest.fixture
 def slot():
-    return Slot(["10am", "12pm", "2pm"])
+    return Slot([1, 2, 3, 4, 5, 6, 7], [(1, 2), (2, 3), (4, 5), (6, 7)])
 
 
 @pytest.fixture
@@ -30,22 +30,22 @@ def section():
 
 @pytest.fixture
 def schedule_item250(course: Course, slot: Slot, section: Section):
-    return ScheduleItem([course, slot, section], ["250", "10am", 1])
+    return ScheduleItem([course, slot, section], ["250", (1, 2), 1])
 
 
 @pytest.fixture
 def schedule_item250_2(course: Course, slot: Slot, section: Section):
-    return ScheduleItem([course, slot, section], ["250", "12pm", 2])
+    return ScheduleItem([course, slot, section], ["250", (4, 5), 2])
 
 
 @pytest.fixture
 def schedule_item301(course: Course, slot: Slot, section: Section):
-    return ScheduleItem([course, slot, section], ["301", "10am", 1])
+    return ScheduleItem([course, slot, section], ["301", (2, 3), 1])
 
 
 @pytest.fixture
 def schedule_item611(course: Course, slot: Slot, section: Section):
-    return ScheduleItem([course, slot, section], ["611", "12pm", 1])
+    return ScheduleItem([course, slot, section], ["611", (4, 5), 1])
 
 
 @pytest.fixture
@@ -107,11 +107,11 @@ def course_valuation(linear_constraint_250_301: CoursePreferrenceConstraint):
 def schedule(course: Course, slot: Slot, section: Section):
     features = [course, slot, section]
     items = [
-        ScheduleItem(features, ["250", "10am", 1]),
-        ScheduleItem(features, ["250", "12pm", 2]),
-        ScheduleItem(features, ["301", "12pm", 1]),
-        ScheduleItem(features, ["301", "2pm", 2]),
-        ScheduleItem(features, ["611", "2pm", 1]),
+        ScheduleItem(features, ["250", (1, 2), 1]),
+        ScheduleItem(features, ["250", (4, 5), 2]),
+        ScheduleItem(features, ["301", (4, 5), 1]),
+        ScheduleItem(features, ["301", (6, 7), 2]),
+        ScheduleItem(features, ["611", (6, 7), 1]),
     ]
     return items
 
