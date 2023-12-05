@@ -1,8 +1,18 @@
 from typing import Any, List
 
+import numpy as np
 import pandas as pd
 
-from .feature import BaseFeature, Course, DomainError, FeatureError, Section, Slot
+from .feature import (
+    BaseFeature,
+    Course,
+    DomainError,
+    FeatureError,
+    Section,
+    Slot,
+    slot_list,
+    slots_for_time_range,
+)
 
 
 class BaseItem:
@@ -101,7 +111,7 @@ class ScheduleItem(BaseItem):
     """An item representing a class in a schedule"""
 
     @staticmethod
-    def parse_excel(path: str):
+    def parse_excel(path: str, frequency: str = "15T"):
         """Read and parse schedule items from excel file
 
         Args:
@@ -112,14 +122,20 @@ class ScheduleItem(BaseItem):
         """
         with open(path, "rb") as fd:
             df = pd.read_excel(fd)
+        df = df[["Catalog", "Section", "Mtg Time", "CICScapacity"]].dropna()
 
         course = Course(df["Catalog"].unique())
         section = Section(df["Section"].unique())
-        time = Slot(df["Mtg Time"].unique())
-        features = [course, section, time]
+        time_slots = slot_list(frequency)
+        slot = Slot.from_time_ranges(df["Mtg Time"].unique(), "15T")
+        features = [course, section, slot]
         items = []
         for _, row in df.iterrows():
-            values = [row["Catalog"], row["Section"], row["Mtg Time"]]
+            values = [
+                row["Catalog"],
+                row["Section"],
+                slots_for_time_range(row["Mtg Time"], time_slots),
+            ]
             try:
                 items.append(ScheduleItem(features, values, int(row["CICScapacity"])))
             except DomainError:

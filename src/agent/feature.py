@@ -1,3 +1,9 @@
+import datetime
+from typing import List
+
+import pandas as pd
+
+
 class DomainError(Exception):
     pass
 
@@ -36,8 +42,80 @@ class Course(BaseFeature):
         super().__init__("course", domain)
 
 
+def parse_time_range(time_range: str):
+    """Converts a time range string into two datetime objects
+
+    Args:
+        time_range (str): A string of the form "%H:%M - %H:%M"
+
+    Returns:
+        List[pd.Timestamp]: Lower and upper timestamps in range
+    """
+    left, right = time_range.split("-")
+
+    return [pd.to_datetime(left.strip()).time(), pd.to_datetime(right.strip()).time()]
+
+
+def slot_list(frequency: str):
+    """List of time slots at given frequency
+
+    Args:
+        frequency (str): A valid time series offset: https://pandas.pydata.org/docs/user_guide/timeseries.html#timeseries-offset-aliases
+
+    Returns:
+        List[datetime.Time]: List of times deonting time slots
+    """
+    return [
+        dt.time()
+        for dt in pd.date_range("1900/01/01 00:00", "1900/01/02 00:00", freq=frequency)
+    ]
+
+
+def slots_for_time_range(time_range: str, time_slots: List[datetime.time]):
+    """Convert string to list of time slots
+
+    Include all time slots contained in the range.
+
+    Args:
+        time_range (str): A string with format "%H:%M - %H:%M"
+        time_slots (List[datetime.time]): A list of all time slots
+
+    Returns:
+        Tuple[datetime.Time]: All slots in the time range
+    """
+    rng = parse_time_range(time_range)
+    values = []
+    for tm in time_slots:
+        if tm >= rng[0] and tm <= rng[1]:
+            values.append(tm)
+
+    return tuple(values)
+
+
 class Slot(BaseFeature):
     """Ordered space of time slots"""
+
+    @staticmethod
+    def from_time_ranges(time_ranges: List[str], frequency: str):
+        """Helper method for creating a slot feature from a list of time ranges
+
+        The domain of the Slot includes a tuple for each time range, which contains all
+        slots in the range.
+
+        Args:
+            time_ranges (List[str]): Time ranges from which to generate domain
+            frequency (str): A valid time series offset: https://pandas.pydata.org/docs/user_guide/timeseries.html#timeseries-offset-aliases
+
+        Returns:
+            Slot: Slot constructed from time ranges
+        """
+        time_slots = slot_list(frequency)
+        domain = []
+        for rng in time_ranges:
+            item_slots = slots_for_time_range(rng, time_slots)
+            domain.append(item_slots)
+
+        return Slot(domain)
 
     def __init__(self, domain):
         """
