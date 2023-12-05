@@ -1,5 +1,5 @@
 import datetime
-from typing import List
+from typing import Any, List
 
 import pandas as pd
 
@@ -23,6 +23,9 @@ class BaseFeature:
         """
         self.name = name
         self.domain = domain
+
+    def index(self, value: Any):
+        return self.domain.index(value)
 
     def __repr__(self):
         return f"{self.name}: [{self.domain[0]} ... {self.domain[-1]}]"

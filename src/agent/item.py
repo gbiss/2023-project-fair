@@ -87,7 +87,7 @@ class BaseItem:
         for feature in features:
             if feature not in self.features:
                 raise FeatureError(f"feature {feature} not valid for {self}")
-            idx += feature.domain.index(self.value(feature)) * mult
+            idx += feature.index(self.value(feature)) * mult
             mult *= len(feature.domain)
 
         return idx
