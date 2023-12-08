@@ -1,6 +1,6 @@
-from agent.constraint import LinearConstraint
-from agent.item import ScheduleItem
-from agent.valuation import ConstraintSatifactionValuation
+from fair.constraint import LinearConstraint
+from fair.item import ScheduleItem
+from fair.valuation import ConstraintSatifactionValuation
 
 
 def test_valid_constraint_valuation(

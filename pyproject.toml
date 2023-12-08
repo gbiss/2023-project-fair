@@ -21,13 +21,14 @@ line_length = 88
 profile = "black"
 
 [project]
-name = "agent"
+name = "fair"
 version = "0.0.1"
 authors = [
   { name="David Thibodeau", email="dpthibodeau@umass.edu" },
+  { name="Paula Navarrete Diaz", email="pnavarretedi@umass.edu" },
   { name="George Bissias", email="gbiss@cs.umass.edu" },
 ]
-description = "Agent valuation tools"
+description = "Fair Allocation Tools"
 readme = "README.md"
 requires-python = ">=3.10"
 classifiers = [

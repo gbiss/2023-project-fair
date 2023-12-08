@@ -1,6 +1,6 @@
 from typing import List
 
-from agent.item import BaseItem
+from fair.item import BaseItem
 
 from .constraint import BaseConstraint
 

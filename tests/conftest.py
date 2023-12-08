@@ -2,10 +2,10 @@ import os
 
 import pytest
 
-from agent.constraint import CoursePreferrenceConstraint
-from agent.feature import Course, Section, Slot
-from agent.item import ScheduleItem
-from agent.valuation import ConstraintSatifactionValuation
+from fair.constraint import CoursePreferrenceConstraint
+from fair.feature import Course, Section, Slot
+from fair.item import ScheduleItem
+from fair.valuation import ConstraintSatifactionValuation
 
 
 @pytest.fixture

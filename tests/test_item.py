@@ -1,7 +1,7 @@
 import pytest
 
-from agent.feature import Course
-from agent.item import DomainError, FeatureError, ScheduleItem
+from fair.feature import Course
+from fair.item import DomainError, FeatureError, ScheduleItem
 
 
 def test_item_hash(schedule_item250: ScheduleItem):

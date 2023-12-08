@@ -1,4 +1,4 @@
-# Allocation Agent
+# Fair Allocation
 
 ## Installation
 

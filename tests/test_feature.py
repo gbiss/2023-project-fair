@@ -1,6 +1,6 @@
 import pandas as pd
 
-from agent.feature import Course, Slot, slot_list, slots_for_time_range
+from fair.feature import Course, Slot, slot_list, slots_for_time_range
 
 
 def test_course():
