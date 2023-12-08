@@ -1,6 +1,6 @@
 from allocation.allocation_functions import yankee_swap
 
-from fair import LegacyStudent, Student, exchange_contribution, marginal_contribution
+from fair.agent import LegacyStudent, Student, exchange_contribution, marginal_contribution
 from fair.constraint import (
     CoursePreferrenceConstraint,
     CourseSectionConstraint,
