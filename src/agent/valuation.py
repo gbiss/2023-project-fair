@@ -8,6 +8,10 @@ from .constraint import BaseConstraint
 class BaseValuation:
     """An agent's utility associated with bundles of items"""
 
+
+class RankValuation(BaseValuation):
+    """Matroid rank utility associated with bundles of items"""
+
     def independent(self, bundle: List[BaseItem]):
         """Does the bundle receive maximal value
         ]
