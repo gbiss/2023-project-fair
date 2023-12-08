@@ -1,11 +1,11 @@
 from typing import List
 
 from .item import BaseItem
-from .valuation import BaseValuation
+from .valuation import RankValuation
 
 
 def exchange_contribution(
-    valuation: BaseValuation,
+    valuation: RankValuation,
     bundle: List[BaseItem],
     og_item: BaseItem,
     new_item: BaseItem,
@@ -52,7 +52,7 @@ def exchange_contribution(
 
 
 def marginal_contribution(
-    valuation: BaseValuation, bundle: List[BaseItem], item: BaseItem
+    valuation: RankValuation, bundle: List[BaseItem], item: BaseItem
 ):
     """Marginal change in utility
 
@@ -78,7 +78,7 @@ def marginal_contribution(
 class BaseAgent:
     """A wrapper class for apply a valuation to bundles of items"""
 
-    def __init__(self, valuation: BaseValuation):
+    def __init__(self, valuation: RankValuation):
         """
         Args:
             valuation (BaseValuation): Valuation object to apply to bundles
@@ -100,14 +100,14 @@ class BaseAgent:
 class Student(BaseAgent):
     """A student agent"""
 
-    def __init__(self, valuation: BaseValuation):
+    def __init__(self, valuation: RankValuation):
         super().__init__(valuation)
 
 
 class LegacyStudent:
     """A student compatible with https://github.com/cheerstopaula/Allocation"""
 
-    def __init__(self, valuation: BaseValuation):
+    def __init__(self, valuation: RankValuation):
         self.agent = Student(valuation)
 
     def valuation(self, bundle: List[BaseItem]):
