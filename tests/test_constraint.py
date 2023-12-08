@@ -1,13 +1,13 @@
 import numpy as np
 
-from agent.constraint import (
+from fair.constraint import (
     CoursePreferrenceConstraint,
     CourseSectionConstraint,
     CourseTimeConstraint,
     indicator,
 )
-from agent.feature import Course, Section, Slot
-from agent.item import ScheduleItem
+from fair.feature import Course, Section, Slot
+from fair.item import ScheduleItem
 
 
 def test_indicator(course: Course, bundle_250_301: list[ScheduleItem]):

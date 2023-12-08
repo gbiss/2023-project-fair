@@ -1,15 +1,15 @@
 from allocation.allocation_functions import yankee_swap
 
-from agent import LegacyStudent, Student, exchange_contribution, marginal_contribution
-from agent.constraint import (
+from fair import LegacyStudent, Student, exchange_contribution, marginal_contribution
+from fair.constraint import (
     CoursePreferrenceConstraint,
     CourseSectionConstraint,
     CourseTimeConstraint,
     LinearConstraint,
 )
-from agent.feature import Course, Section, Slot
-from agent.item import ScheduleItem
-from agent.valuation import ConstraintSatifactionValuation, StudentValuation
+from fair.feature import Course, Section, Slot
+from fair.item import ScheduleItem
+from fair.valuation import ConstraintSatifactionValuation, StudentValuation
 
 
 def test_exchange_contribution(
