@@ -13,4 +13,16 @@ def test_renaissance_man(
         CourseTimeConstraint.mutually_exclusive_slots(schedule, course, slot),
         CourseSectionConstraint.one_section_per_course(schedule, course, section),
     ]
-    RenaissanceMan(topic_list, quantities, course, global_constraints, 1)
+
+    # preferred course list does not exceed max quantitity for multiple random configurations
+    for i in range(10):
+        student = RenaissanceMan(topic_list, quantities, course, global_constraints, i)
+        for j in range(len(quantities)):
+            assert len(student.preferred_courses[j]) <= student.quantities[j]
+
+    # student without global constraints can always be fully satisfied
+    student = RenaissanceMan(topic_list, quantities, course, [], 0)
+    items = []
+    for i, quant in enumerate(student.quantities):
+        items = [ScheduleItem([course], [crs]) for crs in student.preferred_courses[i]]
+        assert student.value(items) == quant
