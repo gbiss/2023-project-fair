@@ -11,50 +11,50 @@ from fair.valuation import BaseValuation, ConstraintSatifactionValuation
 class SimulatedAgent(BaseAgent):
     """A randomly generated agent"""
 
-    def __init__(self, valuation: BaseValuation, seed: int | None = None):
+    def __init__(self, constraints: List[LinearConstraint]):
         """
         Args:
-            valuation (BaseValuation): Valuation object to apply to bundles
-            seed (int | None, optional): _description_. Defaults to None.
+            constraints (List[LinearConstraint]): constraints to be used in defining valuation
         """
-        super().__init__(valuation)
-        self.seed = seed
-        self.rng = np.random.default_rng(seed)
+        super().__init__(ConstraintSatifactionValuation(constraints))
 
 
 class RenaissanceMan(SimulatedAgent):
-    @staticmethod
-    def from_course_lists(
+    """Randomly generate a Renaissance man student
+
+    The Renaissance man prefers courses from multiple topics, up to a maximum quantity per topic.
+    """
+
+    def __init__(
+        self,
         topic_list: List[List[Course]],
-        quantities: List[int],
+        max_quantities: List[int],
         course: Course,
         global_constraints: List[LinearConstraint],
         seed: int | None = None,
     ):
-        """Randomly generate a Renaissance man student
-
-        The Renaissance man prefers courses from multiple topics, up to a maximum quantity per topic.
-
+        """
         Args:
             topic_list (List[List[Course]]): A list of lists of courses, one per topic
             quantities (List[int]): The maximum number of courses desired per topic
             course (Course): The feature corresponding to courses
             global_constraints (List[LinearConstraint]): Constraints not specific to this agent
             seed (int | None, optional): Random seed. Defaults to None.
-
-        Returns:
-            RenaissanceMan: Randomly generated Renaissance man
         """
-        preferred_courses = [[], []]
-        # fill in preferred_courses with random selection from topic_list subject to quantity constraints
+        rng = np.random.default_rng(seed)
 
-        valuation = ConstraintSatifactionValuation(
-            global_constraints
-            + [
-                CoursePreferrenceConstraint.from_course_lists(
-                    preferred_courses, quantities, course
-                )
-            ]
-        )
+        quantities = []
+        for max_quant in max_quantities:
+            quantities.append(rng.integers(0, max_quant))
 
-        return RenaissanceMan(valuation, seed)
+        preferred_courses = []
+        for i, quant in enumerate(max_quantities):
+            preferred_courses.append(rng.choice(topic_list[i], quant, replace=False))
+
+        constraints = global_constraints + [
+            CoursePreferrenceConstraint.from_course_lists(
+                preferred_courses, quantities, course
+            )
+        ]
+
+        super().__init__(constraints)

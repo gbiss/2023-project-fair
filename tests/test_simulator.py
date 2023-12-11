@@ -13,6 +13,4 @@ def test_renaissance_man(
         CourseTimeConstraint.mutually_exclusive_slots(schedule, course, slot),
         CourseSectionConstraint.one_section_per_course(schedule, course, section),
     ]
-    student = RenaissanceMan.from_course_lists(
-        topic_list, quantities, course, global_constraints, 1
-    )
+    RenaissanceMan(topic_list, quantities, course, global_constraints, 1)
