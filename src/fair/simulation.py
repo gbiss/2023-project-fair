@@ -45,12 +45,12 @@ class RenaissanceMan(SimulatedAgent):
 
         self.quantities = []
         for max_quant in max_quantities:
-            self.quantities.append(rng.integers(0, max_quant))
+            self.quantities.append(rng.integers(0, max_quant + 1))
 
         self.preferred_courses = []
-        for i, quant in enumerate(max_quantities):
+        for i, quant in enumerate(self.quantities):
             self.preferred_courses.append(
-                rng.choice(topic_list[i], quant, replace=False)
+                rng.choice(topic_list[i], quant, replace=False).tolist()
             )
 
         constraints = global_constraints + [
