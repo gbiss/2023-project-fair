@@ -43,17 +43,19 @@ class RenaissanceMan(SimulatedAgent):
         """
         rng = np.random.default_rng(seed)
 
-        quantities = []
+        self.quantities = []
         for max_quant in max_quantities:
-            quantities.append(rng.integers(0, max_quant))
+            self.quantities.append(rng.integers(0, max_quant))
 
-        preferred_courses = []
+        self.preferred_courses = []
         for i, quant in enumerate(max_quantities):
-            preferred_courses.append(rng.choice(topic_list[i], quant, replace=False))
+            self.preferred_courses.append(
+                rng.choice(topic_list[i], quant, replace=False)
+            )
 
         constraints = global_constraints + [
             CoursePreferrenceConstraint.from_course_lists(
-                preferred_courses, quantities, course
+                self.preferred_courses, self.quantities, course
             )
         ]
 
