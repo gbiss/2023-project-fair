@@ -107,15 +107,19 @@ class Student(BaseAgent):
 class LegacyStudent:
     """A student compatible with https://github.com/cheerstopaula/Allocation"""
 
-    def __init__(self, valuation: RankValuation):
-        self.agent = Student(valuation)
+    def __init__(self, student: BaseAgent):
+        """
+        Args:
+            student (BaseAgent): Student to delegate value queries to
+        """
+        self.student = student
 
     def valuation(self, bundle: List[BaseItem]):
         """Delegate to value function
         Args:
             bundle (List[BaseItem]): Items to evaluate
         """
-        return self.agent.value(bundle)
+        return self.student.value(bundle)
 
     def marginal_contribution(self, bundle: List[BaseItem], item: BaseItem):
         """Delegate to marginal_contribution function
@@ -124,7 +128,7 @@ class LegacyStudent:
             bundle (List[BaseItem]): Initial set of items
             item (BaseItem): Item to be added
         """
-        return marginal_contribution(self.agent.valuation, bundle, item)
+        return marginal_contribution(self.student.valuation, bundle, item)
 
     def exchange_contribution(
         self, bundle: List[BaseItem], og_item: BaseItem, new_item: BaseItem
@@ -136,4 +140,4 @@ class LegacyStudent:
             og_item (BaseItem): Item to be removed
             new_item (BaseItem): Item to be added
         """
-        exchange_contribution(self.agent.valuation, bundle, og_item, new_item)
+        exchange_contribution(self.student.valuation, bundle, og_item, new_item)

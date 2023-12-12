@@ -1,11 +1,16 @@
 from allocation.allocation_functions import yankee_swap
 
-from fair.agent import LegacyStudent, Student, exchange_contribution, marginal_contribution
+from fair.agent import (
+    BaseAgent,
+    LegacyStudent,
+    Student,
+    exchange_contribution,
+    marginal_contribution,
+)
 from fair.constraint import (
     CoursePreferrenceConstraint,
     CourseSectionConstraint,
     CourseTimeConstraint,
-    LinearConstraint,
 )
 from fair.feature import Course, Section, Slot
 from fair.item import ScheduleItem
@@ -76,11 +81,17 @@ def test_legacy_student(
     course_sect_constr = CourseSectionConstraint.one_section_per_course(
         schedule, course, section
     )
-    student1 = LegacyStudent(
-        StudentValuation([preferred_constr1, course_time_constr, course_sect_constr])
+    student1 = BaseAgent(
+        ConstraintSatifactionValuation(
+            [preferred_constr1, course_time_constr, course_sect_constr]
+        )
     )
-    student2 = LegacyStudent(
-        StudentValuation([preferred_constr2, course_time_constr, course_sect_constr])
+    student2 = BaseAgent(
+        ConstraintSatifactionValuation(
+            [preferred_constr2, course_time_constr, course_sect_constr]
+        )
     )
+    leg_student1 = LegacyStudent(student1)
+    leg_student2 = LegacyStudent(student2)
 
-    yankee_swap([student1, student2], schedule)
+    yankee_swap([leg_student1, leg_student2], schedule)
