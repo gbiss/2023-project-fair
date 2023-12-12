@@ -36,7 +36,7 @@ class RenaissanceMan(SimulatedAgent):
         """
         Args:
             topic_list (List[List[Course]]): A list of lists of courses, one per topic
-            quantities (List[int]): The maximum number of courses desired per topic
+            max_quantities (List[int]): The maximum number of courses desired per topic
             course (Course): The feature corresponding to courses
             global_constraints (List[LinearConstraint]): Constraints not specific to this agent
             seed (int | None, optional): Random seed. Defaults to None.
