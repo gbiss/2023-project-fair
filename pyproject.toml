@@ -42,6 +42,5 @@ dependencies = [
                 "pytest>=7.4.3",
                 "black>=23.11.0",
                 "isort>=5.12.0",
-                "allocation@git+https://github.com/cheerstopaula/Allocation.git",
                 "pdoc>=14.1.0",
                ]
