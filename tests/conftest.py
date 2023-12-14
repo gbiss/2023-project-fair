@@ -1,10 +1,17 @@
 import os
+from typing import List
 
 import pytest
 
-from fair.constraint import CoursePreferrenceConstraint
+from fair.constraint import (
+    CoursePreferrenceConstraint,
+    CourseSectionConstraint,
+    CourseTimeConstraint,
+    LinearConstraint,
+)
 from fair.feature import Course, Section, Slot
 from fair.item import ScheduleItem
+from fair.simulation import RenaissanceMan
 from fair.valuation import ConstraintSatifactionValuation
 
 
@@ -127,4 +134,40 @@ def excel_schedule_path():
 def excel_schedule_path_with_cats():
     return os.path.join(
         os.path.dirname(__file__), "../resources/fall2023schedule-2-cat.xlsx"
+    )
+
+
+@pytest.fixture
+def global_constraints(
+    schedule: list[ScheduleItem], course: Course, section: Section, slot: Slot
+):
+    course_time_constr = CourseTimeConstraint.mutually_exclusive_slots(
+        schedule, course, slot
+    )
+    course_sect_constr = CourseSectionConstraint.one_section_per_course(
+        schedule, course, section
+    )
+
+    return [course_time_constr, course_sect_constr]
+
+
+@pytest.fixture
+def renaissance1(global_constraints: List[LinearConstraint], course: Course):
+    return RenaissanceMan(
+        [["250", "301"], ["611"]],
+        [1, 1],
+        course,
+        global_constraints,
+        0,
+    )
+
+
+@pytest.fixture
+def renaissance2(global_constraints: List[LinearConstraint], course: Course):
+    return RenaissanceMan(
+        [["250", "301"], ["611"]],
+        [1, 1],
+        course,
+        global_constraints,
+        1,
     )

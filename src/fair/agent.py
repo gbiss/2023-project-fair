@@ -1,7 +1,7 @@
 from typing import List
 
 from .item import BaseItem
-from .valuation import RankValuation
+from .valuation import RankValuation, UniqueItemsValuation
 
 
 def exchange_contribution(
@@ -112,6 +112,7 @@ class LegacyStudent:
         Args:
             student (BaseAgent): Student to delegate value queries to
         """
+        student.valuation = UniqueItemsValuation(student.valuation)
         self.student = student
 
     def valuation(self, bundle: List[BaseItem]):
