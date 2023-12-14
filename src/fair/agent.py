@@ -142,3 +142,42 @@ class LegacyStudent:
             new_item (BaseItem): Item to be added
         """
         exchange_contribution(self.student.valuation, bundle, og_item, new_item)
+
+    def get_desired_items_indexes(self, items: List[BaseItem]):
+        """Return subset of indices from items that are preferred by the student
+
+        This method will currently only work if the delegate student object is of type
+        RenaissanceMan since it is the only student type that implements preferred_courses.
+
+        Args:
+            items (List[BaseItem]): Candidate items list
+
+        Raises:
+            NotImplemented: Raised when preferred_courses is not a member of the delgate student
+            AttributeError: Raised when the first item does not have "course" as a feature
+
+        Returns:
+            List[int]: Indices of desired items in list
+        """
+        if not hasattr(self.student, "preferred_courses"):
+            raise NotImplemented("Student must have preferred_courses property")
+
+        if len(items) == 0:
+            return []
+
+        course = None
+        for feature in items[0].features:
+            if feature.name == "course":
+                course = feature
+                break
+
+        if course is None:
+            raise AttributeError("Items must contain a Course feature")
+
+        courses = [crs for topic in self.student.preferred_courses for crs in topic]
+        idxs = []
+        for i, item in enumerate(items):
+            if item.value(course) in courses:
+                idxs.append(i)
+
+        return idxs
