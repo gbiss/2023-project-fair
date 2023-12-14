@@ -153,6 +153,41 @@ class ConstraintSatifactionValuation(MemoableValuation):
         return value
 
 
+class UniqueItemsValuation:
+    """An adapter that discards duplicate items before calculating independence and value"""
+
+    def __init__(self, valuation: RankValuation):
+        """
+        Args:
+            valuation (RankValuation): Underlying rank-based valuation
+        """
+        self.valuation = valuation
+
+    def independent(self, bundle: List[BaseItem]):
+        """Do the unique items in this bundle receive maximal value
+
+        Args:
+            bundle (List[BaseItem]): Items in the bundle
+
+        Returns:
+            bool: True if bundle receives maximal value; False otherwise
+        """
+        return self.valuation.independent(list(set(bundle)))
+
+    def value(self, bundle: List[BaseItem]):
+        """Value of unique items in bundle
+
+        The value is the size of the largest independent set contained in the bundle
+
+        Args:
+            bundle (List[BaseItem]): Items in the bundle
+
+        Returns:
+            int: Bundle value
+        """
+        return self.valuation.value(list(set(bundle)))
+
+
 class StudentValuation(ConstraintSatifactionValuation):
     """A constraint-based student valuation"""
 
