@@ -87,6 +87,15 @@ def linear_constraint_250_301(
 
 
 @pytest.fixture
+def course_time_constraint(
+    all_items: list[ScheduleItem],
+    course: Course,
+    slot: Slot,
+):
+    return CourseTimeConstraint.mutually_exclusive_slots(all_items, course, slot)
+
+
+@pytest.fixture
 def all_items(
     schedule_item250: ScheduleItem,
     schedule_item301: ScheduleItem,
