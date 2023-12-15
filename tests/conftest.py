@@ -161,22 +161,30 @@ def global_constraints(
 
 
 @pytest.fixture
-def renaissance1(global_constraints: List[LinearConstraint], course: Course):
+def renaissance1(
+    global_constraints: List[LinearConstraint],
+    linear_constraint: CoursePreferrenceConstraint,
+    course: Course,
+):
     return RenaissanceMan(
         [["250", "301"], ["611"]],
         [1, 1],
         course,
-        global_constraints,
+        global_constraints + [linear_constraint],
         0,
     )
 
 
 @pytest.fixture
-def renaissance2(global_constraints: List[LinearConstraint], course: Course):
+def renaissance2(
+    global_constraints: List[LinearConstraint],
+    linear_constraint: CoursePreferrenceConstraint,
+    course: Course,
+):
     return RenaissanceMan(
         [["250", "301"], ["611"]],
         [1, 1],
         course,
-        global_constraints,
+        global_constraints + [linear_constraint],
         1,
     )
