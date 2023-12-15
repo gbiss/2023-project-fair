@@ -156,7 +156,7 @@ class ConstraintSatifactionValuation(MemoableValuation):
 class UniqueItemsValuation:
     """An adapter that discards duplicate items before calculating independence and value"""
 
-    def __init__(self, valuation: RankValuation):
+    def __init__(self, valuation: MemoableValuation):
         """
         Args:
             valuation (RankValuation): Underlying rank-based valuation
@@ -186,6 +186,21 @@ class UniqueItemsValuation:
             int: Bundle value
         """
         return self.valuation.value(list(set(bundle)))
+
+    @property
+    def constraints(self):
+        """Make constraints member of delegate valuation available
+
+        Raises:
+            NotImplemented: Constraints needs to be implemented by delegate
+
+        Returns:
+            List[LinearConstraint]: Constraints defining delegate valuation
+        """
+        if not hasattr(self.valuation, "constraints"):
+            raise NotImplemented("Valuation does not implement constraints")
+
+        return self.valuation.constraints
 
 
 class StudentValuation(ConstraintSatifactionValuation):

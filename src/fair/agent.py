@@ -1,5 +1,7 @@
 from typing import List
 
+from fair.constraint import CoursePreferrenceConstraint
+
 from .item import BaseItem
 from .valuation import RankValuation, UniqueItemsValuation
 
@@ -153,31 +155,24 @@ class LegacyStudent:
             items (List[BaseItem]): Candidate items list
 
         Raises:
-            NotImplemented: Raised when preferred_courses is not a member of the delgate student
+            AttributeError: Raised when preferred_courses is not a member of the delgate student
             AttributeError: Raised when the first item does not have "course" as a feature
 
         Returns:
             List[int]: Indices of desired items in list
         """
-        if not hasattr(self.student, "preferred_courses"):
-            raise NotImplemented("Student must have preferred_courses property")
+        if not hasattr(self.student.valuation, "constraints"):
+            raise AttributeError("Student valuation must have constraints property")
 
-        if len(items) == 0:
-            return []
-
-        course = None
-        for feature in items[0].features:
-            if feature.name == "course":
-                course = feature
+        course_preference_constr = None
+        for constraint in self.student.valuation.constraints:
+            if CoursePreferrenceConstraint in type(constraint).__subclasses__():
+                course_preference_constr = constraint
                 break
 
-        if course is None:
-            raise AttributeError("Items must contain a Course feature")
+        if course_preference_constr is None:
+            raise AttributeError("Student must include CoursePreferrenceConstraint")
 
-        courses = [crs for topic in self.student.preferred_courses for crs in topic]
-        idxs = []
-        for i, item in enumerate(items):
-            if item.value(course) in courses:
-                idxs.append(i)
+        constrained = course_preference_constr.constrained_items(items)
 
-        return idxs
+        return [i for i in range(len(items)) if items[i] in constrained]

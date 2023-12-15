@@ -61,3 +61,19 @@ def test_section_constraint(
 
     assert constraint.satisfies(bundle_250_301)
     assert not constraint.satisfies(bundle_250_250_2)
+
+
+def test_constrained_items(
+    all_items: list[ScheduleItem],
+    schedule_item250: ScheduleItem,
+    schedule_item301: ScheduleItem,
+    linear_constraint_250_301: CoursePreferrenceConstraint,
+    course_time_constraint: CourseTimeConstraint,
+):
+    assert schedule_item250 in linear_constraint_250_301.constrained_items(all_items)
+
+    ct_active = course_time_constraint.constrained_items(all_items)
+    assert (
+        len(set(ct_active[schedule_item250]).intersection(ct_active[schedule_item301]))
+        > 0
+    )

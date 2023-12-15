@@ -1,3 +1,4 @@
+from collections import defaultdict
 from typing import List
 
 import numpy as np
@@ -64,6 +65,23 @@ class LinearConstraint(BaseConstraint):
         equal_to = ~(product != self.b).toarray().flatten()
 
         return np.prod([lt or eq for lt, eq in zip(less_than, equal_to)])
+
+    def constrained_items(self, items: BaseItem):
+        """Determine if, and for what constraint, each item is constrained
+
+        Args:
+            items (BaseItem): Items to evaluate
+
+        Returns:
+            Dict(BaseItem, List[int]): List of constraints (rows of A) where each item is constrained
+        """
+        active_map = defaultdict(list)
+        for i in range(self.A.shape[0]):
+            for item in items:
+                if self.A[i, item.index(self.features)] != 0:
+                    active_map[item].append(i)
+
+        return active_map
 
 
 class CoursePreferrenceConstraint(LinearConstraint):

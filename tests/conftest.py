@@ -87,6 +87,15 @@ def linear_constraint_250_301(
 
 
 @pytest.fixture
+def course_time_constraint(
+    all_items: list[ScheduleItem],
+    course: Course,
+    slot: Slot,
+):
+    return CourseTimeConstraint.mutually_exclusive_slots(all_items, course, slot)
+
+
+@pytest.fixture
 def all_items(
     schedule_item250: ScheduleItem,
     schedule_item301: ScheduleItem,
@@ -152,22 +161,30 @@ def global_constraints(
 
 
 @pytest.fixture
-def renaissance1(global_constraints: List[LinearConstraint], course: Course):
+def renaissance1(
+    global_constraints: List[LinearConstraint],
+    linear_constraint: CoursePreferrenceConstraint,
+    course: Course,
+):
     return RenaissanceMan(
         [["250", "301"], ["611"]],
         [1, 1],
         course,
-        global_constraints,
+        global_constraints + [linear_constraint],
         0,
     )
 
 
 @pytest.fixture
-def renaissance2(global_constraints: List[LinearConstraint], course: Course):
+def renaissance2(
+    global_constraints: List[LinearConstraint],
+    linear_constraint: CoursePreferrenceConstraint,
+    course: Course,
+):
     return RenaissanceMan(
         [["250", "301"], ["611"]],
         [1, 1],
         course,
-        global_constraints,
+        global_constraints + [linear_constraint],
         1,
     )
