@@ -63,7 +63,7 @@ def test_section_constraint(
     assert not constraint.satisfies(bundle_250_250_2)
 
 
-def test_linear_constraint_active(
+def test_constrained_items(
     all_items: list[ScheduleItem],
     schedule_item250: ScheduleItem,
     schedule_item301: ScheduleItem,
