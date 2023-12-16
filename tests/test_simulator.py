@@ -13,7 +13,7 @@ def test_renaissance_man(
     ]
     quantities = [1, 1]
     global_constraints = [
-        CourseTimeConstraint.mutually_exclusive_slots(schedule, slot, [course, slot]),
+        CourseTimeConstraint.from_items(schedule, slot, [course, slot]),
         MutualExclusivityConstraint.from_items(schedule, course, [course, section]),
     ]
 

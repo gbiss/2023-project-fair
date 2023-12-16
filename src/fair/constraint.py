@@ -131,9 +131,7 @@ class PreferenceConstraint(LinearConstraint):
 
 class CourseTimeConstraint(LinearConstraint):
     @staticmethod
-    def mutually_exclusive_slots(
-        items: List[ScheduleItem], slot: Slot, features: List[BaseFeature]
-    ):
+    def from_items(items: List[ScheduleItem], slot: Slot, features: List[BaseFeature]):
         """Helper method for creating constraints that prevent course time overlap
 
         A bundle satisfies this constraint only if no two courses meet at the same time.

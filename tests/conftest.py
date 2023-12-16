@@ -86,9 +86,7 @@ def course_time_constraint(
     course: Course,
     slot: Slot,
 ):
-    return CourseTimeConstraint.mutually_exclusive_slots(
-        all_items, slot, [course, slot]
-    )
+    return CourseTimeConstraint.from_items(all_items, slot, [course, slot])
 
 
 @pytest.fixture
@@ -146,9 +144,7 @@ def excel_schedule_path_with_cats():
 def global_constraints(
     schedule: list[ScheduleItem], course: Course, section: Section, slot: Slot
 ):
-    course_time_constr = CourseTimeConstraint.mutually_exclusive_slots(
-        schedule, slot, [course, slot]
-    )
+    course_time_constr = CourseTimeConstraint.from_items(schedule, slot, [course, slot])
     course_sect_constr = MutualExclusivityConstraint.from_items(
         schedule, course, [course, section]
     )
