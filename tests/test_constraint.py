@@ -1,8 +1,8 @@
 import numpy as np
 
 from fair.constraint import (
-    CourseSectionConstraint,
     CourseTimeConstraint,
+    MutualExclusivityConstraint,
     PreferenceConstraint,
     indicator,
 )
@@ -55,8 +55,8 @@ def test_section_constraint(
     course: Course,
     section: Section,
 ):
-    constraint = CourseSectionConstraint.one_section_per_course(
-        items_repeat_section, course, section
+    constraint = MutualExclusivityConstraint.from_items(
+        items_repeat_section, course, [course, section]
     )
 
     assert constraint.satisfies(bundle_250_301)

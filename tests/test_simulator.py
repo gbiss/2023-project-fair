@@ -1,4 +1,4 @@
-from fair.constraint import CourseSectionConstraint, CourseTimeConstraint
+from fair.constraint import CourseTimeConstraint, MutualExclusivityConstraint
 from fair.feature import Course, Section, Slot
 from fair.item import ScheduleItem
 from fair.simulation import RenaissanceMan
@@ -14,7 +14,7 @@ def test_renaissance_man(
     quantities = [1, 1]
     global_constraints = [
         CourseTimeConstraint.mutually_exclusive_slots(schedule, slot, [course, slot]),
-        CourseSectionConstraint.one_section_per_course(schedule, course, section),
+        MutualExclusivityConstraint.from_items(schedule, course, [course, section]),
     ]
 
     # preferred course list does not exceed max quantitity for multiple random configurations

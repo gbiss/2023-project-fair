@@ -166,30 +166,40 @@ class CourseTimeConstraint(LinearConstraint):
         return LinearConstraint(A, b, features)
 
 
-class CourseSectionConstraint(LinearConstraint):
+class MutualExclusivityConstraint(LinearConstraint):
     @staticmethod
-    def one_section_per_course(
-        items: List[ScheduleItem], course: Course, section: Section
+    def from_items(
+        items: List[ScheduleItem],
+        exclusive_feature: BaseFeature,
+        features: List[BaseFeature],
     ):
         """Helper method for creating constraints that prevent scheduling multiple sections of the same class
 
         Args:
-            items (List[ScheduleItem]): Items, possibly from the same course
-            course (Course): Feature for course
-            section (Section): Feature for section
+            items (List[ScheduleItem]): Items, possibly having same value for exclusive_feature
+            exclusive_feature (BaseFeature): Feature that must remain exclusive
+            features (List[BaseFeatures]): Feature list for items
+
+        Raises:
+            AttributeError: Features list is required to contain exclusive_feature
 
         Returns:
-            CourseSectionConstraint: A: (course domain x features domain), b: (course domain x 1)
+            MutualExclusivityConstraint: A: (exclusive_feature domain x features domain), b: (exclusive_feature domain x 1)
         """
-        rows = len(course.domain)
-        cols = len(course.domain) * len(section.domain)
+        if exclusive_feature not in features:
+            raise AttributeError("features list must contain exclusive_feature")
+
+        rows = len(exclusive_feature.domain)
+        cols = np.prod([len(feature.domain) for feature in features])
         A = dok_array((rows, cols), dtype=np.int_)
         b = dok_array((rows, 1), dtype=np.int_)
 
-        for i, crs in enumerate(course.domain):
-            items_for_course = [item for item in items if item.value(course) == crs]
+        for i, excl in enumerate(exclusive_feature.domain):
+            items_for_course = [
+                item for item in items if item.value(exclusive_feature) == excl
+            ]
             for item in items_for_course:
-                A[i, item.index([course, section])] = 1
+                A[i, item.index(features)] = 1
             b[i, 0] = 1
 
-        return LinearConstraint(A, b, [course, section])
+        return LinearConstraint(A, b, features)

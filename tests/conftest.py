@@ -4,9 +4,9 @@ from typing import List
 import pytest
 
 from fair.constraint import (
-    CourseSectionConstraint,
     CourseTimeConstraint,
     LinearConstraint,
+    MutualExclusivityConstraint,
     PreferenceConstraint,
 )
 from fair.feature import Course, Section, Slot
@@ -149,8 +149,8 @@ def global_constraints(
     course_time_constr = CourseTimeConstraint.mutually_exclusive_slots(
         schedule, slot, [course, slot]
     )
-    course_sect_constr = CourseSectionConstraint.one_section_per_course(
-        schedule, course, section
+    course_sect_constr = MutualExclusivityConstraint.from_items(
+        schedule, course, [course, section]
     )
 
     return [course_time_constr, course_sect_constr]
