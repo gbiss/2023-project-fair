@@ -4,10 +4,10 @@ from typing import List
 import pytest
 
 from fair.constraint import (
-    CoursePreferrenceConstraint,
     CourseSectionConstraint,
     CourseTimeConstraint,
     LinearConstraint,
+    PreferrenceConstraint,
 )
 from fair.feature import Course, Section, Slot
 from fair.item import ScheduleItem
@@ -71,19 +71,13 @@ def bundle_301_611(schedule_item301: ScheduleItem, schedule_item611: ScheduleIte
 
 
 @pytest.fixture
-def linear_constraint(
-    course: Course, bundle_250_301: list[ScheduleItem], all_items: list[ScheduleItem]
-):
-    return CoursePreferrenceConstraint.from_course_lists(
-        [["250", "301", "611"]], [2], course
-    )
+def linear_constraint(course: Course, all_items: list[ScheduleItem]):
+    return PreferrenceConstraint.from_item_lists([all_items], [2], [course])
 
 
 @pytest.fixture
-def linear_constraint_250_301(
-    course: Course, bundle_250_301: list[ScheduleItem], all_items: list[ScheduleItem]
-):
-    return CoursePreferrenceConstraint.from_course_lists([["250", "301"]], [1], course)
+def linear_constraint_250_301(course: Course, bundle_250_301: list[ScheduleItem]):
+    return PreferrenceConstraint.from_item_lists([bundle_250_301], [1], [course])
 
 
 @pytest.fixture
@@ -115,7 +109,7 @@ def items_repeat_section(
 
 
 @pytest.fixture
-def course_valuation(linear_constraint_250_301: CoursePreferrenceConstraint):
+def course_valuation(linear_constraint_250_301: PreferrenceConstraint):
     return ConstraintSatifactionValuation([linear_constraint_250_301])
 
 
@@ -163,13 +157,16 @@ def global_constraints(
 @pytest.fixture
 def renaissance1(
     global_constraints: List[LinearConstraint],
-    linear_constraint: CoursePreferrenceConstraint,
+    linear_constraint: PreferrenceConstraint,
     course: Course,
 ):
     return RenaissanceMan(
-        [["250", "301"], ["611"]],
+        [
+            [ScheduleItem([course], ["250"]), ScheduleItem([course], ["301"])],
+            [ScheduleItem([course], ["611"])],
+        ],
         [1, 1],
-        course,
+        [course],
         global_constraints + [linear_constraint],
         0,
     )
@@ -178,13 +175,16 @@ def renaissance1(
 @pytest.fixture
 def renaissance2(
     global_constraints: List[LinearConstraint],
-    linear_constraint: CoursePreferrenceConstraint,
+    linear_constraint: PreferrenceConstraint,
     course: Course,
 ):
     return RenaissanceMan(
-        [["250", "301"], ["611"]],
+        [
+            [ScheduleItem([course], ["250"]), ScheduleItem([course], ["301"])],
+            [ScheduleItem([course], ["611"])],
+        ],
         [1, 1],
-        course,
+        [course],
         global_constraints + [linear_constraint],
         1,
     )

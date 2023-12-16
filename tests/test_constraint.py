@@ -1,9 +1,9 @@
 import numpy as np
 
 from fair.constraint import (
-    CoursePreferrenceConstraint,
     CourseSectionConstraint,
     CourseTimeConstraint,
+    PreferrenceConstraint,
     indicator,
 )
 from fair.feature import Course, Section, Slot
@@ -19,15 +19,13 @@ def test_indicator(course: Course, bundle_250_301: list[ScheduleItem]):
 def test_linear_constraint(
     course: Course, bundle_250_301: list[ScheduleItem], all_items: list[ScheduleItem]
 ):
-    constraint = CoursePreferrenceConstraint.from_course_lists(
-        [["250", "301", "611"]], [1], course
-    )
+    constraint = PreferrenceConstraint.from_item_lists([all_items], [1], [course])
 
     assert not constraint.satisfies(bundle_250_301)
 
 
 def test_linear_constraint_250_301(
-    linear_constraint_250_301: CoursePreferrenceConstraint,
+    linear_constraint_250_301: PreferrenceConstraint,
     bundle_250_301: list[ScheduleItem],
     bundle_301_611: list[ScheduleItem],
 ):
@@ -67,7 +65,7 @@ def test_constrained_items(
     all_items: list[ScheduleItem],
     schedule_item250: ScheduleItem,
     schedule_item301: ScheduleItem,
-    linear_constraint_250_301: CoursePreferrenceConstraint,
+    linear_constraint_250_301: PreferrenceConstraint,
     course_time_constraint: CourseTimeConstraint,
 ):
     assert schedule_item250 in linear_constraint_250_301.constrained_items(all_items)

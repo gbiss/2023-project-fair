@@ -84,44 +84,46 @@ class LinearConstraint(BaseConstraint):
         return active_map
 
 
-class CoursePreferrenceConstraint(LinearConstraint):
+class PreferrenceConstraint(LinearConstraint):
     @staticmethod
-    def from_course_lists(
-        preferred_courses: List[List[str]], limits: List[int], course: Course
+    def from_item_lists(
+        preferred_items: List[List[BaseItem]],
+        limits: List[int],
+        features: List[BaseFeature],
     ):
-        """A helper method for constructing a course preference constraint
+        """A helper method for constructing preference constraints
 
-        This constraint ensures that the bundle contains a limited number of pre-selected courses from
-        each provided topic (e.g. Physics, Chemistry, etc.)
+        This constraint ensures that the bundle contains a limited number of pre-selected items from
+        each provided category (e.g. Physics, Chemistry, etc. for course items)
 
         Args:
-            preferred_courses (List[List[str]]): Each list is a topic and items in that list are courses
-            limits (List[int]): The maximum number of courses desired per topic
-            course (Course): Feature to be used for courses
+            preferred_items (List[List[BaseItem]]): Each list is a category and items in that list are preferred
+            limits (List[int]): The maximum number of items desired per category
+            features (List[BaseFeature]): Feature to be used for items
 
         Raises:
-            IndexError: Number of topics must match among preferred_courses and limits
+            IndexError: Number of categories must match among preferred_items and limits
 
         Returns:
-            CoursePreferrenceConstraint: A: (topics x features domain), b: (topics x 1)
+            PreferrenceConstraint: A: (categories x features domain), b: (categories x 1)
         """
-        if len(preferred_courses) != len(limits):
+        if len(preferred_items) != len(limits):
             raise IndexError("item and limit lists must have the same length")
 
-        constraint_ct = len(preferred_courses)
-        domain = course.domain
-        A = dok_array((constraint_ct, len(domain)), dtype=np.int_)
-        b = dok_array((constraint_ct, 1), dtype=np.int_)
+        rows = len(preferred_items)
+        cols = np.prod([len(feature.domain) for feature in features])
+        A = dok_array((rows, cols), dtype=np.int_)
+        b = dok_array((rows, 1), dtype=np.int_)
 
-        for i in range(constraint_ct):
-            for j in range(len(preferred_courses[i])):
+        for i in range(rows):
+            for item in preferred_items[i]:
                 A[
                     i,
-                    domain.index(preferred_courses[i][j]),
+                    item.index(features),
                 ] = 1
             b[i, 0] = limits[i]
 
-        return LinearConstraint(A, b, [course])
+        return LinearConstraint(A, b, features)
 
     def __init__(self, A: dok_array, b: dok_array, features: List[BaseFeature]):
         super().__init__(A, b, features)
