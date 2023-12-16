@@ -3,7 +3,7 @@ from typing import List
 import numpy as np
 
 from fair.agent import BaseAgent
-from fair.constraint import LinearConstraint, PreferrenceConstraint
+from fair.constraint import LinearConstraint, PreferenceConstraint
 from fair.feature import BaseFeature
 from fair.item import ScheduleItem
 from fair.valuation import ConstraintSatifactionValuation
@@ -55,7 +55,7 @@ class RenaissanceMan(SimulatedAgent):
             )
 
         constraints = global_constraints + [
-            PreferrenceConstraint.from_item_lists(
+            PreferenceConstraint.from_item_lists(
                 self.preferred_courses, self.quantities, features
             )
         ]

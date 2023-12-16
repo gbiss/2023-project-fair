@@ -84,7 +84,7 @@ class LinearConstraint(BaseConstraint):
         return active_map
 
 
-class PreferrenceConstraint(LinearConstraint):
+class PreferenceConstraint(LinearConstraint):
     @staticmethod
     def from_item_lists(
         preferred_items: List[List[BaseItem]],

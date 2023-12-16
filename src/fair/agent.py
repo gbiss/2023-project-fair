@@ -1,6 +1,6 @@
 from typing import List
 
-from fair.constraint import PreferrenceConstraint
+from fair.constraint import PreferenceConstraint
 
 from .item import BaseItem
 from .valuation import RankValuation, UniqueItemsValuation
@@ -165,7 +165,7 @@ class LegacyStudent:
 
         course_preference_constr = None
         for constraint in self.student.valuation.constraints:
-            if PreferrenceConstraint in type(constraint).__subclasses__():
+            if PreferenceConstraint in type(constraint).__subclasses__():
                 course_preference_constr = constraint
                 break
 
