@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import List
+from typing import Any, List
 
 import numpy as np
 from scipy.sparse import dok_array
@@ -87,40 +87,67 @@ class LinearConstraint(BaseConstraint):
 class PreferenceConstraint(LinearConstraint):
     @staticmethod
     def from_item_lists(
-        preferred_items: List[List[BaseItem]],
+        preferred_values: List[List[Any]],
         limits: List[int],
-        features: List[BaseFeature],
+        preferred_feature: BaseFeature,
+        items: List[BaseItem] = None,
+        features: List[BaseFeature] = None,
     ):
         """A helper method for constructing preference constraints
 
         This constraint ensures that the bundle contains a limited number of pre-selected items from
-        each provided category (e.g. Physics, Chemistry, etc. for course items)
+        each provided category (e.g. Physics, Chemistry, etc. for course items).
+
+        When features and items are None, it is assumed that the universe of items is limited to items
+        from preferred_values having feature preferred_feature.
 
         Args:
-            preferred_items (List[List[BaseItem]]): Each list is a category and items in that list are preferred
+            preferred_values (List[List[Any]]): Each list is a category and values in that list are preferred
             limits (List[int]): The maximum number of items desired per category
-            features (List[BaseFeature]): Feature to be used for items
+            preferred_feature (BaseFeature): The feaure in terms of which preferred values are expressed
+            items: (List[BaseItem], optional): Universe of all items under consideration. Defaults to None.
+            features (List[BaseFeature], optional): Feature to be used for items. Defaults to None.
 
         Raises:
             IndexError: Number of categories must match among preferred_items and limits
+            AttributeError: Features list is required to contain preferred_feature
+            TypeError: Items and features must be None if one of them is
 
         Returns:
             PreferrenceConstraint: A: (categories x features domain), b: (categories x 1)
         """
-        if len(preferred_items) != len(limits):
+        if (items is None or features is None) and items != features:
+            raise TypeError(
+                "both items and features must be None if one of them is None"
+            )
+
+        if items is None and features is None:
+            features = [preferred_feature]
+            items = [
+                BaseItem("pref", features, [value])
+                for values in preferred_values
+                for value in values
+            ]
+
+        if preferred_feature not in features:
+            raise AttributeError("features list must contain preferred_feature")
+
+        if len(preferred_values) != len(limits):
             raise IndexError("item and limit lists must have the same length")
 
-        rows = len(preferred_items)
+        rows = len(preferred_values)
         cols = np.prod([len(feature.domain) for feature in features])
         A = dok_array((rows, cols), dtype=np.int_)
         b = dok_array((rows, 1), dtype=np.int_)
 
         for i in range(rows):
-            for item in preferred_items[i]:
-                A[
-                    i,
-                    item.index(features),
-                ] = 1
+            for value in preferred_values[i]:
+                for item in items:
+                    if item.value(preferred_feature) == value:
+                        A[
+                            i,
+                            item.index(features),
+                        ] = 1
             b[i, 0] = limits[i]
 
         return LinearConstraint(A, b, features)

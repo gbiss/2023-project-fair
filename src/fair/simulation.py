@@ -4,7 +4,7 @@ import numpy as np
 
 from fair.agent import BaseAgent
 from fair.constraint import LinearConstraint, PreferenceConstraint
-from fair.feature import BaseFeature
+from fair.feature import BaseFeature, Course
 from fair.item import ScheduleItem
 from fair.valuation import ConstraintSatifactionValuation
 
@@ -30,6 +30,8 @@ class RenaissanceMan(SimulatedAgent):
         self,
         topic_list: List[List[ScheduleItem]],
         max_quantities: List[int],
+        course: Course,
+        schedule: List[ScheduleItem],
         features: List[BaseFeature],
         global_constraints: List[LinearConstraint],
         seed: int | None = None,
@@ -38,7 +40,9 @@ class RenaissanceMan(SimulatedAgent):
         Args:
             topic_list (List[List[ScheduleItem]]): A list of lists of course items, one per topic
             max_quantities (List[int]): The maximum number of courses desired per topic
-            features (List[BaseFeature]): The features implemented by course items in topic_list
+            course (Course): Feature for course
+            schedule (List[ScheduleItem]): All possible items in the student's schedule
+            features (List[BaseFeature]): The features implemented by items in schedule
             global_constraints (List[LinearConstraint]): Constraints not specific to this agent
             seed (int | None, optional): Random seed. Defaults to None.
         """
@@ -56,7 +60,7 @@ class RenaissanceMan(SimulatedAgent):
 
         constraints = global_constraints + [
             PreferenceConstraint.from_item_lists(
-                self.preferred_courses, self.quantities, features
+                self.preferred_courses, self.quantities, course, schedule, features
             )
         ]
 

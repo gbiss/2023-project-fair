@@ -1,3 +1,5 @@
+from typing import List
+
 import numpy as np
 
 from fair.constraint import (
@@ -6,7 +8,7 @@ from fair.constraint import (
     PreferenceConstraint,
     indicator,
 )
-from fair.feature import Course, Section, Slot
+from fair.feature import BaseFeature, Course, Section, Slot
 from fair.item import ScheduleItem
 
 
@@ -17,11 +19,16 @@ def test_indicator(course: Course, bundle_250_301: list[ScheduleItem]):
 
 
 def test_linear_constraint(
-    course: Course, bundle_250_301: list[ScheduleItem], all_items: list[ScheduleItem]
+    course: Course,
+    features: List[BaseFeature],
+    bundle_250_301_2: list[ScheduleItem],
+    schedule: list[ScheduleItem],
 ):
-    constraint = PreferenceConstraint.from_item_lists([all_items], [1], [course])
+    constraint = PreferenceConstraint.from_item_lists(
+        [["250", "301", "611"]], [1], course, schedule, features
+    )
 
-    assert not constraint.satisfies(bundle_250_301)
+    assert not constraint.satisfies(bundle_250_301_2)
 
 
 def test_linear_constraint_250_301(
