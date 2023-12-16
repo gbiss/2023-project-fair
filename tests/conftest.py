@@ -86,7 +86,9 @@ def course_time_constraint(
     course: Course,
     slot: Slot,
 ):
-    return CourseTimeConstraint.mutually_exclusive_slots(all_items, course, slot)
+    return CourseTimeConstraint.mutually_exclusive_slots(
+        all_items, slot, [course, slot]
+    )
 
 
 @pytest.fixture
@@ -145,7 +147,7 @@ def global_constraints(
     schedule: list[ScheduleItem], course: Course, section: Section, slot: Slot
 ):
     course_time_constr = CourseTimeConstraint.mutually_exclusive_slots(
-        schedule, course, slot
+        schedule, slot, [course, slot]
     )
     course_sect_constr = CourseSectionConstraint.one_section_per_course(
         schedule, course, section

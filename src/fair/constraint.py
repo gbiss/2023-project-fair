@@ -131,31 +131,39 @@ class PreferenceConstraint(LinearConstraint):
 
 class CourseTimeConstraint(LinearConstraint):
     @staticmethod
-    def mutually_exclusive_slots(items: List[ScheduleItem], course: Course, slot: Slot):
+    def mutually_exclusive_slots(
+        items: List[ScheduleItem], slot: Slot, features: List[BaseFeature]
+    ):
         """Helper method for creating constraints that prevent course time overlap
 
         A bundle satisfies this constraint only if no two courses meet at the same time.
 
         Args:
             items (List[ScheduleItem]): Possibly time-conflicting items
-            course (Course): Feature for course
             slot (Slot): Feature for time slots
+            features (List[BaseFeature]): Feature list for items
+
+        Raises:
+            AttributeError: Features list is required to contain the provided Slot feature
 
         Returns:
-            CourseTimeConstraint: A: (time slots x course domain), b: (time slots x 1)
+            CourseTimeConstraint: A: (time slots x features domain), b: (time slots x 1)
         """
+        if slot not in features:
+            raise AttributeError("features list must contain Slot feature")
+
         rows = len(slot.times)
-        cols = len(course.domain) * len(slot.domain)
+        cols = np.prod([len(feature.domain) for feature in features])
         A = dok_array((rows, cols), dtype=np.int_)
         b = dok_array((rows, 1), dtype=np.int_)
 
         for i, tm in enumerate(slot.times):
             items_at_time = [item for item in items if tm in item.value(slot)]
             for item in items_at_time:
-                A[i, item.index([course, slot])] = 1
+                A[i, item.index(features)] = 1
             b[i, 0] = 1
 
-        return LinearConstraint(A, b, [course, slot])
+        return LinearConstraint(A, b, features)
 
 
 class CourseSectionConstraint(LinearConstraint):

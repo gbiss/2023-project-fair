@@ -43,7 +43,7 @@ def test_student(
 ):
     preferred_constr = PreferenceConstraint.from_item_lists([all_items], [2], [course])
     course_time_constr = CourseTimeConstraint.mutually_exclusive_slots(
-        schedule, course, slot
+        schedule, slot, [course, slot]
     )
     course_sect_constr = CourseSectionConstraint.one_section_per_course(
         schedule, course, section
