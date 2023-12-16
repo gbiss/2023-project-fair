@@ -3,9 +3,10 @@ from typing import List
 import numpy as np
 
 from fair.agent import BaseAgent
-from fair.constraint import CoursePreferrenceConstraint, LinearConstraint
-from fair.feature import Course
-from fair.valuation import BaseValuation, ConstraintSatifactionValuation
+from fair.constraint import LinearConstraint, PreferenceConstraint
+from fair.feature import BaseFeature, Course
+from fair.item import ScheduleItem
+from fair.valuation import ConstraintSatifactionValuation
 
 
 class SimulatedAgent(BaseAgent):
@@ -27,18 +28,22 @@ class RenaissanceMan(SimulatedAgent):
 
     def __init__(
         self,
-        topic_list: List[List[Course]],
+        topic_list: List[List[ScheduleItem]],
         max_quantities: List[int],
         course: Course,
         global_constraints: List[LinearConstraint],
+        schedule: List[ScheduleItem] = None,
+        features: List[BaseFeature] = None,
         seed: int | None = None,
     ):
         """
         Args:
-            topic_list (List[List[Course]]): A list of lists of courses, one per topic
+            topic_list (List[List[ScheduleItem]]): A list of lists of course items, one per topic
             max_quantities (List[int]): The maximum number of courses desired per topic
-            course (Course): The feature corresponding to courses
+            course (Course): Feature for course
             global_constraints (List[LinearConstraint]): Constraints not specific to this agent
+            schedule (List[ScheduleItem], optional): All possible items in the student's schedule. Defaults to None.
+            features (List[BaseFeature], optional): The features implemented by items in schedule. Defaults to None.
             seed (int | None, optional): Random seed. Defaults to None.
         """
         rng = np.random.default_rng(seed)
@@ -54,8 +59,8 @@ class RenaissanceMan(SimulatedAgent):
             )
 
         constraints = global_constraints + [
-            CoursePreferrenceConstraint.from_course_lists(
-                self.preferred_courses, self.quantities, course
+            PreferenceConstraint.from_item_lists(
+                self.preferred_courses, self.quantities, course, schedule, features
             )
         ]
 

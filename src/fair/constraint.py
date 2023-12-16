@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import List
+from typing import Any, List
 
 import numpy as np
 from scipy.sparse import dok_array
@@ -84,44 +84,73 @@ class LinearConstraint(BaseConstraint):
         return active_map
 
 
-class CoursePreferrenceConstraint(LinearConstraint):
+class PreferenceConstraint(LinearConstraint):
     @staticmethod
-    def from_course_lists(
-        preferred_courses: List[List[str]], limits: List[int], course: Course
+    def from_item_lists(
+        preferred_values: List[List[Any]],
+        limits: List[int],
+        preferred_feature: BaseFeature,
+        items: List[BaseItem] = None,
+        features: List[BaseFeature] = None,
     ):
-        """A helper method for constructing a course preference constraint
+        """A helper method for constructing preference constraints
 
-        This constraint ensures that the bundle contains a limited number of pre-selected courses from
-        each provided topic (e.g. Physics, Chemistry, etc.)
+        This constraint ensures that the bundle contains a limited number of pre-selected items from
+        each provided category (e.g. Physics, Chemistry, etc. for course items).
+
+        When features and items are None, it is assumed that the universe of items is limited to items
+        from preferred_values having feature preferred_feature.
 
         Args:
-            preferred_courses (List[List[str]]): Each list is a topic and items in that list are courses
-            limits (List[int]): The maximum number of courses desired per topic
-            course (Course): Feature to be used for courses
+            preferred_values (List[List[Any]]): Each list is a category and values in that list are preferred
+            limits (List[int]): The maximum number of items desired per category
+            preferred_feature (BaseFeature): The feaure in terms of which preferred values are expressed
+            items: (List[BaseItem], optional): Universe of all items under consideration. Defaults to None.
+            features (List[BaseFeature], optional): Feature to be used for items. Defaults to None.
 
         Raises:
-            IndexError: Number of topics must match among preferred_courses and limits
+            IndexError: Number of categories must match among preferred_items and limits
+            AttributeError: Features list is required to contain preferred_feature
+            TypeError: Items and features must be None if one of them is
 
         Returns:
-            CoursePreferrenceConstraint: A: (topics x features domain), b: (topics x 1)
+            PreferrenceConstraint: A: (categories x features domain), b: (categories x 1)
         """
-        if len(preferred_courses) != len(limits):
+        if (items is None or features is None) and items != features:
+            raise TypeError(
+                "both items and features must be None if one of them is None"
+            )
+
+        if items is None and features is None:
+            features = [preferred_feature]
+            items = [
+                BaseItem("pref", features, [value])
+                for values in preferred_values
+                for value in values
+            ]
+
+        if preferred_feature not in features:
+            raise AttributeError("features list must contain preferred_feature")
+
+        if len(preferred_values) != len(limits):
             raise IndexError("item and limit lists must have the same length")
 
-        constraint_ct = len(preferred_courses)
-        domain = course.domain
-        A = dok_array((constraint_ct, len(domain)), dtype=np.int_)
-        b = dok_array((constraint_ct, 1), dtype=np.int_)
+        rows = len(preferred_values)
+        cols = np.prod([len(feature.domain) for feature in features])
+        A = dok_array((rows, cols), dtype=np.int_)
+        b = dok_array((rows, 1), dtype=np.int_)
 
-        for i in range(constraint_ct):
-            for j in range(len(preferred_courses[i])):
-                A[
-                    i,
-                    domain.index(preferred_courses[i][j]),
-                ] = 1
+        for i in range(rows):
+            for value in preferred_values[i]:
+                for item in items:
+                    if item.value(preferred_feature) == value:
+                        A[
+                            i,
+                            item.index(features),
+                        ] = 1
             b[i, 0] = limits[i]
 
-        return LinearConstraint(A, b, [course])
+        return LinearConstraint(A, b, features)
 
     def __init__(self, A: dok_array, b: dok_array, features: List[BaseFeature]):
         super().__init__(A, b, features)
@@ -129,57 +158,73 @@ class CoursePreferrenceConstraint(LinearConstraint):
 
 class CourseTimeConstraint(LinearConstraint):
     @staticmethod
-    def mutually_exclusive_slots(items: List[ScheduleItem], course: Course, slot: Slot):
+    def from_items(items: List[ScheduleItem], slot: Slot, features: List[BaseFeature]):
         """Helper method for creating constraints that prevent course time overlap
 
         A bundle satisfies this constraint only if no two courses meet at the same time.
 
         Args:
             items (List[ScheduleItem]): Possibly time-conflicting items
-            course (Course): Feature for course
             slot (Slot): Feature for time slots
+            features (List[BaseFeature]): Feature list for items
+
+        Raises:
+            AttributeError: Features list is required to contain the provided Slot feature
 
         Returns:
-            CourseTimeConstraint: A: (time slots x course domain), b: (time slots x 1)
+            CourseTimeConstraint: A: (time slots x features domain), b: (time slots x 1)
         """
+        if slot not in features:
+            raise AttributeError("features list must contain Slot feature")
+
         rows = len(slot.times)
-        cols = len(course.domain) * len(slot.domain)
+        cols = np.prod([len(feature.domain) for feature in features])
         A = dok_array((rows, cols), dtype=np.int_)
         b = dok_array((rows, 1), dtype=np.int_)
 
         for i, tm in enumerate(slot.times):
             items_at_time = [item for item in items if tm in item.value(slot)]
             for item in items_at_time:
-                A[i, item.index([course, slot])] = 1
+                A[i, item.index(features)] = 1
             b[i, 0] = 1
 
-        return LinearConstraint(A, b, [course, slot])
+        return LinearConstraint(A, b, features)
 
 
-class CourseSectionConstraint(LinearConstraint):
+class MutualExclusivityConstraint(LinearConstraint):
     @staticmethod
-    def one_section_per_course(
-        items: List[ScheduleItem], course: Course, section: Section
+    def from_items(
+        items: List[ScheduleItem],
+        exclusive_feature: BaseFeature,
+        features: List[BaseFeature],
     ):
         """Helper method for creating constraints that prevent scheduling multiple sections of the same class
 
         Args:
-            items (List[ScheduleItem]): Items, possibly from the same course
-            course (Course): Feature for course
-            section (Section): Feature for section
+            items (List[ScheduleItem]): Items, possibly having same value for exclusive_feature
+            exclusive_feature (BaseFeature): Feature that must remain exclusive
+            features (List[BaseFeatures]): Feature list for items
+
+        Raises:
+            AttributeError: Features list is required to contain exclusive_feature
 
         Returns:
-            CourseSectionConstraint: A: (course domain x features domain), b: (course domain x 1)
+            MutualExclusivityConstraint: A: (exclusive_feature domain x features domain), b: (exclusive_feature domain x 1)
         """
-        rows = len(course.domain)
-        cols = len(course.domain) * len(section.domain)
+        if exclusive_feature not in features:
+            raise AttributeError("features list must contain exclusive_feature")
+
+        rows = len(exclusive_feature.domain)
+        cols = np.prod([len(feature.domain) for feature in features])
         A = dok_array((rows, cols), dtype=np.int_)
         b = dok_array((rows, 1), dtype=np.int_)
 
-        for i, crs in enumerate(course.domain):
-            items_for_course = [item for item in items if item.value(course) == crs]
+        for i, excl in enumerate(exclusive_feature.domain):
+            items_for_course = [
+                item for item in items if item.value(exclusive_feature) == excl
+            ]
             for item in items_for_course:
-                A[i, item.index([course, section])] = 1
+                A[i, item.index(features)] = 1
             b[i, 0] = 1
 
-        return LinearConstraint(A, b, [course, section])
+        return LinearConstraint(A, b, features)

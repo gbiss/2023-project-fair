@@ -1,8 +1,8 @@
 from fair.agent import Student, exchange_contribution, marginal_contribution
 from fair.constraint import (
-    CoursePreferrenceConstraint,
-    CourseSectionConstraint,
     CourseTimeConstraint,
+    MutualExclusivityConstraint,
+    PreferenceConstraint,
 )
 from fair.feature import Course, Section, Slot
 from fair.item import ScheduleItem
@@ -35,16 +35,17 @@ def test_marginal_contribution(
 
 
 def test_student(
-    course: Course, slot: Slot, section: Section, schedule: list[ScheduleItem]
+    course: Course,
+    slot: Slot,
+    section: Section,
+    schedule: list[ScheduleItem],
 ):
-    preferred_constr = CoursePreferrenceConstraint.from_course_lists(
+    preferred_constr = PreferenceConstraint.from_item_lists(
         [["250", "301", "611"]], [2], course
     )
-    course_time_constr = CourseTimeConstraint.mutually_exclusive_slots(
-        schedule, course, slot
-    )
-    course_sect_constr = CourseSectionConstraint.one_section_per_course(
-        schedule, course, section
+    course_time_constr = CourseTimeConstraint.from_items(schedule, slot, [course, slot])
+    course_sect_constr = MutualExclusivityConstraint.from_items(
+        schedule, course, [course, section]
     )
     student = Student(
         StudentValuation([preferred_constr, course_time_constr, course_sect_constr])

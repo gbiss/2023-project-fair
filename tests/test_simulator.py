@@ -1,4 +1,4 @@
-from fair.constraint import CourseSectionConstraint, CourseTimeConstraint
+from fair.constraint import CourseTimeConstraint, MutualExclusivityConstraint
 from fair.feature import Course, Section, Slot
 from fair.item import ScheduleItem
 from fair.simulation import RenaissanceMan
@@ -9,20 +9,26 @@ def test_renaissance_man(
 ):
     topic_list = [["250", "301"], ["611"]]
     quantities = [1, 1]
+    features = [course, section, slot]
     global_constraints = [
-        CourseTimeConstraint.mutually_exclusive_slots(schedule, course, slot),
-        CourseSectionConstraint.one_section_per_course(schedule, course, section),
+        CourseTimeConstraint.from_items(schedule, slot, [course, slot]),
+        MutualExclusivityConstraint.from_items(schedule, course, [course, section]),
     ]
 
     # preferred course list does not exceed max quantitity for multiple random configurations
     for i in range(10):
-        student = RenaissanceMan(topic_list, quantities, course, global_constraints, i)
+        student = RenaissanceMan(
+            topic_list, quantities, course, global_constraints, schedule, features, i
+        )
         for j in range(len(quantities)):
             assert len(student.preferred_courses[j]) <= student.quantities[j]
 
     # student without global constraints can always be fully satisfied
-    student = RenaissanceMan(topic_list, quantities, course, [], 0)
-    items = []
+    student = RenaissanceMan(topic_list, quantities, course, [], schedule, features, 0)
     for i, quant in enumerate(student.quantities):
-        items = [ScheduleItem([course], [crs]) for crs in student.preferred_courses[i]]
+        items = [
+            item
+            for item in schedule
+            if item.value(course) in student.preferred_courses[i]
+        ]
         assert student.value(items) == quant

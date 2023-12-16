@@ -1,6 +1,6 @@
 from typing import List
 
-from fair.constraint import CoursePreferrenceConstraint
+from fair.constraint import PreferenceConstraint
 
 from .item import BaseItem
 from .valuation import RankValuation, UniqueItemsValuation
@@ -148,15 +148,14 @@ class LegacyStudent:
     def get_desired_items_indexes(self, items: List[BaseItem]):
         """Return subset of indices from items that are preferred by the student
 
-        This method will currently only work if the delegate student object is of type
-        RenaissanceMan since it is the only student type that implements preferred_courses.
+        This method will currently only work if the delegate student object implements a
+        ConstraintSatifactionValuation valuation, which itself includes a PreferrenceConstraint
 
         Args:
             items (List[BaseItem]): Candidate items list
 
         Raises:
-            AttributeError: Raised when preferred_courses is not a member of the delgate student
-            AttributeError: Raised when the first item does not have "course" as a feature
+            AttributeError: Raised when student.valuation does not include PreferrenceConstraint
 
         Returns:
             List[int]: Indices of desired items in list
@@ -166,12 +165,12 @@ class LegacyStudent:
 
         course_preference_constr = None
         for constraint in self.student.valuation.constraints:
-            if CoursePreferrenceConstraint in type(constraint).__subclasses__():
+            if PreferenceConstraint in type(constraint).__subclasses__():
                 course_preference_constr = constraint
                 break
 
         if course_preference_constr is None:
-            raise AttributeError("Student must include CoursePreferrenceConstraint")
+            raise AttributeError("Student must include PreferrenceConstraint")
 
         constrained = course_preference_constr.constrained_items(items)
 
