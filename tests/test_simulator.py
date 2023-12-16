@@ -18,13 +18,13 @@ def test_renaissance_man(
     # preferred course list does not exceed max quantitity for multiple random configurations
     for i in range(10):
         student = RenaissanceMan(
-            topic_list, quantities, course, schedule, features, global_constraints, i
+            topic_list, quantities, course, global_constraints, schedule, features, i
         )
         for j in range(len(quantities)):
             assert len(student.preferred_courses[j]) <= student.quantities[j]
 
     # student without global constraints can always be fully satisfied
-    student = RenaissanceMan(topic_list, quantities, course, schedule, features, [], 0)
+    student = RenaissanceMan(topic_list, quantities, course, [], schedule, features, 0)
     for i, quant in enumerate(student.quantities):
         items = [
             item

@@ -31,9 +31,9 @@ class RenaissanceMan(SimulatedAgent):
         topic_list: List[List[ScheduleItem]],
         max_quantities: List[int],
         course: Course,
-        schedule: List[ScheduleItem],
-        features: List[BaseFeature],
         global_constraints: List[LinearConstraint],
+        schedule: List[ScheduleItem] = None,
+        features: List[BaseFeature] = None,
         seed: int | None = None,
     ):
         """
@@ -41,9 +41,9 @@ class RenaissanceMan(SimulatedAgent):
             topic_list (List[List[ScheduleItem]]): A list of lists of course items, one per topic
             max_quantities (List[int]): The maximum number of courses desired per topic
             course (Course): Feature for course
-            schedule (List[ScheduleItem]): All possible items in the student's schedule
-            features (List[BaseFeature]): The features implemented by items in schedule
             global_constraints (List[LinearConstraint]): Constraints not specific to this agent
+            schedule (List[ScheduleItem], optional): All possible items in the student's schedule. Defaults to None.
+            features (List[BaseFeature], optional): The features implemented by items in schedule. Defaults to None.
             seed (int | None, optional): Random seed. Defaults to None.
         """
         rng = np.random.default_rng(seed)

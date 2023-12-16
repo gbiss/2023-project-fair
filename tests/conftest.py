@@ -174,16 +174,14 @@ def renaissance1(
     global_constraints: List[LinearConstraint],
     linear_constraint: PreferenceConstraint,
     course: Course,
-    features: List[BaseFeature],
-    schedule: List[ScheduleItem],
 ):
     return RenaissanceMan(
         [["250", "301"], ["611"]],
         [1, 1],
         course,
-        schedule,
-        features,
         global_constraints + [linear_constraint],
+        None,
+        None,
         0,
     )
 
@@ -200,8 +198,8 @@ def renaissance2(
         [["250", "301"], ["611"]],
         [1, 1],
         course,
-        schedule,
-        features,
         global_constraints + [linear_constraint],
+        None,
+        None,
         1,
     )
