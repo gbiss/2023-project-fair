@@ -4,9 +4,9 @@ from fair.valuation import ConstraintSatifactionValuation, UniqueItemsValuation
 
 
 def test_valid_constraint_valuation(
-    bundle_250_301: list[ScheduleItem], linear_constraint: LinearConstraint
+    bundle_250_301: list[ScheduleItem], all_courses_constraint: LinearConstraint
 ):
-    valuation = ConstraintSatifactionValuation([linear_constraint])
+    valuation = ConstraintSatifactionValuation([all_courses_constraint])
 
     assert valuation.independent(bundle_250_301) == 1
     assert valuation.value(bundle_250_301) == 2

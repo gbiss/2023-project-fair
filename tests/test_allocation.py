@@ -15,8 +15,8 @@ def test_original_yankee_swap(
     renaissance2: RenaissanceMan,
     schedule: list[ScheduleItem],
 ):
-    leg_student1 = LegacyStudent(renaissance1)
-    leg_student2 = LegacyStudent(renaissance2)
+    leg_student1 = LegacyStudent(renaissance1, renaissance1.all_courses_constraint)
+    leg_student2 = LegacyStudent(renaissance2, renaissance2.all_courses_constraint)
 
     original_yankee_swap([leg_student1, leg_student2], schedule)
 
@@ -26,8 +26,8 @@ def test_general_yankee_swap(
     renaissance2: RenaissanceMan,
     schedule: list[ScheduleItem],
 ):
-    leg_student1 = LegacyStudent(renaissance1)
-    leg_student2 = LegacyStudent(renaissance2)
+    leg_student1 = LegacyStudent(renaissance1, renaissance1.all_courses_constraint)
+    leg_student2 = LegacyStudent(renaissance2, renaissance2.all_courses_constraint)
 
     general_yankee_swap([leg_student1, leg_student2], schedule)
 
@@ -37,8 +37,8 @@ def test_bfs_yankee_swap(
     renaissance2: RenaissanceMan,
     schedule: list[ScheduleItem],
 ):
-    leg_student1 = LegacyStudent(renaissance1)
-    leg_student2 = LegacyStudent(renaissance2)
+    leg_student1 = LegacyStudent(renaissance1, renaissance1.all_courses_constraint)
+    leg_student2 = LegacyStudent(renaissance2, renaissance2.all_courses_constraint)
 
     bfs_yankee_swap([leg_student1, leg_student2], schedule)
 
@@ -48,8 +48,8 @@ def test_round_robin_swap(
     renaissance2: RenaissanceMan,
     schedule: list[ScheduleItem],
 ):
-    leg_student1 = LegacyStudent(renaissance1)
-    leg_student2 = LegacyStudent(renaissance2)
+    leg_student1 = LegacyStudent(renaissance1, renaissance1.all_courses_constraint)
+    leg_student2 = LegacyStudent(renaissance2, renaissance2.all_courses_constraint)
 
     round_robin([leg_student1, leg_student2], schedule)
 
@@ -59,7 +59,7 @@ def test_spire_swap(
     renaissance2: RenaissanceMan,
     schedule: list[ScheduleItem],
 ):
-    leg_student1 = LegacyStudent(renaissance1)
-    leg_student2 = LegacyStudent(renaissance2)
+    leg_student1 = LegacyStudent(renaissance1, renaissance1.all_courses_constraint)
+    leg_student2 = LegacyStudent(renaissance2, renaissance2.all_courses_constraint)
 
     SPIRE_algorithm([leg_student1, leg_student2], schedule)

@@ -21,7 +21,7 @@ def test_renaissance_man(
             topic_list, quantities, course, global_constraints, schedule, features, i
         )
         for j in range(len(quantities)):
-            assert len(student.preferred_courses[j]) <= student.quantities[j]
+            assert len(student.preferred_topics[j]) <= student.quantities[j]
 
     # student without global constraints can always be fully satisfied
     student = RenaissanceMan(topic_list, quantities, course, [], schedule, features, 0)
@@ -29,6 +29,6 @@ def test_renaissance_man(
         items = [
             item
             for item in schedule
-            if item.value(course) in student.preferred_courses[i]
+            if item.value(course) in student.preferred_topics[i]
         ]
         assert student.value(items) == quant
