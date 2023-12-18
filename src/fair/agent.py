@@ -109,13 +109,23 @@ class Student(BaseAgent):
 class LegacyStudent:
     """A student compatible with https://github.com/cheerstopaula/Allocation"""
 
-    def __init__(self, student: BaseAgent):
+    def __init__(
+        self, student: BaseAgent, all_courses_constraint: PreferenceConstraint
+    ):
         """
+        Raises:
+            AttributeError: student must include valuation as member
+
         Args:
             student (BaseAgent): Student to delegate value queries to
+            all_courses_constraint (PreferenceConstraint): All desirable courses
         """
+        if not hasattr(student, "valuation"):
+            raise AttributeError("student delegate must have valuation member")
+
         student.valuation = UniqueItemsValuation(student.valuation)
         self.student = student
+        self.all_courses_constraint = all_courses_constraint
 
     def valuation(self, bundle: List[BaseItem]):
         """Delegate to value function
@@ -155,23 +165,14 @@ class LegacyStudent:
             items (List[BaseItem]): Candidate items list
 
         Raises:
-            AttributeError: Raised when student.valuation does not include PreferrenceConstraint
+            AttributeError: student.valuation.constraints must include all_courses_constraint
 
         Returns:
             List[int]: Indices of desired items in list
         """
-        if not hasattr(self.student.valuation, "constraints"):
-            raise AttributeError("Student valuation must have constraints property")
+        if self.all_courses_constraint not in self.student.valuation.constraints:
+            raise AttributeError("student delegate must include all_courses_constraint")
 
-        course_preference_constr = None
-        for constraint in self.student.valuation.constraints:
-            if PreferenceConstraint in type(constraint).__subclasses__():
-                course_preference_constr = constraint
-                break
+        desired_items = self.all_courses_constraint.constrained_items(items)
 
-        if course_preference_constr is None:
-            raise AttributeError("Student must include PreferrenceConstraint")
-
-        constrained = course_preference_constr.constrained_items(items)
-
-        return [i for i in range(len(items)) if items[i] in constrained]
+        return [i for i in range(len(items)) if items[i] in desired_items]

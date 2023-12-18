@@ -52,16 +52,27 @@ class RenaissanceMan(SimulatedAgent):
         for max_quant in max_quantities:
             self.quantities.append(rng.integers(0, max_quant + 1))
 
+        self.preferred_topics = []
         self.preferred_courses = []
         for i, quant in enumerate(self.quantities):
-            self.preferred_courses.append(
-                rng.choice(topic_list[i], quant, replace=False).tolist()
-            )
+            topic = rng.choice(topic_list[i], quant, replace=False).tolist()
+            self.preferred_topics.append(topic)
+            self.preferred_courses += topic
+
+        self.all_courses_constraint = PreferenceConstraint.from_item_lists(
+            [self.preferred_courses],
+            [sum(self.quantities)],
+            course,
+            schedule,
+            features,
+        )
+        self.topic_constraint = PreferenceConstraint.from_item_lists(
+            self.preferred_topics, self.quantities, course, schedule, features
+        )
 
         constraints = global_constraints + [
-            PreferenceConstraint.from_item_lists(
-                self.preferred_courses, self.quantities, course, schedule, features
-            )
+            self.all_courses_constraint,
+            self.topic_constraint,
         ]
 
         super().__init__(constraints)

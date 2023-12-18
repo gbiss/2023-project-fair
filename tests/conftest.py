@@ -172,34 +172,26 @@ def global_constraints(
 @pytest.fixture
 def renaissance1(
     global_constraints: List[LinearConstraint],
-    all_courses_constraint: PreferenceConstraint,
     course: Course,
 ):
     return RenaissanceMan(
         [["250", "301"], ["611"]],
         [1, 1],
         course,
-        global_constraints + [all_courses_constraint],
-        None,
-        None,
-        0,
+        global_constraints,
+        seed=0,
     )
 
 
 @pytest.fixture
 def renaissance2(
     global_constraints: List[LinearConstraint],
-    all_courses_constraint: PreferenceConstraint,
     course: Course,
-    features: List[BaseFeature],
-    schedule: List[ScheduleItem],
 ):
     return RenaissanceMan(
         [["250", "301"], ["611"]],
         [1, 1],
         course,
-        global_constraints + [all_courses_constraint],
-        None,
-        None,
-        1,
+        global_constraints,
+        seed=1,
     )
