@@ -89,7 +89,7 @@ def slots_for_time_range(time_range: str, time_slots: List[datetime.time]):
     rng = parse_time_range(time_range)
     values = []
     for tm in time_slots:
-        if tm >= rng[0] and tm <= rng[1]:
+        if tm >= rng[0] and tm < rng[1]:
             values.append(tm)
 
     return tuple(values)
