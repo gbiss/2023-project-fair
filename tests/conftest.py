@@ -86,7 +86,7 @@ def bundle_301_611(schedule_item301: ScheduleItem, schedule_item611: ScheduleIte
 
 
 @pytest.fixture
-def linear_constraint(course: Course, all_items: list[ScheduleItem]):
+def all_courses_constraint(course: Course, all_items: list[ScheduleItem]):
     return PreferenceConstraint.from_item_lists(
         [["250", "301", "611"]], [2], course, all_items, [course]
     )
@@ -172,14 +172,14 @@ def global_constraints(
 @pytest.fixture
 def renaissance1(
     global_constraints: List[LinearConstraint],
-    linear_constraint: PreferenceConstraint,
+    all_courses_constraint: PreferenceConstraint,
     course: Course,
 ):
     return RenaissanceMan(
         [["250", "301"], ["611"]],
         [1, 1],
         course,
-        global_constraints + [linear_constraint],
+        global_constraints + [all_courses_constraint],
         None,
         None,
         0,
@@ -189,7 +189,7 @@ def renaissance1(
 @pytest.fixture
 def renaissance2(
     global_constraints: List[LinearConstraint],
-    linear_constraint: PreferenceConstraint,
+    all_courses_constraint: PreferenceConstraint,
     course: Course,
     features: List[BaseFeature],
     schedule: List[ScheduleItem],
@@ -198,7 +198,7 @@ def renaissance2(
         [["250", "301"], ["611"]],
         [1, 1],
         course,
-        global_constraints + [linear_constraint],
+        global_constraints + [all_courses_constraint],
         None,
         None,
         1,
