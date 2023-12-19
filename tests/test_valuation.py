@@ -1,4 +1,7 @@
-from fair.constraint import LinearConstraint
+from typing import List
+
+from fair.constraint import LinearConstraint, PreferenceConstraint
+from fair.feature import Course
 from fair.item import ScheduleItem
 from fair.valuation import ConstraintSatifactionValuation, UniqueItemsValuation
 
@@ -34,3 +37,27 @@ def test_unique_item_adapter(
     assert original_valuation.value(bundle) == 2
     assert unique_valuation.independent(bundle) == True
     assert unique_valuation.value(bundle) == 1
+
+
+def test_memoization(
+    schedule_item250: ScheduleItem, all_items: List[ScheduleItem], course: Course
+):
+    constraint = PreferenceConstraint.from_item_lists([["250", "301"]], [1], course)
+    valuation = ConstraintSatifactionValuation([constraint])
+    valuation.value([schedule_item250])
+    valuation.value([schedule_item250])
+
+    assert valuation._value_ct == 2
+    assert valuation._unique_value_ct == 1
+
+    constraint = PreferenceConstraint.from_item_lists(
+        [["250", "301", "611"]], [2], course
+    )
+    valuation = ConstraintSatifactionValuation([constraint])
+    valuation.value(all_items)
+    before_value = valuation._unique_value_ct
+    before_independent = valuation._unique_independent_ct
+    valuation.value(all_items)
+
+    assert valuation._unique_value_ct == before_value
+    assert valuation._unique_independent_ct == before_independent

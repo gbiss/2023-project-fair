@@ -46,6 +46,10 @@ class MemoableValuation:
         self.constraints = constraints
         self._independent_memo = {}
         self._value_memo = {}
+        self._independent_ct = 0
+        self._unique_independent_ct = 0
+        self._value_ct = 0
+        self._unique_value_ct = 0
 
     def _independent(self, bundle: List[BaseItem]):
         """Actual calculation of bundle independence
@@ -71,8 +75,10 @@ class MemoableValuation:
         """
         hashable_bundle = tuple(sorted(bundle))
 
+        self._independent_ct += 1
         if hashable_bundle not in self._independent_memo:
             self._independent_memo[hashable_bundle] = self._independent(bundle)
+            self._unique_independent_ct += 1
 
         return self._independent_memo[hashable_bundle]
 
@@ -100,8 +106,10 @@ class MemoableValuation:
         """
         hashable_bundle = tuple(sorted(bundle))
 
+        self._value_ct += 1
         if hashable_bundle not in self._value_memo:
             self._value_memo[hashable_bundle] = self._value(bundle)
+            self._unique_value_ct += 1
 
         return self._value_memo[hashable_bundle]
 
