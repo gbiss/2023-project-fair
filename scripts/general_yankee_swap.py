@@ -10,7 +10,7 @@ from fair.feature import Course, Section, Slot, slots_for_time_range
 from fair.item import ScheduleItem
 from fair.simulation import RenaissanceMan
 
-NUM_STUDENTS = 100
+NUM_STUDENTS = 3
 MAX_COURSES_PER_TOPIC = 5
 MAX_COURSES_TOTAL = 5
 EXCEL_SCHEDULE_PATH = os.path.join(
@@ -38,7 +38,8 @@ for _, row in df.iterrows():
     topic_map[row["Categories"]].add(crs)
     slt = slots_for_time_range(row["Mtg Time"], slot.times)
     sec = row["Section"]
-    schedule.append(ScheduleItem(features, [crs, slt, sec]))
+    capacity = row["CICScapacity"]
+    schedule.append(ScheduleItem(features, [crs, slt, sec], capacity=capacity))
 
 topics = [list(courses) for courses in topic_map.values()]
 
