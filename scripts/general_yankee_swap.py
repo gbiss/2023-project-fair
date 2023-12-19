@@ -63,3 +63,5 @@ for i in range(NUM_STUDENTS):
     students.append(LegacyStudent(student, student.all_courses_constraint))
 
 general_yankee_swap(students, schedule)
+print("total bundles evaluated", [student.valuation.valuation._value_ct])
+print("unique bundles evaluated", [student.valuation.valuation._unique_value_ct])
