@@ -30,6 +30,7 @@ class RenaissanceMan(SimulatedAgent):
         self,
         topic_list: List[List[ScheduleItem]],
         max_quantities: List[int],
+        max_courses: int,
         course: Course,
         global_constraints: List[LinearConstraint],
         schedule: List[ScheduleItem] = None,
@@ -40,6 +41,7 @@ class RenaissanceMan(SimulatedAgent):
         Args:
             topic_list (List[List[ScheduleItem]]): A list of lists of course items, one per topic
             max_quantities (List[int]): The maximum number of courses desired per topic
+            max_courses (int): Student can take no more than max_courses total
             course (Course): Feature for course
             global_constraints (List[LinearConstraint]): Constraints not specific to this agent
             schedule (List[ScheduleItem], optional): All possible items in the student's schedule. Defaults to None.
@@ -59,9 +61,10 @@ class RenaissanceMan(SimulatedAgent):
             self.preferred_topics.append(topic)
             self.preferred_courses += topic
 
+        self.total_courses = rng.integers(1, max_courses + 1)
         self.all_courses_constraint = PreferenceConstraint.from_item_lists(
             [self.preferred_courses],
-            [sum(self.quantities)],
+            [self.total_courses],
             course,
             schedule,
             features,

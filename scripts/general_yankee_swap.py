@@ -10,12 +10,15 @@ from fair.feature import Course, Section, Slot, slots_for_time_range
 from fair.item import ScheduleItem
 from fair.simulation import RenaissanceMan
 
-excel_schedule_path_with_cats = os.path.join(
+NUM_STUDENTS = 100
+MAX_COURSES_PER_TOPIC = 5
+MAX_COURSES_TOTAL = 5
+EXCEL_SCHEDULE_PATH = os.path.join(
     os.path.dirname(__file__), "../resources/fall2023schedule-2-cat.xlsx"
 )
 
 # load schedule as DataFrame
-with open(excel_schedule_path_with_cats, "rb") as fd:
+with open(EXCEL_SCHEDULE_PATH, "rb") as fd:
     df = pd.read_excel(fd)
 
 # construct features from DataFrame
@@ -47,10 +50,11 @@ course_sect_constr = MutualExclusivityConstraint.from_items(
 
 # randomly generate students
 students = []
-for i in range(3):
+for i in range(NUM_STUDENTS):
     student = RenaissanceMan(
         topics,
-        [min(len(topic), 6) for topic in topics],
+        [min(len(topic), MAX_COURSES_PER_TOPIC) for topic in topics],
+        MAX_COURSES_TOTAL,
         course,
         [course_time_constr, course_sect_constr],
         seed=i,
