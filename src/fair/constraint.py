@@ -27,7 +27,7 @@ def indicator(features: List[BaseFeature], bundle: List[BaseItem]):
     for item in bundle:
         ind[item.index(features), 0] = True
 
-    return ind
+    return ind.tocsr()
 
 
 class BaseConstraint:
@@ -44,8 +44,8 @@ class LinearConstraint(BaseConstraint):
             b (dok_array): Row capacities
             features (List[BaseFeature]): Features relevant for this constraint
         """
-        self.A = A
-        self.b = b
+        self.A = A.tocsr()
+        self.b = b.tocsr()
         self.features = features
 
     def satisfies(self, bundle: List[BaseItem]):
