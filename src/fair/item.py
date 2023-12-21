@@ -1,6 +1,5 @@
 from typing import Any, List
 
-import numpy as np
 import pandas as pd
 
 from .feature import (
@@ -23,12 +22,14 @@ class BaseItem:
         name: str,
         features: List[BaseFeature],
         values: List[Any],
+        index: int = None,
         capacity: int = 1,
     ):
         """
         Args:
             features (List[BaseFeature]): Features revelvant for this item
             values (List[Any]): Value of each feature from its domain
+            index (int, optional): Position relative to other items. Defaults to None.
             capacity (int): Number of times item can be allocated
 
         Raises:
@@ -38,6 +39,7 @@ class BaseItem:
         self.name = name
         self.features = features
         self.values = values
+        self.idx = index
         self.capacity = capacity
 
         # validate cardinality
@@ -69,8 +71,10 @@ class BaseItem:
     def index(self, features: List[BaseFeature] = None):
         """Position of item in canonical order
 
-        The domains of features provided as input are ordered according to their cartesian product.
-        This method maps the feature values of the present item the associated point in that product.
+        If self.idx is not None, then self.idx is returned and features is ignored.
+        Otherwise, the domains of features provided as input are ordered according to
+        their cartesian product. This method maps the feature values of the present
+        item the associated point in that product.
 
         Args:
             features (List[BaseFeature], optional): Subset of features from initialization. Defaults to None.
@@ -79,8 +83,11 @@ class BaseItem:
             FeatureError: Features provided must be a subset of those provided during initialization
 
         Returns:
-            Any: Point associated with item in the cartesian product of feature domains
+            Any: self.index, otherwise the point associated with item in the cartesian product of feature domains
         """
+        if self.idx is not None:
+            return self.idx
+
         features = self.features if features is None else features
         mult = 1
         idx = 0
@@ -134,7 +141,7 @@ class ScheduleItem(BaseItem):
         slot = Slot.from_time_ranges(df["Mtg Time"].unique(), "15T")
         features = [course, section, slot]
         items = []
-        for _, row in df.iterrows():
+        for idx, row in df.iterrows():
             values = [
                 row["Catalog"],
                 row["Section"],
@@ -145,6 +152,7 @@ class ScheduleItem(BaseItem):
                     ScheduleItem(
                         features,
                         values,
+                        idx,
                         int(row["CICScapacity"]),
                         row["Categories"] if "Categories" in df else None,
                     )
@@ -158,6 +166,7 @@ class ScheduleItem(BaseItem):
         self,
         features: List[BaseFeature],
         values: List[Any],
+        index: int = None,
         capacity: int = 1,
         category: str = None,
     ):
@@ -166,8 +175,9 @@ class ScheduleItem(BaseItem):
         Args:
             features (List[BaseFeature]): Features revelvant for this item
             values (List[Any]): Value of each feature from its domain
+            index (int, optional): Position relative to other items. Defaults to None.
             capacity (int): Number of times item can be allocated. Defaults to 1.
             category (str, optional): Topic for course. Defaults to None.
         """
-        super().__init__("schedule", features, values, capacity)
+        super().__init__("schedule", features, values, index, capacity)
         self.category = category

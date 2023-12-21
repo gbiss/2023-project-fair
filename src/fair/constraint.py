@@ -8,7 +8,7 @@ from .feature import BaseFeature, Course, Section, Slot
 from .item import BaseItem, ScheduleItem
 
 
-def indicator(features: List[BaseFeature], bundle: List[BaseItem]):
+def indicator(features: List[BaseFeature], bundle: List[BaseItem], extent: int):
     """Indicator vector for bundle over domain of features
 
     Associated with each item in the bundle is a point in the cartesian product of
@@ -18,11 +18,12 @@ def indicator(features: List[BaseFeature], bundle: List[BaseItem]):
     Args:
         features (List[BaseFeature]): Subset of features over which the bundle items are defined
         bundle (List[BaseItem]): Items whose index we would like to identify
+        extent (int): Maximum index in domain
 
     Returns:
         scipy.sparse.dok_array: Indicator vector of bundle indices
     """
-    rows = np.prod([len(feature.domain) for feature in features])
+    rows = extent
     ind = dok_array((rows, 1), dtype=np.int_)
     for item in bundle:
         ind[item.index(features), 0] = True
@@ -37,16 +38,28 @@ class BaseConstraint:
 class LinearConstraint(BaseConstraint):
     """Constraints that can be expressed in the form A*x <= b"""
 
-    def __init__(self, A: dok_array, b: dok_array, features: List[BaseFeature]):
+    def __init__(
+        self,
+        A: dok_array,
+        b: dok_array,
+        features: List[BaseFeature],
+        extent: int = None,
+    ):
         """
         Args:
             A (dok_array): Constraint matrix
             b (dok_array): Row capacities
             features (List[BaseFeature]): Features relevant for this constraint
+            extent (int, optional): Largest possible index value. Defaults to None.
         """
         self.A = A.tocsr()
         self.b = b.tocsr()
         self.features = features
+
+        if extent is not None:
+            self.extent = extent
+        else:
+            self.extent = np.prod([len(feature.domain) for feature in features])
 
     def satisfies(self, bundle: List[BaseItem]):
         """Determine if bundle satisfies this constraint
@@ -57,7 +70,7 @@ class LinearConstraint(BaseConstraint):
         Returns:
             bool: True if the constraint is satisfied; False otherwise
         """
-        ind = indicator(self.features, bundle)
+        ind = indicator(self.features, bundle, self.extent)
         product = self.A @ ind
 
         # apparently <= is much less efficient than using < and != separately
@@ -124,10 +137,13 @@ class PreferenceConstraint(LinearConstraint):
         if items is None and features is None:
             features = [preferred_feature]
             items = [
-                BaseItem("pref", features, [value])
+                BaseItem(preferred_feature.name, features, [value])
                 for values in preferred_values
                 for value in values
             ]
+            cols = len(preferred_feature.domain)
+        else:
+            cols = max([item.index(features) for item in items]) + 1
 
         if preferred_feature not in features:
             raise AttributeError("features list must contain preferred_feature")
@@ -136,7 +152,6 @@ class PreferenceConstraint(LinearConstraint):
             raise IndexError("item and limit lists must have the same length")
 
         rows = len(preferred_values)
-        cols = np.prod([len(feature.domain) for feature in features])
         A = dok_array((rows, cols), dtype=np.int_)
         b = dok_array((rows, 1), dtype=np.int_)
 
@@ -150,7 +165,7 @@ class PreferenceConstraint(LinearConstraint):
                         ] = 1
             b[i, 0] = limits[i]
 
-        return LinearConstraint(A, b, features)
+        return LinearConstraint(A, b, features, cols)
 
     def __init__(self, A: dok_array, b: dok_array, features: List[BaseFeature]):
         super().__init__(A, b, features)
@@ -178,7 +193,7 @@ class CourseTimeConstraint(LinearConstraint):
             raise AttributeError("features list must contain Slot feature")
 
         rows = len(slot.times)
-        cols = np.prod([len(feature.domain) for feature in features])
+        cols = max([item.index(features) for item in items]) + 1
         A = dok_array((rows, cols), dtype=np.int_)
         b = dok_array((rows, 1), dtype=np.int_)
 
@@ -188,7 +203,7 @@ class CourseTimeConstraint(LinearConstraint):
                 A[i, item.index(features)] = 1
             b[i, 0] = 1
 
-        return LinearConstraint(A, b, features)
+        return LinearConstraint(A, b, features, cols)
 
 
 class MutualExclusivityConstraint(LinearConstraint):
@@ -215,7 +230,7 @@ class MutualExclusivityConstraint(LinearConstraint):
             raise AttributeError("features list must contain exclusive_feature")
 
         rows = len(exclusive_feature.domain)
-        cols = np.prod([len(feature.domain) for feature in features])
+        cols = max([item.index(features) for item in items]) + 1
         A = dok_array((rows, cols), dtype=np.int_)
         b = dok_array((rows, 1), dtype=np.int_)
 
@@ -227,4 +242,4 @@ class MutualExclusivityConstraint(LinearConstraint):
                 A[i, item.index(features)] = 1
             b[i, 0] = 1
 
-        return LinearConstraint(A, b, features)
+        return LinearConstraint(A, b, features, cols)

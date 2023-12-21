@@ -33,13 +33,15 @@ features = [course, slot, section]
 # construct schedule
 schedule = []
 topic_map = defaultdict(set)
-for _, row in df.iterrows():
+for idx, row in df.iterrows():
     crs = str(row["Catalog"])
     topic_map[row["Categories"]].add(crs)
     slt = slots_for_time_range(row["Mtg Time"], slot.times)
     sec = row["Section"]
     capacity = row["CICScapacity"]
-    schedule.append(ScheduleItem(features, [crs, slt, sec], capacity=capacity))
+    schedule.append(
+        ScheduleItem(features, [crs, slt, sec], index=idx, capacity=capacity)
+    )
 
 topics = [list(courses) for courses in topic_map.values()]
 
@@ -58,6 +60,8 @@ for i in range(NUM_STUDENTS):
         MAX_COURSES_TOTAL,
         course,
         [course_time_constr, course_sect_constr],
+        schedule,
+        features,
         seed=i,
     )
     students.append(LegacyStudent(student, student.all_courses_constraint))

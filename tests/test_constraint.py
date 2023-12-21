@@ -13,7 +13,7 @@ from fair.item import ScheduleItem
 
 
 def test_indicator(course: Course, bundle_250_301: list[ScheduleItem]):
-    ind = indicator([course], bundle_250_301)
+    ind = indicator([course], bundle_250_301, len(course.domain))
 
     np.testing.assert_array_equal(ind.toarray().flatten(), [1, 1, 0])
 
