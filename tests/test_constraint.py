@@ -13,9 +13,13 @@ from fair.item import ScheduleItem
 
 
 def test_indicator(bundle_250_301: list[ScheduleItem]):
-    ind = indicator(bundle_250_301, 3)
-
+    # sparse
+    ind = indicator(bundle_250_301, 3, True)
     np.testing.assert_array_equal(ind.toarray().flatten(), [1, 0, 1])
+
+    # dense
+    ind = indicator(bundle_250_301, 3, False)
+    np.testing.assert_array_equal(ind.flatten(), [1, 0, 1])
 
 
 def test_linear_constraint(
@@ -23,8 +27,16 @@ def test_linear_constraint(
     bundle_250_301_2: list[ScheduleItem],
     schedule: list[ScheduleItem],
 ):
+    # sparse
     constraint = PreferenceConstraint.from_item_lists(
-        schedule, [["250", "301", "611"]], [1], course
+        schedule, [["250", "301", "611"]], [1], course, True
+    )
+
+    assert not constraint.satisfies(bundle_250_301_2)
+
+    # dense
+    constraint = PreferenceConstraint.from_item_lists(
+        schedule, [["250", "301", "611"]], [1], course, False
     )
 
     assert not constraint.satisfies(bundle_250_301_2)
