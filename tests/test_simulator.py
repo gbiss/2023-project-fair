@@ -25,7 +25,6 @@ def test_renaissance_man(
             course,
             global_constraints,
             schedule,
-            features,
             i,
         )
         for j in range(len(quantities)):
@@ -33,7 +32,7 @@ def test_renaissance_man(
 
     # student without global constraints can always be fully satisfied
     student = RenaissanceMan(
-        topic_list, quantities, max_courses, course, [], schedule, features, 0
+        topic_list, quantities, max_courses, course, [], schedule, 0
     )
     for i, quant in enumerate(student.quantities):
         items = [
