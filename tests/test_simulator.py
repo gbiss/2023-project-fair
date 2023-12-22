@@ -12,8 +12,8 @@ def test_renaissance_man(
     max_courses = 2
     features = [course, section, slot]
     global_constraints = [
-        CourseTimeConstraint.from_items(schedule, slot, [course, slot]),
-        MutualExclusivityConstraint.from_items(schedule, course, [course, section]),
+        CourseTimeConstraint.from_items(schedule, slot),
+        MutualExclusivityConstraint.from_items(schedule, course),
     ]
 
     # preferred course list does not exceed max quantitity for multiple random configurations
@@ -25,7 +25,6 @@ def test_renaissance_man(
             course,
             global_constraints,
             schedule,
-            features,
             i,
         )
         for j in range(len(quantities)):
@@ -33,7 +32,7 @@ def test_renaissance_man(
 
     # student without global constraints can always be fully satisfied
     student = RenaissanceMan(
-        topic_list, quantities, max_courses, course, [], schedule, features, 0
+        topic_list, quantities, max_courses, course, [], schedule, 0
     )
     for i, quant in enumerate(student.quantities):
         items = [

@@ -1,5 +1,5 @@
 from collections import defaultdict
-from typing import Any, List
+from typing import Any, List, Union
 
 import numpy as np
 from scipy.sparse import dok_array
@@ -8,26 +8,33 @@ from .feature import BaseFeature, Course, Section, Slot
 from .item import BaseItem, ScheduleItem
 
 
-def indicator(features: List[BaseFeature], bundle: List[BaseItem]):
+def indicator(bundle: List[BaseItem], extent: int, sparse: bool):
     """Indicator vector for bundle over domain of features
 
-    Associated with each item in the bundle is a point in the cartesian product of
-    domains associated with the features. This method returns a vector with a 1 at
-    the index associated with each of these points, and a zero everywhere else.
+    This method returns a vector of length extent with a 1 at the index of each item
+    in the bundle
 
     Args:
-        features (List[BaseFeature]): Subset of features over which the bundle items are defined
         bundle (List[BaseItem]): Items whose index we would like to identify
+        extent (int): Maximum index in domain
+        sparse (bool): Should the vector returned be sparse
 
     Returns:
         scipy.sparse.dok_array: Indicator vector of bundle indices
     """
-    rows = np.prod([len(feature.domain) for feature in features])
-    ind = dok_array((rows, 1), dtype=np.int_)
-    for item in bundle:
-        ind[item.index(features), 0] = True
+    rows = extent
+    if sparse:
+        ind = dok_array((rows, 1), dtype=np.int_)
+    else:
+        ind = np.zeros((rows, 1), dtype=np.int_)
 
-    return ind.tocsr()
+    for item in bundle:
+        ind[item.index, 0] = True
+
+    if sparse:
+        ind = ind.tocsr()
+
+    return ind
 
 
 class BaseConstraint:
@@ -37,16 +44,31 @@ class BaseConstraint:
 class LinearConstraint(BaseConstraint):
     """Constraints that can be expressed in the form A*x <= b"""
 
-    def __init__(self, A: dok_array, b: dok_array, features: List[BaseFeature]):
+    def __init__(
+        self,
+        A: Union[dok_array, np.array],
+        b: Union[dok_array, np.array],
+        extent: int,
+    ):
         """
         Args:
-            A (dok_array): Constraint matrix
-            b (dok_array): Row capacities
-            features (List[BaseFeature]): Features relevant for this constraint
+            A (Union[dok_array, np.array]): Constraint matrix
+            b (Union[dok_array, np.array]): Row capacities
+            extent (int): Largest possible index value
         """
-        self.A = A.tocsr()
-        self.b = b.tocsr()
-        self.features = features
+        if type(A) != type(b):
+            raise TypeError(f"type of A: {type(A)} and b: {type(b)} must be identical")
+
+        if type(A) == dok_array:
+            self.A = A.tocsr()
+            self.b = b.tocsr()
+            self._sparse = True
+        else:
+            self.A = A
+            self.b = b
+            self._sparse = False
+
+        self.extent = extent
 
     def satisfies(self, bundle: List[BaseItem]):
         """Determine if bundle satisfies this constraint
@@ -57,14 +79,17 @@ class LinearConstraint(BaseConstraint):
         Returns:
             bool: True if the constraint is satisfied; False otherwise
         """
-        ind = indicator(self.features, bundle)
+        ind = indicator(bundle, self.extent, self._sparse)
         product = self.A @ ind
 
         # apparently <= is much less efficient than using < and != separately
-        less_than = (product < self.b).toarray().flatten()
-        equal_to = ~(product != self.b).toarray().flatten()
+        if self._sparse:
+            less_than = (product < self.b).toarray().flatten()
+            equal_to = ~(product != self.b).toarray().flatten()
 
-        return np.prod([lt or eq for lt, eq in zip(less_than, equal_to)])
+            return np.prod([lt or eq for lt, eq in zip(less_than, equal_to)])
+        else:
+            return np.prod(product <= self.b)
 
     def constrained_items(self, items: BaseItem):
         """Determine if, and for what constraint, each item is constrained
@@ -78,7 +103,7 @@ class LinearConstraint(BaseConstraint):
         active_map = defaultdict(list)
         for i in range(self.A.shape[0]):
             for item in items:
-                if self.A[i, item.index(self.features)] != 0:
+                if self.A[i, item.index] != 0:
                     active_map[item].append(i)
 
         return active_map
@@ -87,78 +112,62 @@ class LinearConstraint(BaseConstraint):
 class PreferenceConstraint(LinearConstraint):
     @staticmethod
     def from_item_lists(
+        schedule: List[BaseItem],
         preferred_values: List[List[Any]],
         limits: List[int],
         preferred_feature: BaseFeature,
-        items: List[BaseItem] = None,
-        features: List[BaseFeature] = None,
+        sparse: bool = False,
     ):
         """A helper method for constructing preference constraints
 
         This constraint ensures that the bundle contains a limited number of pre-selected items from
         each provided category (e.g. Physics, Chemistry, etc. for course items).
 
-        When features and items are None, it is assumed that the universe of items is limited to items
-        from preferred_values having feature preferred_feature.
-
         Args:
+            schedule: (List[BaseItem], optional): Universe of all items under consideration
             preferred_values (List[List[Any]]): Each list is a category and values in that list are preferred
             limits (List[int]): The maximum number of items desired per category
             preferred_feature (BaseFeature): The feaure in terms of which preferred values are expressed
-            items: (List[BaseItem], optional): Universe of all items under consideration. Defaults to None.
-            features (List[BaseFeature], optional): Feature to be used for items. Defaults to None.
+            sparse (bool): Should A and b be sparse matrices. Defaults to False.
 
         Raises:
             IndexError: Number of categories must match among preferred_items and limits
-            AttributeError: Features list is required to contain preferred_feature
-            TypeError: Items and features must be None if one of them is
 
         Returns:
             PreferrenceConstraint: A: (categories x features domain), b: (categories x 1)
         """
-        if (items is None or features is None) and items != features:
-            raise TypeError(
-                "both items and features must be None if one of them is None"
-            )
-
-        if items is None and features is None:
-            features = [preferred_feature]
-            items = [
-                BaseItem("pref", features, [value])
-                for values in preferred_values
-                for value in values
-            ]
-
-        if preferred_feature not in features:
-            raise AttributeError("features list must contain preferred_feature")
-
         if len(preferred_values) != len(limits):
             raise IndexError("item and limit lists must have the same length")
 
         rows = len(preferred_values)
-        cols = np.prod([len(feature.domain) for feature in features])
+        cols = max([item.index for item in schedule]) + 1
         A = dok_array((rows, cols), dtype=np.int_)
         b = dok_array((rows, 1), dtype=np.int_)
 
         for i in range(rows):
             for value in preferred_values[i]:
-                for item in items:
+                for item in schedule:
                     if item.value(preferred_feature) == value:
                         A[
                             i,
-                            item.index(features),
+                            item.index,
                         ] = 1
             b[i, 0] = limits[i]
 
-        return LinearConstraint(A, b, features)
+        if not sparse:
+            A = A.todense()
+            b = b.todense()
 
-    def __init__(self, A: dok_array, b: dok_array, features: List[BaseFeature]):
-        super().__init__(A, b, features)
+        return LinearConstraint(A, b, cols)
 
 
 class CourseTimeConstraint(LinearConstraint):
     @staticmethod
-    def from_items(items: List[ScheduleItem], slot: Slot, features: List[BaseFeature]):
+    def from_items(
+        items: List[ScheduleItem],
+        slot: Slot,
+        sparse: bool = False,
+    ):
         """Helper method for creating constraints that prevent course time overlap
 
         A bundle satisfies this constraint only if no two courses meet at the same time.
@@ -166,29 +175,27 @@ class CourseTimeConstraint(LinearConstraint):
         Args:
             items (List[ScheduleItem]): Possibly time-conflicting items
             slot (Slot): Feature for time slots
-            features (List[BaseFeature]): Feature list for items
-
-        Raises:
-            AttributeError: Features list is required to contain the provided Slot feature
+            sparse (bool): Should A and b be sparse matrices. Defaults to False.
 
         Returns:
             CourseTimeConstraint: A: (time slots x features domain), b: (time slots x 1)
         """
-        if slot not in features:
-            raise AttributeError("features list must contain Slot feature")
-
         rows = len(slot.times)
-        cols = np.prod([len(feature.domain) for feature in features])
+        cols = max([item.index for item in items]) + 1
         A = dok_array((rows, cols), dtype=np.int_)
         b = dok_array((rows, 1), dtype=np.int_)
 
         for i, tm in enumerate(slot.times):
             items_at_time = [item for item in items if tm in item.value(slot)]
             for item in items_at_time:
-                A[i, item.index(features)] = 1
+                A[i, item.index] = 1
             b[i, 0] = 1
 
-        return LinearConstraint(A, b, features)
+        if not sparse:
+            A = A.todense()
+            b = b.todense()
+
+        return LinearConstraint(A, b, cols)
 
 
 class MutualExclusivityConstraint(LinearConstraint):
@@ -196,26 +203,20 @@ class MutualExclusivityConstraint(LinearConstraint):
     def from_items(
         items: List[ScheduleItem],
         exclusive_feature: BaseFeature,
-        features: List[BaseFeature],
+        sparse: bool = False,
     ):
         """Helper method for creating constraints that prevent scheduling multiple sections of the same class
 
         Args:
             items (List[ScheduleItem]): Items, possibly having same value for exclusive_feature
             exclusive_feature (BaseFeature): Feature that must remain exclusive
-            features (List[BaseFeatures]): Feature list for items
-
-        Raises:
-            AttributeError: Features list is required to contain exclusive_feature
+            sparse (bool, optional): Should A and b be sparse matrices. Defaults to False.
 
         Returns:
             MutualExclusivityConstraint: A: (exclusive_feature domain x features domain), b: (exclusive_feature domain x 1)
         """
-        if exclusive_feature not in features:
-            raise AttributeError("features list must contain exclusive_feature")
-
         rows = len(exclusive_feature.domain)
-        cols = np.prod([len(feature.domain) for feature in features])
+        cols = max([item.index for item in items]) + 1
         A = dok_array((rows, cols), dtype=np.int_)
         b = dok_array((rows, 1), dtype=np.int_)
 
@@ -224,7 +225,11 @@ class MutualExclusivityConstraint(LinearConstraint):
                 item for item in items if item.value(exclusive_feature) == excl
             ]
             for item in items_for_course:
-                A[i, item.index(features)] = 1
+                A[i, item.index] = 1
             b[i, 0] = 1
 
-        return LinearConstraint(A, b, features)
+        if not sparse:
+            A = A.todense()
+            b = b.todense()
+
+        return LinearConstraint(A, b, cols)

@@ -42,27 +42,27 @@ def features(course: Course, slot: Slot, section: Section):
 
 @pytest.fixture
 def schedule_item250(course: Course, slot: Slot, section: Section):
-    return ScheduleItem([course, slot, section], ["250", (1, 2), 1])
+    return ScheduleItem([course, slot, section], ["250", (1, 2), 1], 0)
 
 
 @pytest.fixture
 def schedule_item250_2(course: Course, slot: Slot, section: Section):
-    return ScheduleItem([course, slot, section], ["250", (4, 5), 2])
+    return ScheduleItem([course, slot, section], ["250", (4, 5), 2], 1)
 
 
 @pytest.fixture
 def schedule_item301(course: Course, slot: Slot, section: Section):
-    return ScheduleItem([course, slot, section], ["301", (2, 3), 1])
+    return ScheduleItem([course, slot, section], ["301", (2, 3), 1], 2)
 
 
 @pytest.fixture
 def schedule_item301_2(course: Course, slot: Slot, section: Section):
-    return ScheduleItem([course, slot, section], ["301", (4, 5), 1])
+    return ScheduleItem([course, slot, section], ["301", (4, 5), 1], 3)
 
 
 @pytest.fixture
 def schedule_item611(course: Course, slot: Slot, section: Section):
-    return ScheduleItem([course, slot, section], ["611", (4, 5), 1])
+    return ScheduleItem([course, slot, section], ["611", (4, 5), 1], 4)
 
 
 @pytest.fixture
@@ -88,22 +88,23 @@ def bundle_301_611(schedule_item301: ScheduleItem, schedule_item611: ScheduleIte
 @pytest.fixture
 def all_courses_constraint(course: Course, all_items: list[ScheduleItem]):
     return PreferenceConstraint.from_item_lists(
-        [["250", "301", "611"]], [2], course, all_items, [course]
+        all_items, [["250", "301", "611"]], [2], course
     )
 
 
 @pytest.fixture
 def linear_constraint_250_301(course: Course, bundle_250_301: list[ScheduleItem]):
-    return PreferenceConstraint.from_item_lists([["250", "301"]], [1], course)
+    return PreferenceConstraint.from_item_lists(
+        bundle_250_301, [["250", "301"]], [1], course
+    )
 
 
 @pytest.fixture
 def course_time_constraint(
     all_items: list[ScheduleItem],
-    course: Course,
     slot: Slot,
 ):
-    return CourseTimeConstraint.from_items(all_items, slot, [course, slot])
+    return CourseTimeConstraint.from_items(all_items, slot)
 
 
 @pytest.fixture
@@ -126,19 +127,19 @@ def items_repeat_section(
 
 
 @pytest.fixture
-def course_valuation(linear_constraint_250_301: PreferenceConstraint):
-    return ConstraintSatifactionValuation([linear_constraint_250_301])
+def course_valuation(all_courses_constraint: PreferenceConstraint):
+    return ConstraintSatifactionValuation([all_courses_constraint])
 
 
 @pytest.fixture
 def schedule(course: Course, slot: Slot, section: Section):
     features = [course, slot, section]
     items = [
-        ScheduleItem(features, ["250", (1, 2), 1]),
-        ScheduleItem(features, ["250", (4, 5), 2]),
-        ScheduleItem(features, ["301", (4, 5), 1]),
-        ScheduleItem(features, ["301", (6, 7), 2]),
-        ScheduleItem(features, ["611", (6, 7), 1]),
+        ScheduleItem(features, ["250", (1, 2), 1], 0),
+        ScheduleItem(features, ["250", (4, 5), 2], 1),
+        ScheduleItem(features, ["301", (4, 5), 1], 2),
+        ScheduleItem(features, ["301", (6, 7), 2], 3),
+        ScheduleItem(features, ["611", (6, 7), 1], 4),
     ]
     return items
 
@@ -161,16 +162,15 @@ def excel_schedule_path_with_cats():
 def global_constraints(
     schedule: list[ScheduleItem], course: Course, section: Section, slot: Slot
 ):
-    course_time_constr = CourseTimeConstraint.from_items(schedule, slot, [course, slot])
-    course_sect_constr = MutualExclusivityConstraint.from_items(
-        schedule, course, [course, section]
-    )
+    course_time_constr = CourseTimeConstraint.from_items(schedule, slot)
+    course_sect_constr = MutualExclusivityConstraint.from_items(schedule, course)
 
     return [course_time_constr, course_sect_constr]
 
 
 @pytest.fixture
 def renaissance1(
+    schedule: List[ScheduleItem],
     global_constraints: List[LinearConstraint],
     course: Course,
 ):
@@ -180,12 +180,14 @@ def renaissance1(
         2,
         course,
         global_constraints,
+        schedule,
         seed=0,
     )
 
 
 @pytest.fixture
 def renaissance2(
+    schedule: List[ScheduleItem],
     global_constraints: List[LinearConstraint],
     course: Course,
 ):
@@ -195,5 +197,6 @@ def renaissance2(
         2,
         course,
         global_constraints,
+        schedule,
         seed=1,
     )

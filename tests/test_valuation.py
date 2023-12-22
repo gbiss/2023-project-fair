@@ -19,10 +19,12 @@ def test_asymmetric_constraint_valuation(
     bundle_250_301: list[ScheduleItem],
     bundle_301_611: list[ScheduleItem],
     linear_constraint_250_301: LinearConstraint,
+    all_courses_constraint: LinearConstraint,
 ):
     valuation = ConstraintSatifactionValuation([linear_constraint_250_301])
-
     assert valuation.value(bundle_250_301) == 1
+
+    valuation = ConstraintSatifactionValuation([all_courses_constraint])
     assert valuation.value(bundle_301_611) == 2
 
 
@@ -42,7 +44,9 @@ def test_unique_item_adapter(
 def test_memoization(
     schedule_item250: ScheduleItem, all_items: List[ScheduleItem], course: Course
 ):
-    constraint = PreferenceConstraint.from_item_lists([["250", "301"]], [1], course)
+    constraint = PreferenceConstraint.from_item_lists(
+        all_items, [["250", "301"]], [1], course
+    )
     valuation = ConstraintSatifactionValuation([constraint])
     valuation.value([schedule_item250])
     valuation.value([schedule_item250])
@@ -51,7 +55,7 @@ def test_memoization(
     assert valuation._unique_value_ct == 1
 
     constraint = PreferenceConstraint.from_item_lists(
-        [["250", "301", "611"]], [2], course
+        all_items, [["250", "301", "611"]], [2], course
     )
     valuation = ConstraintSatifactionValuation([constraint])
     valuation.value(all_items)

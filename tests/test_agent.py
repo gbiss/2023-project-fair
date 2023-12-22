@@ -21,7 +21,10 @@ def test_exchange_contribution(
 
     assert (
         exchange_contribution(
-            course_valuation, [all_items[0], all_items[2]], all_items[2], all_items[1]
+            course_valuation,
+            all_items,
+            all_items[2],
+            all_items[1],
         )
         == False
     )
@@ -30,23 +33,25 @@ def test_exchange_contribution(
 def test_marginal_contribution(
     course_valuation: ConstraintSatifactionValuation, all_items: list[ScheduleItem]
 ):
-    assert marginal_contribution(course_valuation, [all_items[0]], all_items[1]) == 0
-    assert marginal_contribution(course_valuation, [all_items[0]], all_items[2]) == 1
+    assert marginal_contribution(course_valuation, [all_items[0]], all_items[1]) == 1
+    assert (
+        marginal_contribution(
+            course_valuation, [all_items[0], all_items[1]], all_items[2]
+        )
+        == 0
+    )
 
 
 def test_student(
     course: Course,
     slot: Slot,
-    section: Section,
     schedule: list[ScheduleItem],
 ):
     preferred_constr = PreferenceConstraint.from_item_lists(
-        [["250", "301", "611"]], [2], course
+        schedule, [["250", "301", "611"]], [2], course
     )
-    course_time_constr = CourseTimeConstraint.from_items(schedule, slot, [course, slot])
-    course_sect_constr = MutualExclusivityConstraint.from_items(
-        schedule, course, [course, section]
-    )
+    course_time_constr = CourseTimeConstraint.from_items(schedule, slot)
+    course_sect_constr = MutualExclusivityConstraint.from_items(schedule, course)
     student = Student(
         StudentValuation([preferred_constr, course_time_constr, course_sect_constr])
     )

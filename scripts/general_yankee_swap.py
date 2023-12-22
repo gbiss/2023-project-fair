@@ -16,6 +16,7 @@ MAX_COURSES_TOTAL = 5
 EXCEL_SCHEDULE_PATH = os.path.join(
     os.path.dirname(__file__), "../resources/fall2023schedule-2-cat.xlsx"
 )
+SPARSE = False
 
 # load schedule as DataFrame
 with open(EXCEL_SCHEDULE_PATH, "rb") as fd:
@@ -33,21 +34,21 @@ features = [course, slot, section]
 # construct schedule
 schedule = []
 topic_map = defaultdict(set)
-for _, row in df.iterrows():
+for idx, row in df.iterrows():
     crs = str(row["Catalog"])
     topic_map[row["Categories"]].add(crs)
     slt = slots_for_time_range(row["Mtg Time"], slot.times)
     sec = row["Section"]
     capacity = row["CICScapacity"]
-    schedule.append(ScheduleItem(features, [crs, slt, sec], capacity=capacity))
+    schedule.append(
+        ScheduleItem(features, [crs, slt, sec], index=idx, capacity=capacity)
+    )
 
 topics = [list(courses) for courses in topic_map.values()]
 
 # global constraints
-course_time_constr = CourseTimeConstraint.from_items(schedule, slot, [course, slot])
-course_sect_constr = MutualExclusivityConstraint.from_items(
-    schedule, course, [course, section]
-)
+course_time_constr = CourseTimeConstraint.from_items(schedule, slot, SPARSE)
+course_sect_constr = MutualExclusivityConstraint.from_items(schedule, course, SPARSE)
 
 # randomly generate students
 students = []
@@ -58,7 +59,9 @@ for i in range(NUM_STUDENTS):
         MAX_COURSES_TOTAL,
         course,
         [course_time_constr, course_sect_constr],
+        schedule,
         seed=i,
+        sparse=SPARSE,
     )
     students.append(LegacyStudent(student, student.all_courses_constraint))
 
