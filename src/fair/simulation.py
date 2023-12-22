@@ -33,8 +33,7 @@ class RenaissanceMan(SimulatedAgent):
         max_courses: int,
         course: Course,
         global_constraints: List[LinearConstraint],
-        schedule: List[ScheduleItem] = None,
-        features: List[BaseFeature] = None,
+        schedule: List[ScheduleItem],
         seed: int | None = None,
     ):
         """
@@ -45,7 +44,6 @@ class RenaissanceMan(SimulatedAgent):
             course (Course): Feature for course
             global_constraints (List[LinearConstraint]): Constraints not specific to this agent
             schedule (List[ScheduleItem], optional): All possible items in the student's schedule. Defaults to None.
-            features (List[BaseFeature], optional): The features implemented by items in schedule. Defaults to None.
             seed (int | None, optional): Random seed. Defaults to None.
         """
         rng = np.random.default_rng(seed)
@@ -63,14 +61,16 @@ class RenaissanceMan(SimulatedAgent):
 
         self.total_courses = rng.integers(1, max_courses + 1)
         self.all_courses_constraint = PreferenceConstraint.from_item_lists(
+            schedule,
             [self.preferred_courses],
             [self.total_courses],
             course,
-            schedule,
-            features,
         )
         self.topic_constraint = PreferenceConstraint.from_item_lists(
-            self.preferred_topics, self.quantities, course, schedule, features
+            schedule,
+            self.preferred_topics,
+            self.quantities,
+            course,
         )
 
         constraints = global_constraints + [

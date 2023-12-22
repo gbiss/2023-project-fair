@@ -46,10 +46,8 @@ for idx, row in df.iterrows():
 topics = [list(courses) for courses in topic_map.values()]
 
 # global constraints
-course_time_constr = CourseTimeConstraint.from_items(schedule, slot, [course, slot])
-course_sect_constr = MutualExclusivityConstraint.from_items(
-    schedule, course, [course, section]
-)
+course_time_constr = CourseTimeConstraint.from_items(schedule, slot)
+course_sect_constr = MutualExclusivityConstraint.from_items(schedule, course)
 
 # randomly generate students
 students = []
@@ -61,7 +59,6 @@ for i in range(NUM_STUDENTS):
         course,
         [course_time_constr, course_sect_constr],
         schedule,
-        features,
         seed=i,
     )
     students.append(LegacyStudent(student, student.all_courses_constraint))

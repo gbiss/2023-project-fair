@@ -12,8 +12,8 @@ def test_renaissance_man(
     max_courses = 2
     features = [course, section, slot]
     global_constraints = [
-        CourseTimeConstraint.from_items(schedule, slot, [course, slot]),
-        MutualExclusivityConstraint.from_items(schedule, course, [course, section]),
+        CourseTimeConstraint.from_items(schedule, slot),
+        MutualExclusivityConstraint.from_items(schedule, course),
     ]
 
     # preferred course list does not exceed max quantitity for multiple random configurations

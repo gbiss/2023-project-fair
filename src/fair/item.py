@@ -22,15 +22,15 @@ class BaseItem:
         name: str,
         features: List[BaseFeature],
         values: List[Any],
-        index: int = None,
+        index: int,
         capacity: int = 1,
     ):
         """
         Args:
             features (List[BaseFeature]): Features revelvant for this item
             values (List[Any]): Value of each feature from its domain
-            index (int, optional): Position relative to other items. Defaults to None.
-            capacity (int): Number of times item can be allocated
+            index (int): Position relative to other items
+            capacity (int, optional): Number of times item can be allocated. Defaults to 1.
 
         Raises:
             FeatureError: Values and features must correspond 1:1
@@ -39,7 +39,7 @@ class BaseItem:
         self.name = name
         self.features = features
         self.values = values
-        self.idx = index
+        self.index = index
         self.capacity = capacity
 
         # validate cardinality
@@ -67,37 +67,6 @@ class BaseItem:
             return self.values[self.features.index(feature)]
         except IndexError:
             raise FeatureError("feature unknown for this item")
-
-    def index(self, features: List[BaseFeature] = None):
-        """Position of item in canonical order
-
-        If self.idx is not None, then self.idx is returned and features is ignored.
-        Otherwise, the domains of features provided as input are ordered according to
-        their cartesian product. This method maps the feature values of the present
-        item the associated point in that product.
-
-        Args:
-            features (List[BaseFeature], optional): Subset of features from initialization. Defaults to None.
-
-        Raises:
-            FeatureError: Features provided must be a subset of those provided during initialization
-
-        Returns:
-            Any: self.index, otherwise the point associated with item in the cartesian product of feature domains
-        """
-        if self.idx is not None:
-            return self.idx
-
-        features = self.features if features is None else features
-        mult = 1
-        idx = 0
-        for feature in features:
-            if feature not in self.features:
-                raise FeatureError(f"feature {feature} not valid for {self}")
-            idx += feature.index(self.value(feature)) * mult
-            mult *= len(feature.domain)
-
-        return idx
 
     def __repr__(self):
         return f"{self.name}: {[self.value(feature) for feature in self.features]}"
@@ -166,7 +135,7 @@ class ScheduleItem(BaseItem):
         self,
         features: List[BaseFeature],
         values: List[Any],
-        index: int = None,
+        index: int,
         capacity: int = 1,
         category: str = None,
     ):
@@ -175,7 +144,7 @@ class ScheduleItem(BaseItem):
         Args:
             features (List[BaseFeature]): Features revelvant for this item
             values (List[Any]): Value of each feature from its domain
-            index (int, optional): Position relative to other items. Defaults to None.
+            index (int): Position relative to other items
             capacity (int): Number of times item can be allocated. Defaults to 1.
             category (str, optional): Topic for course. Defaults to None.
         """
