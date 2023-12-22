@@ -134,6 +134,9 @@ class LegacyStudent:
         """
         return self.student.value(bundle)
 
+    def valuation_index(self, bundle, items):
+        return self.valuation([items[i] for i in bundle])
+
     def marginal_contribution(self, bundle: List[BaseItem], item: BaseItem):
         """Delegate to marginal_contribution function
 

@@ -4,19 +4,21 @@ from collections import defaultdict
 import pandas as pd
 
 from fair.agent import LegacyStudent
-from fair.allocation import general_yankee_swap
+from fair.allocation import bfs_yankee_swap, general_yankee_swap
 from fair.constraint import CourseTimeConstraint, MutualExclusivityConstraint
 from fair.feature import Course, Section, Slot, slots_for_time_range
 from fair.item import ScheduleItem
 from fair.simulation import RenaissanceMan
 
-NUM_STUDENTS = 3
+NUM_STUDENTS = 2
 MAX_COURSES_PER_TOPIC = 5
 MAX_COURSES_TOTAL = 5
+MAX_SCHEDULE_LENGTH = 15
 EXCEL_SCHEDULE_PATH = os.path.join(
     os.path.dirname(__file__), "../resources/fall2023schedule-2-cat.xlsx"
 )
 SPARSE = False
+ALGORITHM = bfs_yankee_swap
 
 # load schedule as DataFrame
 with open(EXCEL_SCHEDULE_PATH, "rb") as fd:
@@ -43,6 +45,7 @@ for idx, row in df.iterrows():
     schedule.append(
         ScheduleItem(features, [crs, slt, sec], index=idx, capacity=capacity)
     )
+schedule = schedule[:MAX_SCHEDULE_LENGTH]
 
 topics = [list(courses) for courses in topic_map.values()]
 
@@ -65,6 +68,6 @@ for i in range(NUM_STUDENTS):
     )
     students.append(LegacyStudent(student, student.all_courses_constraint))
 
-general_yankee_swap(students, schedule)
+ALGORITHM(students, schedule)
 print("total bundles evaluated", [student.valuation.valuation._value_ct])
 print("unique bundles evaluated", [student.valuation.valuation._unique_value_ct])

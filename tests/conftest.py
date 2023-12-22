@@ -135,11 +135,11 @@ def course_valuation(all_courses_constraint: PreferenceConstraint):
 def schedule(course: Course, slot: Slot, section: Section):
     features = [course, slot, section]
     items = [
-        ScheduleItem(features, ["250", (1, 2), 1], 0),
-        ScheduleItem(features, ["250", (4, 5), 2], 1),
-        ScheduleItem(features, ["301", (4, 5), 1], 2),
-        ScheduleItem(features, ["301", (6, 7), 2], 3),
-        ScheduleItem(features, ["611", (6, 7), 1], 4),
+        ScheduleItem(features, ["250", (1, 2), 1], 0, 5),
+        ScheduleItem(features, ["250", (4, 5), 2], 1, 5),
+        ScheduleItem(features, ["301", (4, 5), 1], 2, 5),
+        ScheduleItem(features, ["301", (6, 7), 2], 3, 5),
+        ScheduleItem(features, ["611", (6, 7), 1], 4, 5),
     ]
     return items
 
