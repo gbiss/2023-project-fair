@@ -89,3 +89,29 @@ def test_constrained_items(
         len(set(ct_active[schedule_item250]).intersection(ct_active[schedule_item301]))
         > 0
     )
+
+
+def test_sparse_addition(course: Course, schedule: List[ScheduleItem]):
+    constraint1 = PreferenceConstraint.from_item_lists(
+        schedule, [["250", "301"]], [1], course, True
+    )
+    constraint2 = PreferenceConstraint.from_item_lists(
+        schedule, [["301", "611"]], [1], course, True
+    )
+    constraint = constraint1 + constraint2
+
+    assert constraint.A.shape[0] == constraint1.A.shape[0] + constraint2.A.shape[0]
+    assert constraint._sparse
+
+
+def test_dense_addition(course: Course, schedule: List[ScheduleItem]):
+    constraint1 = PreferenceConstraint.from_item_lists(
+        schedule, [["250", "301"]], [1], course, False
+    )
+    constraint2 = PreferenceConstraint.from_item_lists(
+        schedule, [["301", "611"]], [1], course, False
+    )
+    constraint = constraint1 + constraint2
+
+    assert constraint.A.shape[0] == constraint1.A.shape[0] + constraint2.A.shape[0]
+    assert not constraint._sparse

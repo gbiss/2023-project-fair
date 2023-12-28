@@ -1,3 +1,4 @@
+from copy import copy
 from typing import List
 
 from fair.item import BaseItem
@@ -159,6 +160,22 @@ class ConstraintSatifactionValuation(MemoableValuation):
             value = max(value, self.value(subbundle))
 
         return value
+
+    def compile(self):
+        """Compile constraints list into single constraint
+
+        Returns:
+            ConstraintSatifactionValuation: Valuation with constraints compiled
+        """
+        constraints = copy(self.constraints)
+        if len(constraints) == 0:
+            return self
+
+        constraint = constraints.pop()
+        while len(constraints) > 0:
+            constraint += constraints.pop()
+
+        return ConstraintSatifactionValuation([constraint])
 
 
 class UniqueItemsValuation:

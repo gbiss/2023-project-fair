@@ -65,3 +65,13 @@ def test_memoization(
 
     assert valuation._unique_value_ct == before_value
     assert valuation._unique_independent_ct == before_independent
+
+
+def test_valuation_compilation(
+    bundle_250_301: list[ScheduleItem], all_courses_constraint: LinearConstraint
+):
+    valuation = ConstraintSatifactionValuation([all_courses_constraint])
+    compiled = valuation.compile()
+
+    assert valuation.independent(bundle_250_301) == compiled.independent(bundle_250_301)
+    assert valuation.value(bundle_250_301) == compiled.value(bundle_250_301)

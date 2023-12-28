@@ -64,7 +64,11 @@ for i in range(NUM_STUDENTS):
         seed=i,
         sparse=SPARSE,
     )
-    students.append(LegacyStudent(student, student.all_courses_constraint))
+    legacy_student = LegacyStudent(student, student.all_courses_constraint)
+    legacy_student.student.valuation.valuation = (
+        legacy_student.student.valuation.valuation.compile()
+    )
+    students.append(legacy_student)
 
 X = general_yankee_swap(students, schedule)
 print("utilitarian welfare: ", utilitarian_welfare(X[0], students, schedule))
