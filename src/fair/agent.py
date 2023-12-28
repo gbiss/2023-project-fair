@@ -115,6 +115,7 @@ class LegacyStudent:
         """
         Raises:
             AttributeError: student must include valuation as member
+            AttributeError: student.valuation.constraints must include all_courses_constraint
 
         Args:
             student (BaseAgent): Student to delegate value queries to
@@ -122,6 +123,9 @@ class LegacyStudent:
         """
         if not hasattr(student, "valuation"):
             raise AttributeError("student delegate must have valuation member")
+
+        if all_courses_constraint not in student.valuation.constraints:
+            raise AttributeError("student delegate must include all_courses_constraint")
 
         student.valuation = UniqueItemsValuation(student.valuation)
         self.student = student
@@ -164,15 +168,9 @@ class LegacyStudent:
         Args:
             items (List[BaseItem]): Candidate items list
 
-        Raises:
-            AttributeError: student.valuation.constraints must include all_courses_constraint
-
         Returns:
             List[int]: Indices of desired items in list
         """
-        if self.all_courses_constraint not in self.student.valuation.constraints:
-            raise AttributeError("student delegate must include all_courses_constraint")
-
         desired_items = self.all_courses_constraint.constrained_items(items)
 
         return [i for i in range(len(items)) if items[i] in desired_items]
