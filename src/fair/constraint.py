@@ -2,6 +2,7 @@ from collections import defaultdict
 from typing import Any, List, Union
 
 import numpy as np
+import scipy
 from scipy.sparse import dok_array
 
 from .feature import BaseFeature, Course, Section, Slot
@@ -59,7 +60,7 @@ class LinearConstraint(BaseConstraint):
         if type(A) != type(b):
             raise TypeError(f"type of A: {type(A)} and b: {type(b)} must be identical")
 
-        if type(A) == dok_array:
+        if scipy.sparse.issparse(A):
             self.A = A.tocsr()
             self.b = b.tocsr()
             self._sparse = True
@@ -107,6 +108,43 @@ class LinearConstraint(BaseConstraint):
                     active_map[item].append(i)
 
         return active_map
+
+    def __add__(self, other):
+        """Adds A and b (row-wise) between self and other
+
+        Args:
+            other (LinearConstraint): LinearConstraint to be added
+
+        Raises:
+            TypeError: Type of self and other must match
+            TypeError: Sparsity must match between self and other
+            ValueError: Column numbers must match between self and other
+
+        Returns:
+            LinearConstraint: sum of self and other
+        """
+        if type(other) != type(self):
+            raise TypeError(f"type of other: {type(other)} must match {type(self)}")
+
+        if other._sparse != self._sparse:
+            raise TypeError(
+                f"sparsity of other: {other._sparse} must match {self._sparse}"
+            )
+
+        if other.A.shape[1] != self.A.shape[1]:
+            raise ValueError(
+                f"column dimension for other: {other.A.shape[1]} must match {self.A.shape[1]}"
+            )
+
+        extent = max(self.extent, other.extent)
+        if self._sparse:
+            A = scipy.sparse.vstack([self.A, other.A])
+            b = scipy.sparse.vstack([self.b, other.b])
+        else:
+            A = np.vstack([self.A, other.A])
+            b = np.vstack([self.b, other.b])
+
+        return LinearConstraint(A, b, extent)
 
 
 class PreferenceConstraint(LinearConstraint):
