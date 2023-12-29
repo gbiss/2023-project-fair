@@ -66,7 +66,7 @@ for i in range(NUM_STUDENTS):
     )
     legacy_student = LegacyStudent(student, student.all_courses_constraint)
     legacy_student.student.valuation.valuation = (
-        legacy_student.student.valuation.valuation.compile()
+        legacy_student.student.valuation.compile()
     )
     students.append(legacy_student)
 
@@ -74,5 +74,5 @@ X = general_yankee_swap(students, schedule)
 print("utilitarian welfare: ", utilitarian_welfare(X[0], students, schedule))
 print("nash welfare: ", nash_welfare(X[0], students, schedule))
 print("leximin vector: ", leximin(X[0], students, schedule))
-print("total bundles evaluated", [student.valuation.valuation._value_ct])
-print("unique bundles evaluated", [student.valuation.valuation._unique_value_ct])
+print("total bundles evaluated", [student.valuation._value_ct])
+print("unique bundles evaluated", [student.valuation._unique_value_ct])
