@@ -73,19 +73,19 @@ class LinearConstraint(BaseConstraint):
 
     def to_sparse(self):
         if self._sparse:
-            return
+            return self
 
-        self.A = scipy.sparse.csr_matrix(self.A)
-        self.b = scipy.sparse.csr_matrix(self.b)
-        self._sparse = True
+        return LinearConstraint(
+            scipy.sparse.csr_matrix(self.A),
+            scipy.sparse.csr_matrix(self.b),
+            self.extent,
+        )
 
     def to_dense(self):
         if not self._sparse:
-            return
+            return self
 
-        self.A = self.A.to_dense()
-        self.b = self.b.to_dense()
-        self._sparse = False
+        return LinearConstraint(self.A.to_dense(), self.b.to_dense(), self.extent)
 
     def satisfies(self, bundle: List[BaseItem]):
         """Determine if bundle satisfies this constraint

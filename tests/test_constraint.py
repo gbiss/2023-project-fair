@@ -123,10 +123,10 @@ def test_to_desnse_to_sparse(course: Course, schedule: List[ScheduleItem]):
         schedule, [["250", "301"]], [1], course, False
     )
 
-    constraint.to_dense()
+    constraint = constraint.to_dense()
     assert not scipy.sparse.issparse(constraint.A)
     assert not scipy.sparse.issparse(constraint.b)
 
-    constraint.to_sparse()
+    constraint = constraint.to_sparse()
     assert scipy.sparse.issparse(constraint.A)
     assert scipy.sparse.issparse(constraint.b)
