@@ -72,6 +72,11 @@ class LinearConstraint(BaseConstraint):
         self.extent = extent
 
     def to_sparse(self):
+        """Convert constraint from dense to sparse matrix format
+
+        Returns:
+            LinearConstraint: A copy of the original constraint object
+        """
         if self._sparse:
             return self
 
@@ -82,6 +87,11 @@ class LinearConstraint(BaseConstraint):
         )
 
     def to_dense(self):
+        """Convert constraint from sparse to dense matrix format
+
+        Returns:
+            LinearConstraint: A copy of the original constraint object
+        """
         if not self._sparse:
             return self
 
