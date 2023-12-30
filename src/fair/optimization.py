@@ -13,6 +13,9 @@ class IntegerLinearProgram:
         self.agents = agents
         self.A = None
         self.b = None
+        self.c = None
+        self.bounds = None
+        self.constraint = None
 
     def compile(self):
         """Create a single (block) constraint matrix for all agents
@@ -23,9 +26,6 @@ class IntegerLinearProgram:
         Returns:
             IntegerLinearProgram: compiled IntegerLinearProgram
         """
-        if self.A is not None and self.b is not None:
-            return
-
         A_blocks = []
         bs = []
         for i, agent in enumerate(self.agents):
@@ -39,6 +39,45 @@ class IntegerLinearProgram:
         self.b = scipy.sparse.vstack(bs)
 
         return self
+
+    def formulateUSW(self):
+        """Put previously compiled constraints into scipy optimization format
+
+        Raises:
+            AttributeError: ILP cannot be formulated until it is compiled
+
+        Returns:
+            IntegerLinearProgram: self
+        """
+        if self.A is None or self.b is None:
+            raise AttributeError("IntegerLinearProgram must be compiled first")
+
+        n, m = self.A.shape
+        self.c = -np.ones((m,))
+        self.bounds = scipy.optimize.Bounds(0, 1)
+        self.constraint = scipy.optimize.LinearConstraint(
+            self.A, ub=self.b.toarray().reshape((n,))
+        )
+
+        return self
+
+    def solve(self):
+        """Solve using scipy.optimize.milp (Mixed Integer Linear Programming)
+
+        Raises:
+            ValueError: Thrown if no optimal solutuion was found
+
+        Returns:
+            np.ndarray: optimal allocation
+        """
+        res = scipy.optimize.milp(
+            c=self.c, bounds=self.bounds, constraints=self.constraint
+        )
+
+        if not res.success:
+            raise ValueError("no optimal solution found")
+
+        return res.x
 
     def convert_allocation(self, X: type[np.ndarray | scipy.sparse.sparray]):
         """Convert an allocation matrix to a form that can be tested against constraints

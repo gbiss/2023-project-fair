@@ -29,3 +29,11 @@ def test_integer_linear(
 
     # since allocation X should be non-redundant, USW should equal sum(ind) / len(agents)
     assert np.sum(ind) / len(agents) == util
+
+    opt_alloc = program.formulateUSW().solve()
+
+    # allocation should be feasible
+    assert not np.sum(program.A @ opt_alloc > program.b.T) > 0
+
+    # YS solution should not exceed ilp solution
+    assert sum(opt_alloc) / len(agents) >= util
