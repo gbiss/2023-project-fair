@@ -188,6 +188,14 @@ class UniqueItemsValuation:
         """
         self.valuation = valuation
 
+    def __getattr__(self, name):
+        if name == "independent":
+            return self.independent
+        elif name == "value":
+            return self.value
+        else:
+            return getattr(self.valuation, name)
+
     def independent(self, bundle: List[BaseItem]):
         """Do the unique items in this bundle receive maximal value
 
@@ -211,21 +219,6 @@ class UniqueItemsValuation:
             int: Bundle value
         """
         return self.valuation.value(list(set(bundle)))
-
-    @property
-    def constraints(self):
-        """Make constraints member of delegate valuation available
-
-        Raises:
-            NotImplemented: Constraints needs to be implemented by delegate
-
-        Returns:
-            List[LinearConstraint]: Constraints defining delegate valuation
-        """
-        if not hasattr(self.valuation, "constraints"):
-            raise NotImplemented("Valuation does not implement constraints")
-
-        return self.valuation.constraints
 
 
 class StudentValuation(ConstraintSatifactionValuation):

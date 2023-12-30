@@ -1,6 +1,7 @@
 from typing import List
 
 import numpy as np
+import scipy
 
 from fair.constraint import (
     CourseTimeConstraint,
@@ -115,3 +116,17 @@ def test_dense_addition(course: Course, schedule: List[ScheduleItem]):
 
     assert constraint.A.shape[0] == constraint1.A.shape[0] + constraint2.A.shape[0]
     assert not constraint._sparse
+
+
+def test_to_desnse_to_sparse(course: Course, schedule: List[ScheduleItem]):
+    constraint = PreferenceConstraint.from_item_lists(
+        schedule, [["250", "301"]], [1], course, False
+    )
+
+    constraint = constraint.to_dense()
+    assert not scipy.sparse.issparse(constraint.A)
+    assert not scipy.sparse.issparse(constraint.b)
+
+    constraint = constraint.to_sparse()
+    assert scipy.sparse.issparse(constraint.A)
+    assert scipy.sparse.issparse(constraint.b)
