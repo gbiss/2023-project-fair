@@ -9,6 +9,7 @@ from fair.constraint import CourseTimeConstraint, MutualExclusivityConstraint
 from fair.feature import Course, Section, Slot, slots_for_time_range
 from fair.item import ScheduleItem
 from fair.metrics import leximin, nash_welfare, utilitarian_welfare
+from fair.optimization import IntegerLinearProgram
 from fair.simulation import RenaissanceMan
 
 NUM_STUDENTS = 3
@@ -18,6 +19,7 @@ EXCEL_SCHEDULE_PATH = os.path.join(
     os.path.dirname(__file__), "../resources/fall2023schedule-2-cat.xlsx"
 )
 SPARSE = False
+FIND_OPTIMAL = True
 
 # load schedule as DataFrame
 with open(EXCEL_SCHEDULE_PATH, "rb") as fd:
@@ -76,3 +78,11 @@ print("nash welfare: ", nash_welfare(X[0], students, schedule))
 print("leximin vector: ", leximin(X[0], students, schedule))
 print("total bundles evaluated", [student.valuation._value_ct])
 print("unique bundles evaluated", [student.valuation._unique_value_ct])
+
+if FIND_OPTIMAL:
+    orig_students = [student.student for student in students]
+    program = IntegerLinearProgram(orig_students).compile()
+    ind = program.convert_allocation(X[0])
+    opt_alloc = program.formulateUSW().solve()
+    opt_USW = sum(opt_alloc) / len(orig_students)
+    print("optimal utilitarian welfare", opt_USW)
