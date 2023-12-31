@@ -6,7 +6,7 @@ import pandas as pd
 from fair.agent import LegacyStudent
 from fair.allocation import general_yankee_swap
 from fair.constraint import CourseTimeConstraint, MutualExclusivityConstraint
-from fair.feature import Course, Section, Slot, slots_for_time_range
+from fair.feature import Course, Section, Slot, Weekday, slots_for_time_range
 from fair.item import ScheduleItem
 from fair.metrics import leximin, nash_welfare, utilitarian_welfare
 from fair.optimization import IntegerLinearProgram
@@ -30,9 +30,10 @@ course = Course(df["Catalog"].astype(str).unique().tolist())
 
 time_ranges = df["Mtg Time"].dropna().unique()
 slot = Slot.from_time_ranges(time_ranges, "15T")
+weekday = Weekday()
 
 section = Section(df["Section"].dropna().unique().tolist())
-features = [course, slot, section]
+features = [course, slot, weekday, section]
 
 # construct schedule
 schedule = []
@@ -43,14 +44,15 @@ for idx, row in df.iterrows():
     slt = slots_for_time_range(row["Mtg Time"], slot.times)
     sec = row["Section"]
     capacity = row["CICScapacity"]
+    dys = tuple([day.strip() for day in row["zc.days"].split(" ")])
     schedule.append(
-        ScheduleItem(features, [crs, slt, sec], index=idx, capacity=capacity)
+        ScheduleItem(features, [crs, slt, dys, sec], index=idx, capacity=capacity)
     )
 
 topics = [list(courses) for courses in topic_map.values()]
 
 # global constraints
-course_time_constr = CourseTimeConstraint.from_items(schedule, slot, SPARSE)
+course_time_constr = CourseTimeConstraint.from_items(schedule, slot, weekday, SPARSE)
 course_sect_constr = MutualExclusivityConstraint.from_items(schedule, course, SPARSE)
 
 # randomly generate students

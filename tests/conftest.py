@@ -9,7 +9,7 @@ from fair.constraint import (
     MutualExclusivityConstraint,
     PreferenceConstraint,
 )
-from fair.feature import BaseFeature, Course, Section, Slot
+from fair.feature import Course, Section, Slot, Weekday
 from fair.item import ScheduleItem
 from fair.simulation import RenaissanceMan
 from fair.valuation import ConstraintSatifactionValuation
@@ -31,6 +31,11 @@ def slot():
 
 
 @pytest.fixture
+def weekday():
+    return Weekday()
+
+
+@pytest.fixture
 def section():
     return Section([1, 2, 3])
 
@@ -41,28 +46,38 @@ def features(course: Course, slot: Slot, section: Section):
 
 
 @pytest.fixture
-def schedule_item250(course: Course, slot: Slot, section: Section):
-    return ScheduleItem([course, slot, section], ["250", (1, 2), 1], 0)
+def schedule_item250(course: Course, slot: Slot, weekday: Weekday, section: Section):
+    return ScheduleItem(
+        [course, slot, weekday, section], ["250", (1, 2), ("Mon",), 1], 0
+    )
 
 
 @pytest.fixture
-def schedule_item250_2(course: Course, slot: Slot, section: Section):
-    return ScheduleItem([course, slot, section], ["250", (4, 5), 2], 1)
+def schedule_item250_2(course: Course, slot: Slot, weekday: Weekday, section: Section):
+    return ScheduleItem(
+        [course, slot, weekday, section], ["250", (4, 5), ("Mon",), 2], 1
+    )
 
 
 @pytest.fixture
-def schedule_item301(course: Course, slot: Slot, section: Section):
-    return ScheduleItem([course, slot, section], ["301", (2, 3), 1], 2)
+def schedule_item301(course: Course, slot: Slot, weekday: Weekday, section: Section):
+    return ScheduleItem(
+        [course, slot, weekday, section], ["301", (2, 3), ("Mon",), 1], 2
+    )
 
 
 @pytest.fixture
-def schedule_item301_2(course: Course, slot: Slot, section: Section):
-    return ScheduleItem([course, slot, section], ["301", (4, 5), 1], 3)
+def schedule_item301_2(course: Course, slot: Slot, weekday: Weekday, section: Section):
+    return ScheduleItem(
+        [course, slot, weekday, section], ["301", (4, 5), ("Mon",), 1], 3
+    )
 
 
 @pytest.fixture
-def schedule_item611(course: Course, slot: Slot, section: Section):
-    return ScheduleItem([course, slot, section], ["611", (4, 5), 1], 4)
+def schedule_item611(course: Course, slot: Slot, weekday: Weekday, section: Section):
+    return ScheduleItem(
+        [course, slot, weekday, section], ["611", (4, 5), ("Mon",), 1], 4
+    )
 
 
 @pytest.fixture
@@ -103,8 +118,9 @@ def linear_constraint_250_301(course: Course, bundle_250_301: list[ScheduleItem]
 def course_time_constraint(
     all_items: list[ScheduleItem],
     slot: Slot,
+    weekday: Weekday,
 ):
-    return CourseTimeConstraint.from_items(all_items, slot)
+    return CourseTimeConstraint.from_items(all_items, slot, weekday)
 
 
 @pytest.fixture
@@ -132,14 +148,14 @@ def course_valuation(all_courses_constraint: PreferenceConstraint):
 
 
 @pytest.fixture
-def schedule(course: Course, slot: Slot, section: Section):
-    features = [course, slot, section]
+def schedule(course: Course, slot: Slot, weekday: Weekday, section: Section):
+    features = [course, slot, weekday, section]
     items = [
-        ScheduleItem(features, ["250", (1, 2), 1], 0),
-        ScheduleItem(features, ["250", (4, 5), 2], 1),
-        ScheduleItem(features, ["301", (4, 5), 1], 2),
-        ScheduleItem(features, ["301", (6, 7), 2], 3),
-        ScheduleItem(features, ["611", (6, 7), 1], 4),
+        ScheduleItem(features, ["250", (1, 2), ("Mon",), 1], 0),
+        ScheduleItem(features, ["250", (4, 5), ("Mon",), 2], 1),
+        ScheduleItem(features, ["301", (4, 5), ("Mon",), 1], 2),
+        ScheduleItem(features, ["301", (6, 7), ("Mon",), 2], 3),
+        ScheduleItem(features, ["611", (6, 7), ("Mon",), 1], 4),
     ]
     return items
 
@@ -160,9 +176,13 @@ def excel_schedule_path_with_cats():
 
 @pytest.fixture
 def global_constraints(
-    schedule: list[ScheduleItem], course: Course, section: Section, slot: Slot
+    schedule: list[ScheduleItem],
+    course: Course,
+    section: Section,
+    slot: Slot,
+    weekday: Weekday,
 ):
-    course_time_constr = CourseTimeConstraint.from_items(schedule, slot)
+    course_time_constr = CourseTimeConstraint.from_items(schedule, slot, weekday)
     course_sect_constr = MutualExclusivityConstraint.from_items(schedule, course)
 
     return [course_time_constr, course_sect_constr]

@@ -1,18 +1,21 @@
 from fair.constraint import CourseTimeConstraint, MutualExclusivityConstraint
-from fair.feature import Course, Section, Slot
+from fair.feature import Course, Section, Slot, Weekday
 from fair.item import ScheduleItem
 from fair.simulation import RenaissanceMan
 
 
 def test_renaissance_man(
-    course: Course, section: Section, slot: Slot, schedule: ScheduleItem
+    course: Course,
+    section: Section,
+    slot: Slot,
+    weekday: Weekday,
+    schedule: ScheduleItem,
 ):
     topic_list = [["250", "301"], ["611"]]
     quantities = [1, 1]
     max_courses = 2
-    features = [course, section, slot]
     global_constraints = [
-        CourseTimeConstraint.from_items(schedule, slot),
+        CourseTimeConstraint.from_items(schedule, slot, weekday),
         MutualExclusivityConstraint.from_items(schedule, course),
     ]
 

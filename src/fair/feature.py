@@ -1,4 +1,5 @@
 import datetime
+import itertools
 from typing import Any, List, Tuple
 
 import pandas as pd
@@ -128,6 +129,21 @@ class Slot(BaseFeature):
         """
         super().__init__("slot", domain)
         self.times = times
+
+
+class Weekday(BaseFeature):
+    """Day of the week"""
+
+    def __init__(self):
+        self.days = ["Mon", "Tue", "Wed", "Thu", "Fri"]
+
+        domain = [
+            comb
+            for i in range(1, len(self.days) + 1)
+            for comb in itertools.combinations(self.days, i)
+        ]
+
+        super().__init__("weekday", domain)
 
 
 class Section(BaseFeature):

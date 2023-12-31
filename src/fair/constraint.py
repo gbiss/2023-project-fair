@@ -5,7 +5,7 @@ import numpy as np
 import scipy
 from scipy.sparse import dok_array
 
-from .feature import BaseFeature, Course, Section, Slot
+from .feature import BaseFeature, Slot, Weekday
 from .item import BaseItem, ScheduleItem
 
 
@@ -230,6 +230,7 @@ class CourseTimeConstraint(LinearConstraint):
     def from_items(
         items: List[ScheduleItem],
         slot: Slot,
+        weekday: Weekday,
         sparse: bool = False,
     ):
         """Helper method for creating constraints that prevent course time overlap
@@ -239,21 +240,28 @@ class CourseTimeConstraint(LinearConstraint):
         Args:
             items (List[ScheduleItem]): Possibly time-conflicting items
             slot (Slot): Feature for time slots
+            weekday (Weekday): Feature for weekdays
             sparse (bool): Should A and b be sparse matrices. Defaults to False.
 
         Returns:
             CourseTimeConstraint: A: (time slots x features domain), b: (time slots x 1)
         """
-        rows = len(slot.times)
+        rows = len(weekday.days) * len(slot.times)
         cols = max([item.index for item in items]) + 1
         A = dok_array((rows, cols), dtype=np.int_)
         b = dok_array((rows, 1), dtype=np.int_)
 
-        for i, tm in enumerate(slot.times):
-            items_at_time = [item for item in items if tm in item.value(slot)]
-            for item in items_at_time:
-                A[i, item.index] = 1
-            b[i, 0] = 1
+        for i, wk in enumerate(weekday.days):
+            for j, tm in enumerate(slot.times):
+                idx = i * len(slot.times) + j
+                items_at_day_time = [
+                    item
+                    for item in items
+                    if wk in item.value(weekday) and tm in item.value(slot)
+                ]
+                for item in items_at_day_time:
+                    A[idx, item.index] = 1
+                b[idx, 0] = 1
 
         if not sparse:
             A = A.todense()
