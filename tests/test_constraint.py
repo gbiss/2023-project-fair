@@ -9,7 +9,7 @@ from fair.constraint import (
     PreferenceConstraint,
     indicator,
 )
-from fair.feature import BaseFeature, Course, Section, Slot
+from fair.feature import Course, Section, Slot, Weekday
 from fair.item import ScheduleItem
 
 
@@ -57,8 +57,9 @@ def test_time_constraint(
     bundle_250_301: list[ScheduleItem],
     bundle_301_611: list[ScheduleItem],
     slot: Slot,
+    weekday: Weekday,
 ):
-    constraint = CourseTimeConstraint.from_items(all_items, slot)
+    constraint = CourseTimeConstraint.from_items(all_items, slot, weekday)
 
     assert not constraint.satisfies(bundle_250_301)
     assert constraint.satisfies(bundle_301_611)

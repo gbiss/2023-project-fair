@@ -4,7 +4,7 @@ from fair.constraint import (
     MutualExclusivityConstraint,
     PreferenceConstraint,
 )
-from fair.feature import Course, Section, Slot
+from fair.feature import Course, Slot, Weekday
 from fair.item import ScheduleItem
 from fair.valuation import ConstraintSatifactionValuation, StudentValuation
 
@@ -45,12 +45,13 @@ def test_marginal_contribution(
 def test_student(
     course: Course,
     slot: Slot,
+    weekday: Weekday,
     schedule: list[ScheduleItem],
 ):
     preferred_constr = PreferenceConstraint.from_item_lists(
         schedule, [["250", "301", "611"]], [2], course
     )
-    course_time_constr = CourseTimeConstraint.from_items(schedule, slot)
+    course_time_constr = CourseTimeConstraint.from_items(schedule, slot, weekday)
     course_sect_constr = MutualExclusivityConstraint.from_items(schedule, course)
     student = Student(
         StudentValuation([preferred_constr, course_time_constr, course_sect_constr])
