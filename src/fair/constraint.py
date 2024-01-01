@@ -86,6 +86,18 @@ class LinearConstraint(BaseConstraint):
             self.extent,
         )
 
+    def prune(self):
+        """Remove any rows of all zeros from A (and corresponding entries from b)
+
+        Returns:
+            LinearConstraint: Copy of original constraint with A and b updated
+        """
+        active_idxs = np.nonzero(self.A.sum(axis=1))[0]
+
+        return LinearConstraint(
+            self.A[active_idxs, :], self.b[active_idxs, :], self.extent
+        )
+
     def to_dense(self):
         """Convert constraint from sparse to dense matrix format
 

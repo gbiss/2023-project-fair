@@ -131,3 +131,24 @@ def test_to_desnse_to_sparse(course: Course, schedule: List[ScheduleItem]):
     constraint = constraint.to_sparse()
     assert scipy.sparse.issparse(constraint.A)
     assert scipy.sparse.issparse(constraint.b)
+
+
+def test_prune(
+    all_items: list[ScheduleItem],
+    bundle_250_301: list[ScheduleItem],
+    bundle_301_611: list[ScheduleItem],
+    slot: Slot,
+    weekday: Weekday,
+):
+    constraint = CourseTimeConstraint.from_items(all_items, slot, weekday)
+    constraint_pruned = constraint.prune()
+
+    assert constraint_pruned.A.shape[0] == constraint_pruned.b.shape[0]
+    assert constraint.A.shape[0] > constraint_pruned.A.shape[0]
+
+    assert constraint.satisfies(bundle_250_301) == constraint_pruned.satisfies(
+        bundle_250_301
+    )
+    assert constraint.satisfies(bundle_301_611) == constraint_pruned.satisfies(
+        bundle_301_611
+    )
