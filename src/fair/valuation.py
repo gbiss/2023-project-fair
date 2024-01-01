@@ -175,7 +175,7 @@ class ConstraintSatifactionValuation(MemoableValuation):
         while len(constraints) > 0:
             constraint += constraints.pop()
 
-        return ConstraintSatifactionValuation([constraint])
+        return ConstraintSatifactionValuation([constraint.prune()])
 
 
 class UniqueItemsValuation:
