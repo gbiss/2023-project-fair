@@ -26,7 +26,8 @@ def exchange_contribution(
     Returns:
         bool: True if utility can be improved; False otherwise
     """
-    og_val = valuation.value(bundle)
+    if og_item.item_id==new_item.item_id:
+        return False
 
     for i in range(len(bundle)):
         if bundle[i] == new_item:
@@ -44,9 +45,9 @@ def exchange_contribution(
     T0.pop(index[0])
     T0.append(new_item)
 
+    og_val = valuation.value(bundle)
     new_val = valuation.value(T0)
-    if og_item == new_item:
-        return False
+    
     if og_val == new_val:
         return True
     else:
