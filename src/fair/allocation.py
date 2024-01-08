@@ -174,7 +174,7 @@ def build_exchange_graph(X,items, agents):
                 item_2=items[item_2_index]
                 exchangeable=False
                 for owner in owners:
-                    if owner!=0:
+                    if owner!=len(agents):
                         agent=agents[owner]        
                         bundle_owner=get_bundle_from_allocation_matrix(X, items, owner)
                         willing_owner=agent.exchange_contribution(bundle_owner,item_1, item_2)
