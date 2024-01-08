@@ -26,7 +26,7 @@ def exchange_contribution(
     Returns:
         bool: True if utility can be improved; False otherwise
     """
-    if og_item==new_item:
+    if og_item == new_item:
         return False
 
     for i in range(len(bundle)):
@@ -47,7 +47,7 @@ def exchange_contribution(
 
     og_val = valuation.value(bundle)
     new_val = valuation.value(T0)
-    
+
     if og_val == new_val:
         return True
     else:
