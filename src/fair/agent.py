@@ -1,7 +1,7 @@
 from typing import List
 
 from fair.constraint import PreferenceConstraint
-
+import copy
 from .item import BaseItem
 from .valuation import RankValuation, UniqueItemsValuation
 
@@ -26,14 +26,18 @@ def exchange_contribution(
     Returns:
         bool: True if utility can be improved; False otherwise
     """
-    og_val = valuation.value(bundle)
+    
+    if og_item == new_item:
+        print('Here1:',og_item.index,new_item.index)
+        return False
 
     for i in range(len(bundle)):
         if bundle[i] == new_item:
-            print(bundle[i], new_item)
+            # print(bundle[i], new_item)
+            print('Here2:',og_item.index,new_item.index)
             return False
 
-    T0 = bundle.copy()
+    T0 = copy.deepcopy(bundle)
     index = []
     for i in range(len(T0)):
         if T0[i] == og_item:
@@ -44,10 +48,11 @@ def exchange_contribution(
     T0.pop(index[0])
     T0.append(new_item)
 
+    og_val = valuation.value(bundle)
     new_val = valuation.value(T0)
-    if og_item == new_item:
-        return False
+
     if og_val == new_val:
+        print('TRUEEE:',og_item.index,new_item.index)
         return True
     else:
         return False
@@ -69,7 +74,7 @@ def marginal_contribution(
     Returns:
         Any: Change in value
     """
-    T = bundle.copy()
+    T = copy.deepcopy(bundle)
     current_val = valuation.value(T)
     T.append(item)
     new_val = valuation.value(T)
@@ -157,7 +162,7 @@ class LegacyStudent:
             og_item (BaseItem): Item to be removed
             new_item (BaseItem): Item to be added
         """
-        exchange_contribution(self.student.valuation, bundle, og_item, new_item)
+        return exchange_contribution(self.student.valuation, bundle, og_item, new_item)
 
     def get_desired_items_indexes(self, items: List[BaseItem]):
         """Return subset of indices from items that are preferred by the student

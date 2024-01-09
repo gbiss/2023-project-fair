@@ -14,9 +14,9 @@ from fair.simulation import RenaissanceMan
 
 
 
-NUM_STUDENTS = 3
+NUM_STUDENTS = 2
 MAX_COURSES_PER_TOPIC = 5
-MAX_COURSES_TOTAL = 5
+MAX_COURSES_TOTAL = 10
 EXCEL_SCHEDULE_PATH = os.path.join(
     os.path.dirname(__file__), "../resources/fall2023schedule-2-cat.xlsx"
 )
@@ -26,7 +26,7 @@ FIND_OPTIMAL = True
 # load schedule as DataFrame
 with open(EXCEL_SCHEDULE_PATH, "rb") as fd:
     df = pd.read_excel(fd)
-
+df=df[10:15]
 # construct features from DataFrame
 course = Course(df["Catalog"].astype(str).unique().tolist())
 
@@ -40,6 +40,7 @@ features = [course, slot, weekday, section]
 # construct schedule
 schedule = []
 topic_map = defaultdict(set)
+count=0
 for idx, row in df.iterrows():
     crs = str(row["Catalog"])
     topic_map[row["Categories"]].add(crs)
@@ -48,11 +49,12 @@ for idx, row in df.iterrows():
     capacity = row["CICScapacity"]
     dys = tuple([day.strip() for day in row["zc.days"].split(" ")])
     schedule.append(
-        ScheduleItem(features, [crs, slt, dys, sec], index=idx, capacity=capacity)
+        ScheduleItem(features, [crs, slt, dys, sec], index=count, capacity=capacity)
     )
+    print(count,crs,capacity,dys,slt)
+    count+=1
 
 topics = sorted([sorted(list(courses)) for courses in topic_map.values()])
-
 # global constraints
 course_time_constr = CourseTimeConstraint.from_items(schedule, slot, weekday, SPARSE)
 course_sect_constr = MutualExclusivityConstraint.from_items(schedule, course, SPARSE)
@@ -70,13 +72,16 @@ for i in range(NUM_STUDENTS):
         seed=i,
         sparse=SPARSE,
     )
+    print(student.preferred_courses)
     legacy_student = LegacyStudent(student, student.all_courses_constraint)
     legacy_student.student.valuation.valuation = (
         legacy_student.student.valuation.compile()
     )
     students.append(legacy_student)
+    print(legacy_student.get_desired_items_indexes(schedule))
 
-X = general_yankee_swap(students, schedule)
+X = general_yankee_swap(students, schedule, plot_exchange_graph=True)
+print(X[0])
 print("utilitarian welfare: ", utilitarian_welfare(X[0], students, schedule))
 print("nash welfare: ", nash_welfare(X[0], students, schedule))
 print("leximin vector: ", leximin(X[0], students, schedule))
@@ -86,10 +91,10 @@ print("unique bundles evaluated", [student.valuation._unique_value_ct])
 # print(student.preferred_courses)
 # print(student.total_courses)
 
-# if FIND_OPTIMAL:
-#     orig_students = [student.student for student in students]
-#     program = IntegerLinearProgram(orig_students).compile()
-#     ind = program.convert_allocation(X[0])
-#     opt_alloc = program.formulateUSW().solve()
-#     opt_USW = sum(opt_alloc) / len(orig_students)
-#     print("optimal utilitarian welfare", opt_USW)
+if FIND_OPTIMAL:
+    orig_students = [student.student for student in students]
+    program = IntegerLinearProgram(orig_students).compile()
+    ind = program.convert_allocation(X[0])
+    opt_alloc = program.formulateUSW().solve()
+    opt_USW = sum(opt_alloc) / len(orig_students)
+    print("optimal utilitarian welfare", opt_USW)

@@ -150,10 +150,12 @@ def find_shortest_path(G, start, end):
 def add_agent_to_exchange_graph(G, X, items, agents, agent_picked):
     G.add_node("s")
     bundle = get_bundle_from_allocation_matrix(X, items, agent_picked)
+    agent = agents[agent_picked]
     for i in range(len(items)):
         g = items[i]
-        if agents[agent_picked].marginal_contribution(bundle, g) == 1:
-            G.add_edge("s", i)
+        if g not in bundle:
+            if agent.marginal_contribution(bundle, g) == 1:
+                G.add_edge("s", i)
     return G
 
 
@@ -208,13 +210,17 @@ def update_exchange_graph(X, G, path_og, agents, items, agents_involved):
                             bundle_owner = get_bundle_from_allocation_matrix(
                                 X, items, owner
                             )
+                            print('should be here')
                             willing_owner = agent.exchange_contribution(
                                 bundle_owner, item_1, item_2
                             )
+                            print(willing_owner)
                             if willing_owner:
+                                print('should go in here too')
                                 exchangeable = True
                     if exchangeable:
                         if not G.has_edge(item_idx, item_2_idx):
+                            print('adding the edge')
                             G.add_edge(item_idx, item_2_idx)
                     else:
                         if G.has_edge(item_idx, item_2_idx):
@@ -429,6 +435,7 @@ def general_yankee_swap(
             agents_involved_arr.append(0)
         else:
             X, agents_involved = update_allocation(X, path, agents, items, agent_picked)
+            print(X)
             G = update_exchange_graph(X, G, path, agents, items, agents_involved)
             gain_vector[agent_picked] = get_gain_function(
                 X, agents, items, agent_picked, criteria, weights
