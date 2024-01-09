@@ -29,7 +29,10 @@ def test_general_yankee_swap(
     leg_student1 = LegacyStudent(renaissance1, renaissance1.all_courses_constraint)
     leg_student2 = LegacyStudent(renaissance2, renaissance2.all_courses_constraint)
 
-    general_yankee_swap([leg_student1, leg_student2], schedule)
+    X, _, _ = general_yankee_swap([leg_student1, leg_student2], schedule)
+
+    assert sum(X[:, 0]) <= renaissance1.total_courses
+    assert sum(X[:, 1]) <= renaissance2.total_courses
 
 
 def test_bfs_yankee_swap(
