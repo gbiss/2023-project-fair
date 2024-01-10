@@ -6,6 +6,7 @@ from fair.allocation import (
     original_yankee_swap,
     round_robin,
 )
+from fair.feature import Course
 from fair.item import ScheduleItem
 from fair.simulation import RenaissanceMan
 
@@ -14,52 +15,117 @@ def test_original_yankee_swap(
     renaissance1: RenaissanceMan,
     renaissance2: RenaissanceMan,
     schedule: list[ScheduleItem],
+    course: Course,
 ):
     leg_student1 = LegacyStudent(renaissance1, renaissance1.all_courses_constraint)
     leg_student2 = LegacyStudent(renaissance2, renaissance2.all_courses_constraint)
 
-    original_yankee_swap([leg_student1, leg_student2], schedule)
+    X, _, _ = original_yankee_swap([leg_student1, leg_student2], schedule)
+    alloc1 = X[:, 0]
+    alloc2 = X[:, 1]
+
+    # quantity allocated courses does not exceed limit
+    assert sum(alloc1) <= renaissance1.total_courses
+    assert sum(alloc2) <= renaissance2.total_courses
+
+    # only preferred courses are allocated
+    courses1 = [schedule[i].value(course) for i in range(len(alloc1)) if alloc1[i] == 1]
+    courses2 = [schedule[i].value(course) for i in range(len(alloc2)) if alloc2[i] == 1]
+    assert set(courses1) <= set(renaissance1.preferred_courses)
+    assert set(courses2) <= set(renaissance2.preferred_courses)
 
 
 def test_general_yankee_swap(
     renaissance1: RenaissanceMan,
     renaissance2: RenaissanceMan,
     schedule: list[ScheduleItem],
+    course: Course,
 ):
     leg_student1 = LegacyStudent(renaissance1, renaissance1.all_courses_constraint)
     leg_student2 = LegacyStudent(renaissance2, renaissance2.all_courses_constraint)
 
-    general_yankee_swap([leg_student1, leg_student2], schedule)
+    X, _, _ = general_yankee_swap([leg_student1, leg_student2], schedule)
+    alloc1 = X[:, 0]
+    alloc2 = X[:, 1]
+
+    # quantity allocated courses does not exceed limit
+    assert sum(alloc1) <= renaissance1.total_courses
+    assert sum(alloc2) <= renaissance2.total_courses
+
+    # only preferred courses are allocated
+    courses1 = [schedule[i].value(course) for i in range(len(alloc1)) if alloc1[i] == 1]
+    courses2 = [schedule[i].value(course) for i in range(len(alloc2)) if alloc2[i] == 1]
+    assert set(courses1) <= set(renaissance1.preferred_courses)
+    assert set(courses2) <= set(renaissance2.preferred_courses)
 
 
 def test_bfs_yankee_swap(
     renaissance1: RenaissanceMan,
     renaissance2: RenaissanceMan,
     schedule: list[ScheduleItem],
+    course: Course,
 ):
     leg_student1 = LegacyStudent(renaissance1, renaissance1.all_courses_constraint)
     leg_student2 = LegacyStudent(renaissance2, renaissance2.all_courses_constraint)
 
-    bfs_yankee_swap([leg_student1, leg_student2], schedule)
+    X = bfs_yankee_swap([leg_student1, leg_student2], schedule)
+    alloc1 = X[:, 0]
+    alloc2 = X[:, 1]
+
+    # quantity allocated courses does not exceed limit
+    assert sum(alloc1) <= renaissance1.total_courses
+    assert sum(alloc2) <= renaissance2.total_courses
+
+    # only preferred courses are allocated
+    courses1 = [schedule[i].value(course) for i in range(len(alloc1)) if alloc1[i] == 1]
+    courses2 = [schedule[i].value(course) for i in range(len(alloc2)) if alloc2[i] == 1]
+    assert set(courses1) <= set(renaissance1.preferred_courses)
+    assert set(courses2) <= set(renaissance2.preferred_courses)
 
 
 def test_round_robin_swap(
     renaissance1: RenaissanceMan,
     renaissance2: RenaissanceMan,
     schedule: list[ScheduleItem],
+    course: Course,
 ):
     leg_student1 = LegacyStudent(renaissance1, renaissance1.all_courses_constraint)
     leg_student2 = LegacyStudent(renaissance2, renaissance2.all_courses_constraint)
 
-    round_robin([leg_student1, leg_student2], schedule)
+    X = round_robin([leg_student1, leg_student2], schedule)
+    alloc1 = X[:, 0]
+    alloc2 = X[:, 1]
+
+    # quantity allocated courses does not exceed limit
+    assert sum(alloc1) <= renaissance1.total_courses
+    assert sum(alloc2) <= renaissance2.total_courses
+
+    # only preferred courses are allocated
+    courses1 = [schedule[i].value(course) for i in range(len(alloc1)) if alloc1[i] == 1]
+    courses2 = [schedule[i].value(course) for i in range(len(alloc2)) if alloc2[i] == 1]
+    assert set(courses1) <= set(renaissance1.preferred_courses)
+    assert set(courses2) <= set(renaissance2.preferred_courses)
 
 
 def test_spire_swap(
     renaissance1: RenaissanceMan,
     renaissance2: RenaissanceMan,
     schedule: list[ScheduleItem],
+    course: Course,
 ):
     leg_student1 = LegacyStudent(renaissance1, renaissance1.all_courses_constraint)
     leg_student2 = LegacyStudent(renaissance2, renaissance2.all_courses_constraint)
 
-    SPIRE_algorithm([leg_student1, leg_student2], schedule)
+    X = SPIRE_algorithm([leg_student1, leg_student2], schedule)
+    alloc1 = X[:, 0]
+    alloc2 = X[:, 1]
+
+    # quantity allocated courses does not exceed limit
+    assert sum(alloc1) <= renaissance1.total_courses
+    assert sum(alloc2) <= renaissance2.total_courses
+
+    # only preferred courses are allocated
+    courses1 = [schedule[i].value(course) for i in range(len(alloc1)) if alloc1[i] == 1]
+    courses2 = [schedule[i].value(course) for i in range(len(alloc2)) if alloc2[i] == 1]
+    assert set(courses1) <= set(renaissance1.preferred_courses)
+    assert set(courses2) <= set(renaissance2.preferred_courses)
