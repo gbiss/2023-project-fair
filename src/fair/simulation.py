@@ -71,7 +71,7 @@ class RenaissanceMan(SimulatedAgent):
             sparse,
         )
         undesirable_courses = list(set(all_courses).difference(self.preferred_courses))
-        self.undersireable_courses_constraint = PreferenceConstraint.from_item_lists(
+        self.undesirable_courses_constraint = PreferenceConstraint.from_item_lists(
             schedule,
             [undesirable_courses],
             [0],
@@ -88,7 +88,7 @@ class RenaissanceMan(SimulatedAgent):
 
         constraints = global_constraints + [
             self.all_courses_constraint,
-            self.undersireable_courses_constraint,
+            self.undesirable_courses_constraint,
             self.topic_constraint,
         ]
 
