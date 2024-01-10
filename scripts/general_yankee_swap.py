@@ -9,7 +9,7 @@ from fair.constraint import CourseTimeConstraint, MutualExclusivityConstraint
 from fair.feature import Course, Section, Slot, Weekday, slots_for_time_range
 from fair.item import ScheduleItem
 from fair.metrics import leximin, nash_welfare, utilitarian_welfare
-from fair.optimization import IntegerLinearProgram
+from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan
 
 NUM_STUDENTS = 3
@@ -83,7 +83,7 @@ print("unique bundles evaluated", [student.valuation._unique_value_ct])
 
 if FIND_OPTIMAL:
     orig_students = [student.student for student in students]
-    program = IntegerLinearProgram(orig_students).compile()
+    program = StudentAllocationProgram(orig_students, schedule).compile()
     ind = program.convert_allocation(X[0])
     opt_alloc = program.formulateUSW().solve()
     opt_USW = sum(opt_alloc) / len(orig_students)
