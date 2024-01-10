@@ -54,7 +54,7 @@ class IntegerLinearProgram:
             AttributeError: Shapes of self.A and Ap must be compatible
 
         Returns:
-            _type_: _description_
+            IntegerLinearProgram: ILP with augmented constraints
         """
         if self.A is None or self.b is None:
             raise AttributeError("IntegerLinearProgram must be compiled first")
