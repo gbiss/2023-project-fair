@@ -12,8 +12,6 @@ from fair.metrics import leximin, nash_welfare, utilitarian_welfare
 from fair.optimization import IntegerLinearProgram
 from fair.simulation import RenaissanceMan
 
-
-
 NUM_STUDENTS = 3
 MAX_COURSES_PER_TOPIC = 5
 MAX_COURSES_TOTAL = 5
@@ -51,7 +49,7 @@ for idx, row in df.iterrows():
         ScheduleItem(features, [crs, slt, dys, sec], index=idx, capacity=capacity)
     )
 
-topics = sorted([sorted(list(courses)) for courses in topic_map.values()])
+topics = [list(courses) for courses in topic_map.values()]
 
 # global constraints
 course_time_constr = CourseTimeConstraint.from_items(schedule, slot, weekday, SPARSE)
@@ -82,14 +80,11 @@ print("nash welfare: ", nash_welfare(X[0], students, schedule))
 print("leximin vector: ", leximin(X[0], students, schedule))
 print("total bundles evaluated", [student.valuation._value_ct])
 print("unique bundles evaluated", [student.valuation._unique_value_ct])
-# print(student.quantities)
-# print(student.preferred_courses)
-# print(student.total_courses)
 
-# if FIND_OPTIMAL:
-#     orig_students = [student.student for student in students]
-#     program = IntegerLinearProgram(orig_students).compile()
-#     ind = program.convert_allocation(X[0])
-#     opt_alloc = program.formulateUSW().solve()
-#     opt_USW = sum(opt_alloc) / len(orig_students)
-#     print("optimal utilitarian welfare", opt_USW)
+if FIND_OPTIMAL:
+    orig_students = [student.student for student in students]
+    program = IntegerLinearProgram(orig_students).compile()
+    ind = program.convert_allocation(X[0])
+    opt_alloc = program.formulateUSW().solve()
+    opt_USW = sum(opt_alloc) / len(orig_students)
+    print("optimal utilitarian welfare", opt_USW)
