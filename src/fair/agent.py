@@ -157,7 +157,7 @@ class LegacyStudent:
             og_item (BaseItem): Item to be removed
             new_item (BaseItem): Item to be added
         """
-        exchange_contribution(self.student.valuation, bundle, og_item, new_item)
+        return exchange_contribution(self.student.valuation, bundle, og_item, new_item)
 
     def get_desired_items_indexes(self, items: List[BaseItem]):
         """Return subset of indices from items that are preferred by the student
