@@ -38,7 +38,7 @@ features = [course, slot, weekday, section]
 # construct schedule
 schedule = []
 topic_map = defaultdict(set)
-for idx, row in df.iterrows():
+for idx, (_, row) in enumerate(df.iterrows()):
     crs = str(row["Catalog"])
     topic_map[row["Categories"]].add(crs)
     slt = slots_for_time_range(row["Mtg Time"], slot.times)
@@ -49,7 +49,7 @@ for idx, row in df.iterrows():
         ScheduleItem(features, [crs, slt, dys, sec], index=idx, capacity=capacity)
     )
 
-topics = [list(courses) for courses in topic_map.values()]
+topics = sorted([sorted(list(courses)) for courses in topic_map.values()])
 
 # global constraints
 course_time_constr = CourseTimeConstraint.from_items(schedule, slot, weekday, SPARSE)
