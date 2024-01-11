@@ -38,8 +38,7 @@ features = [course, slot, weekday, section]
 # construct schedule
 schedule = []
 topic_map = defaultdict(set)
-count = 0
-for idx, row in df.iterrows():
+for idx, (_, row) in enumerate(df.iterrows()):
     crs = str(row["Catalog"])
     topic_map[row["Categories"]].add(crs)
     slt = slots_for_time_range(row["Mtg Time"], slot.times)
@@ -47,9 +46,8 @@ for idx, row in df.iterrows():
     capacity = row["CICScapacity"]
     dys = tuple([day.strip() for day in row["zc.days"].split(" ")])
     schedule.append(
-        ScheduleItem(features, [crs, slt, dys, sec], index=count, capacity=capacity)
+        ScheduleItem(features, [crs, slt, dys, sec], index=idx, capacity=capacity)
     )
-    count += 1
 
 topics = sorted([sorted(list(courses)) for courses in topic_map.values()])
 
