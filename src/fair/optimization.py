@@ -2,6 +2,7 @@ import numpy as np
 import scipy
 
 from fair.agent import BaseAgent
+from fair.item import ScheduleItem
 
 
 class IntegerLinearProgram:
@@ -37,6 +38,35 @@ class IntegerLinearProgram:
 
         self.A = scipy.sparse.bmat(A_blocks, format="csr")
         self.b = scipy.sparse.vstack(bs)
+
+        return self
+
+    def add_constraint(self, Ap, bp):
+        """Augment constraints beyond those supplied by the agent
+
+        Args:
+            Ap (np.ndarray | scipy.sparse.matrix): Constraint matrix
+            bp (np.ndarray | scipy.sparse.matrix): Limit vector
+
+        Raises:
+            AttributeError: Constraints cannot be formulated until the ILP is compiled
+            AttributeError: Shapes of Ap and bp must be compatible
+            AttributeError: Shapes of self.A and Ap must be compatible
+
+        Returns:
+            IntegerLinearProgram: ILP with augmented constraints
+        """
+        if self.A is None or self.b is None:
+            raise AttributeError("IntegerLinearProgram must be compiled first")
+
+        if Ap.shape[0] != bp.shape[0]:
+            raise AttributeError("rows in Ap must match rows in bp")
+
+        if Ap.shape[1] != self.A.shape[1]:
+            raise AttributeError("columns in Ap must match columns in A")
+
+        self.A = scipy.sparse.vstack([self.A, scipy.sparse.csr_matrix(Ap)])
+        self.b = scipy.sparse.vstack([self.b, scipy.sparse.csr_matrix(bp)])
 
         return self
 
@@ -99,3 +129,47 @@ class IntegerLinearProgram:
         return scipy.sparse.vstack(
             [scipy.sparse.csr_matrix(X[:, i]).T for i in range(len(self.agents))]
         )
+
+
+class StudentAllocationProgram(IntegerLinearProgram):
+    """An Integer Linear Program for allocating courses to students"""
+
+    def __init__(self, students: list[BaseAgent], schedule: list[ScheduleItem]):
+        """
+        Args:
+            students (list[BaseAgent]): Students whose constraints define the program
+            schedule (list[ScheduleItem]): Items from which student preferences are constructed
+        """
+        self.schedule = schedule
+        super().__init__(students)
+
+    def compile(self):
+        """Create a single (block) constraint matrix for all students
+
+        Resulting block matrix A acts on an allocation vector that results from
+        concatenating all allocation indicator vectors across all students. Beyond
+        student linear constraints, also add capacity constraints for all courses
+        in schedule.
+
+        Returns:
+            StudentAllocationProgram: compiled StudentAllocationProgram
+        """
+        super().compile()
+
+        columns = self.A.shape[1]
+        A = scipy.sparse.lil_matrix((len(self.schedule), columns), dtype=np.int64)
+        b = scipy.sparse.lil_matrix((len(self.schedule), 1), dtype=np.int64)
+        extents = [
+            student.valuation.compile().constraints[0].extent for student in self.agents
+        ]
+        for row, item in enumerate(self.schedule):
+            block_offset = 0
+            for i in range(len(self.agents)):
+                block_idx = block_offset + item.index
+                A[row, block_idx] = 1
+                block_offset += extents[i]
+            b[row, 0] = item.capacity
+
+        self.add_constraint(A.tocsr(), b.tocsr())
+
+        return self
