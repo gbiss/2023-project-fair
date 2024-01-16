@@ -1,9 +1,9 @@
 from typing import List
 
 from fair.constraint import LinearConstraint, PreferenceConstraint
-from fair.feature import Course
+from fair.feature import Course, Section, Slot, Weekday
 from fair.item import ScheduleItem
-from fair.valuation import ConstraintSatifactionValuation, UniqueItemsValuation
+from fair.valuation import ConstraintSatifactionValuation, UniqueItemsValuation, is_mrf
 
 
 def test_valid_constraint_valuation(
@@ -75,3 +75,20 @@ def test_valuation_compilation(
 
     assert valuation.independent(bundle_250_301) == compiled.independent(bundle_250_301)
     assert valuation.value(bundle_250_301) == compiled.value(bundle_250_301)
+
+
+def test_mrf(course: Course, slot: Slot, weekday: Weekday, section: Section):
+    features = [course, slot, weekday, section]
+    schedule = [
+        ScheduleItem(features, ["250", (1, 2), ("Mon",), 1], 0),
+        ScheduleItem(features, ["250", (4, 5), ("Mon",), 2], 1),
+        ScheduleItem(features, ["301", (4, 5), ("Mon",), 1], 2),
+    ]
+    # is not MRF
+    A = [[1, 1, 0], [0, 1, 1]]
+    b = [1, 1]
+    constraint = LinearConstraint(A, b, 3)
+    valuation = ConstraintSatifactionValuation([constraint])
+    assert not is_mrf(schedule, valuation.value)
+
+    # add example where is it MRF

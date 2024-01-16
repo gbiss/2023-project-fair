@@ -230,3 +230,15 @@ class StudentValuation(ConstraintSatifactionValuation):
             constraints (List[BaseConstraint]): Constraints that limit independence
         """
         super().__init__(constraints)
+
+
+def is_mrf(ground, func):
+    return is_submodular(func, ground) and is_monotonic(func, ground)
+
+
+def is_submodular(ground, func):
+    return True
+
+
+def is_monotonic(ground, func):
+    return True
