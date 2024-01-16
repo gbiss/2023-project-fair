@@ -83,26 +83,24 @@ class MemoableValuation:
 
         return self._independent_memo[hashable_bundle]
 
-    def _value(self, bundle: List[BaseItem], bottom_up: bool = True):
+    def _value(self, bundle: List[BaseItem]):
         """Actual implementation of value function
 
         Args:
             bundle (List[BaseItem]): Items in the bundle
-            bottom_up (bool, optional): Method to test for indepenence
 
         Raises:
             NotImplementedError: Must be implemented by child class
         """
         raise NotImplementedError
 
-    def value(self, bundle: List[BaseItem], bottom_up: bool = True):
+    def value(self, bundle: List[BaseItem]):
         """Value of bundle
 
         Retreives cached value if present, otherwise it calculates it
 
         Args:
             bundle (List[BaseItem]): Items in the bundle
-            bottom_up (bool, optional): Method to test for indepenence
 
         Returns:
             int: Bundle value
@@ -111,7 +109,7 @@ class MemoableValuation:
 
         self._value_ct += 1
         if hashable_bundle not in self._value_memo:
-            self._value_memo[hashable_bundle] = self._value(bundle, bottom_up)
+            self._value_memo[hashable_bundle] = self._value(bundle)
             self._unique_value_ct += 1
 
         return self._value_memo[hashable_bundle]
@@ -142,14 +140,13 @@ class ConstraintSatifactionValuation(MemoableValuation):
 
         return satisfies
 
-    def _value(self, bundle: List[BaseItem], bottom_up: bool = True):
+    def _value(self, bundle: List[BaseItem]):
         """Value of bundle
 
         The value is the size of the largest independent set contained in the bundle
 
         Args:
             bundle (List[BaseItem]): Items in the bundle
-            bottom_up (bool, optional): Method to test for indepenence
 
         Returns:
             int: Bundle value
@@ -157,44 +154,6 @@ class ConstraintSatifactionValuation(MemoableValuation):
         if self.independent(bundle):
             return len(bundle)
 
-        if bottom_up:
-            return self._bottom_up_value(bundle)
-        else:
-            return self._top_down_value(bundle)
-
-    def _top_down_value(self, bundle: List[BaseItem]):
-        """Value of bundle
-
-        The value is the size of the largest independent set contained in the bundle.
-        Recursively analyze all possible subbundles beginning with the largest.
-
-        Args:
-            bundle (List[BaseItem]): Items in the bundle
-            bottom_up (bool, optional): Method to test for indepenence
-
-        Returns:
-            int: Bundle value
-        """
-        value = 0
-        for i in range(len(bundle)):
-            subbundle = bundle[:i] + bundle[i + 1 :]
-            value = max(value, self.value(subbundle, bottom_up=False))
-
-        return value
-
-    def _bottom_up_value(self, bundle: List[BaseItem]):
-        """Value of bundle
-
-        The value is the size of the largest independent set contained in the bundle.
-        Grow the independent set from the bottom up, using the augmentation property.
-
-        Args:
-            bundle (List[BaseItem]): Items in the bundle
-            bottom_up (bool, optional): Method to test for indepenence
-
-        Returns:
-            int: Bundle value
-        """
         bundle = list(deepcopy(bundle))
         indep = []
         while len(bundle) > 0:
