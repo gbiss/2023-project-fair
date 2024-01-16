@@ -1,3 +1,4 @@
+import itertools
 from typing import List
 
 from fair.constraint import LinearConstraint, PreferenceConstraint
@@ -75,3 +76,15 @@ def test_valuation_compilation(
 
     assert valuation.independent(bundle_250_301) == compiled.independent(bundle_250_301)
     assert valuation.value(bundle_250_301) == compiled.value(bundle_250_301)
+
+
+def test_bottom_up_vs_top_down(schedule: list[ScheduleItem], course: Course):
+    constraint = PreferenceConstraint.from_item_lists(
+        schedule, [["250", "301", "611"]], [2], course
+    )
+    valuation = ConstraintSatifactionValuation([constraint])
+    for size in range(1, len(schedule) + 1):
+        for bundle in itertools.combinations(schedule, size):
+            assert valuation.value(bundle, bottom_up=True) == valuation.value(
+                bundle, bottom_up=False
+            )
