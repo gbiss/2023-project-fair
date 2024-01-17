@@ -68,7 +68,7 @@ for i in range(NUM_STUDENTS):
         seed=i,
         sparse=SPARSE,
     )
-    legacy_student = LegacyStudent(student, student.all_courses_constraint)
+    legacy_student = LegacyStudent(student, student.preferred_courses, course)
     legacy_student.student.valuation.valuation = (
         legacy_student.student.valuation.compile()
     )

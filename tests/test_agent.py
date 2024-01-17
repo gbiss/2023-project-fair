@@ -1,4 +1,9 @@
-from fair.agent import Student, exchange_contribution, marginal_contribution
+from fair.agent import (
+    LegacyStudent,
+    Student,
+    exchange_contribution,
+    marginal_contribution,
+)
 from fair.constraint import (
     CourseTimeConstraint,
     MutualExclusivityConstraint,
@@ -63,3 +68,19 @@ def test_student(
     assert student.value([schedule[1], schedule[2]]) == 1
     # two sections of the same course
     assert student.value([schedule[0], schedule[1]]) == 1
+
+
+def test_get_desired_item_indexes(schedule, course):
+    actual_desired = ["250", "301"]
+    preferred_constr = PreferenceConstraint.from_item_lists(
+        schedule, [actual_desired], [2], course
+    )
+    student = Student(StudentValuation([preferred_constr]))
+    leg_student = LegacyStudent(student, actual_desired, course)
+
+    actual_desired = [
+        item.index for item in schedule if item.value(course) in actual_desired
+    ]
+    computed_desired = leg_student.get_desired_items_indexes(schedule)
+
+    assert actual_desired == computed_desired
