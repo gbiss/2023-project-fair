@@ -1,4 +1,4 @@
-from copy import copy
+from copy import deepcopy
 from typing import List
 
 from fair.item import BaseItem
@@ -154,12 +154,14 @@ class ConstraintSatifactionValuation(MemoableValuation):
         if self.independent(bundle):
             return len(bundle)
 
-        value = 0
-        for i in range(len(bundle)):
-            subbundle = bundle[:i] + bundle[i + 1 :]
-            value = max(value, self.value(subbundle))
+        bundle = list(deepcopy(bundle))
+        indep = []
+        while len(bundle) > 0:
+            cand = bundle.pop()
+            if self.independent(indep + [cand]):
+                indep.append(cand)
 
-        return value
+        return len(indep)
 
     def compile(self):
         """Compile constraints list into single constraint
@@ -167,7 +169,7 @@ class ConstraintSatifactionValuation(MemoableValuation):
         Returns:
             ConstraintSatifactionValuation: Valuation with constraints compiled
         """
-        constraints = copy(self.constraints)
+        constraints = deepcopy(self.constraints)
         if len(constraints) == 0:
             return self
 

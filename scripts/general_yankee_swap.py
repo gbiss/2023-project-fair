@@ -78,8 +78,14 @@ X = general_yankee_swap(students, schedule)
 print("utilitarian welfare: ", utilitarian_welfare(X[0], students, schedule))
 print("nash welfare: ", nash_welfare(X[0], students, schedule))
 print("leximin vector: ", leximin(X[0], students, schedule))
-print("total bundles evaluated", [student.valuation._value_ct])
-print("unique bundles evaluated", [student.valuation._unique_value_ct])
+print(
+    "total bundles evaluated",
+    sum([student.student.valuation._value_ct for student in students]),
+)
+print(
+    "unique bundles evaluated",
+    sum([student.student.valuation._unique_value_ct for student in students]),
+)
 
 if FIND_OPTIMAL:
     orig_students = [student.student for student in students]
