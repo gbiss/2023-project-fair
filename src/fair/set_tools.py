@@ -2,10 +2,10 @@ from itertools import chain, combinations
 
 
 def powerset(iterable):
-    """generates the power set of iterable
+    """Generates the power set of iterable
 
     Args:
-        iterable (List or Set): ground set of items
+        iterable (List or Set): Ground set of items
 
     Returns:
         set of tuples: power set
@@ -15,11 +15,11 @@ def powerset(iterable):
 
 
 def is_mrf(ground, func):
-    """checks 4 conditions of valid rank functions
+    """Checks 4 conditions of valid rank functions
 
     Args:
-        ground (List): ground set of items (bundle)
-        func (function): rank value function
+        ground (List): Ground set of items (bundle)
+        func (function): Rank value function
 
     Returns:
         bool: True if func is an MRF, given ground; False otherwise
@@ -33,11 +33,11 @@ def is_mrf(ground, func):
 
 
 def is_submodular(ground, func):
-    """performs check for submodularity of func, given a ground set of items
+    """Performs check for submodularity of func, given a ground set of items
 
     Args:
-        ground (List): ground set of items (bundle)
-        func (function): rank value function
+        ground (List): Gound set of items (bundle)
+        func (function): Rank value function
 
     Returns:
         bool: True if func is submodular, given ground; False otherwise
@@ -60,11 +60,11 @@ def is_submodular(ground, func):
 
 
 def is_monotonic_non_decreasing(ground, func):
-    """checks that func is monotonic non-decreasing, given the ground set, ground
+    """Checks that func is monotonic non-decreasing, given the ground set, ground
 
     Args:
-        ground (List): ground set of items (bundle)
-        func (function): rank value function
+        ground (List): Ground set of items (bundle)
+        func (function): Rank value function
 
     Returns:
         bool: True if func is monotonic non_decreasing, given ground; False otherwise
@@ -83,11 +83,11 @@ def is_monotonic_non_decreasing(ground, func):
 
 
 def nonnegative_rank_value(ground, func):
-    """checks that func always returns a non-negative value, given the ground set, ground
+    """Checks that func always returns a non-negative value, given the ground set, ground
 
     Args:
-        ground (List): ground set of items (bundle)
-        func (function): rank value function
+        ground (List): Ground set of items (bundle)
+        func (function): Rank value function
     Returns:
         bool: True if func returns non-negative value, given ground; False otherwise
     """
@@ -101,11 +101,11 @@ def nonnegative_rank_value(ground, func):
 
 
 def rank_value_leq_cardinality(ground, func):
-    """checks that func always returns a value less than the cardinality
+    """Checks that func always returns a value less than the cardinality
 
     Args:
-        ground (List): ground set of items (bundle)
-        func (function): rank value function
+        ground (List): Ground set of items (bundle)
+        func (function): Rank value function
 
     Returns:
         bool: True if func returns a value less than the cardinality, given ground; False otherwise
