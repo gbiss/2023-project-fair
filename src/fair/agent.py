@@ -1,8 +1,9 @@
 from typing import List
 
 from fair.constraint import PreferenceConstraint
+from fair.feature import Course
 
-from .item import BaseItem
+from .item import BaseItem, ScheduleItem
 from .valuation import RankValuation, UniqueItemsValuation
 
 
@@ -110,26 +111,27 @@ class LegacyStudent:
     """A student compatible with https://github.com/cheerstopaula/Allocation"""
 
     def __init__(
-        self, student: BaseAgent, all_courses_constraint: PreferenceConstraint
+        self,
+        student: BaseAgent,
+        preferred_courses: list[ScheduleItem],
+        course: Course,
     ):
         """
-        Raises:
-            AttributeError: student must include valuation as member
-            AttributeError: student.valuation.constraints must include all_courses_constraint
-
         Args:
             student (BaseAgent): Student to delegate value queries to
-            all_courses_constraint (PreferenceConstraint): All desirable courses
+            preferred_courses (list[str]): All courses preferred by student
+            course (Course): Course feature associated with preferred_courses
+
+        Raises:
+            AttributeError: student must include valuation as member
         """
         if not hasattr(student, "valuation"):
             raise AttributeError("student delegate must have valuation member")
 
-        if all_courses_constraint not in student.valuation.constraints:
-            raise AttributeError("student delegate must include all_courses_constraint")
-
         student.valuation = UniqueItemsValuation(student.valuation)
         self.student = student
-        self.all_courses_constraint = all_courses_constraint
+        self.preferred_courses = preferred_courses
+        self.course = course
 
     def valuation(self, bundle: List[BaseItem]):
         """Delegate to value function
@@ -162,15 +164,14 @@ class LegacyStudent:
     def get_desired_items_indexes(self, items: List[BaseItem]):
         """Return subset of indices from items that are preferred by the student
 
-        This method will currently only work if the delegate student object implements a
-        ConstraintSatifactionValuation valuation, which itself includes a PreferrenceConstraint
-
         Args:
             items (List[BaseItem]): Candidate items list
 
         Returns:
             List[int]: Indices of desired items in list
         """
-        desired_items = self.all_courses_constraint.constrained_items(items)
-
-        return [i for i in range(len(items)) if items[i] in desired_items]
+        return [
+            item.index
+            for item in items
+            if item.value(self.course) in self.preferred_courses
+        ]

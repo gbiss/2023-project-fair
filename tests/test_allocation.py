@@ -17,8 +17,8 @@ def test_original_yankee_swap(
     schedule: list[ScheduleItem],
     course: Course,
 ):
-    leg_student1 = LegacyStudent(renaissance1, renaissance1.all_courses_constraint)
-    leg_student2 = LegacyStudent(renaissance2, renaissance2.all_courses_constraint)
+    leg_student1 = LegacyStudent(renaissance1, renaissance1.preferred_courses, course)
+    leg_student2 = LegacyStudent(renaissance2, renaissance2.preferred_courses, course)
 
     X, _, _ = original_yankee_swap([leg_student1, leg_student2], schedule)
     alloc1 = X[:, 0]
@@ -41,8 +41,8 @@ def test_general_yankee_swap(
     schedule: list[ScheduleItem],
     course: Course,
 ):
-    leg_student1 = LegacyStudent(renaissance1, renaissance1.all_courses_constraint)
-    leg_student2 = LegacyStudent(renaissance2, renaissance2.all_courses_constraint)
+    leg_student1 = LegacyStudent(renaissance1, renaissance1.preferred_courses, course)
+    leg_student2 = LegacyStudent(renaissance2, renaissance2.preferred_courses, course)
 
     X, _, _ = general_yankee_swap([leg_student1, leg_student2], schedule)
     alloc1 = X[:, 0]
@@ -65,8 +65,8 @@ def test_bfs_yankee_swap(
     schedule: list[ScheduleItem],
     course: Course,
 ):
-    leg_student1 = LegacyStudent(renaissance1, renaissance1.all_courses_constraint)
-    leg_student2 = LegacyStudent(renaissance2, renaissance2.all_courses_constraint)
+    leg_student1 = LegacyStudent(renaissance1, renaissance1.preferred_courses, course)
+    leg_student2 = LegacyStudent(renaissance2, renaissance2.preferred_courses, course)
 
     X = bfs_yankee_swap([leg_student1, leg_student2], schedule)
     alloc1 = X[:, 0]
@@ -89,8 +89,8 @@ def test_round_robin_swap(
     schedule: list[ScheduleItem],
     course: Course,
 ):
-    leg_student1 = LegacyStudent(renaissance1, renaissance1.all_courses_constraint)
-    leg_student2 = LegacyStudent(renaissance2, renaissance2.all_courses_constraint)
+    leg_student1 = LegacyStudent(renaissance1, renaissance1.preferred_courses, course)
+    leg_student2 = LegacyStudent(renaissance2, renaissance2.preferred_courses, course)
 
     X = round_robin([leg_student1, leg_student2], schedule)
     alloc1 = X[:, 0]
@@ -113,8 +113,8 @@ def test_spire_swap(
     schedule: list[ScheduleItem],
     course: Course,
 ):
-    leg_student1 = LegacyStudent(renaissance1, renaissance1.all_courses_constraint)
-    leg_student2 = LegacyStudent(renaissance2, renaissance2.all_courses_constraint)
+    leg_student1 = LegacyStudent(renaissance1, renaissance1.preferred_courses, course)
+    leg_student2 = LegacyStudent(renaissance2, renaissance2.preferred_courses, course)
 
     X = SPIRE_algorithm([leg_student1, leg_student2], schedule)
     alloc1 = X[:, 0]
