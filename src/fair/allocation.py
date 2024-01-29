@@ -153,8 +153,9 @@ def add_agent_to_exchange_graph(G, X, items, agents, agent_picked):
     agent = agents[agent_picked]
     for i in agent.get_desired_items_indexes(items):
         g = items[i]
-        if agents[agent_picked].marginal_contribution(bundle, g) == 1:
-            G.add_edge("s", i)
+        if g not in bundle:
+            if agents[agent_picked].marginal_contribution(bundle, g) == 1:
+                G.add_edge("s", i)
     return G
 
 

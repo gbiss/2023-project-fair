@@ -71,6 +71,8 @@ def marginal_contribution(
     Returns:
         Any: Change in value
     """
+    if item in bundle:
+        return 0
     T = bundle.copy()
     current_val = valuation.value(T)
     T.append(item)
