@@ -45,14 +45,14 @@ def is_submodular(ground: list, func: Callable):
     """
     powerset_ground = list(powerset(ground))
 
-    for i in range(len(powerset_ground)):
-        for j in range(len(powerset_ground)):
-            add_val = func(powerset_ground[i]) + func(powerset_ground[j])
+    for set1 in powerset_ground:
+        for set2 in powerset_ground:
+            add_val = func(set1) + func(set2)
             int_val = func(
-                list(set(powerset_ground[i]).intersection(set(powerset_ground[j])))
+                list(set(set1).intersection(set(set2)))
             )
             union_val = func(
-                list(set(powerset_ground[i]).union(set(powerset_ground[j])))
+                list(set(set1).union(set(set2)))
             )
             if add_val < int_val + union_val:
                 return False
@@ -94,6 +94,10 @@ def nonnegative_rank_value(ground: list, func: Callable):
     Returns:
         bool: True if func returns non-negative value, given ground; False otherwise
     """
+    for item in ground:
+        if type(item) != int:
+            return False
+    
     powerset_ground = list(powerset(ground))
 
     for cand in powerset(ground):
