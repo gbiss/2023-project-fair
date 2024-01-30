@@ -73,10 +73,10 @@ def is_monotonic_non_decreasing(ground: list, func: function):
 
     for i in range(len(powerset_ground)):
         for j in range(len(powerset_ground)):
-            subset = False
+            set1_subset_set2 = False
             if set(powerset_ground[i]).issubset(set(powerset_ground[j])):
-                subset = True
-            if subset == True and func(powerset_ground[i]) > func(powerset_ground[j]):
+                set1_subset_set2 = True
+            if set1_subset_set2 == True and func(powerset_ground[i]) > func(powerset_ground[j]):
                 return False
 
     return True

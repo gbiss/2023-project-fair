@@ -68,13 +68,13 @@ def test_submodular():
 
 
 def test_monotonic_non_decreasing():
-    vals_1 = [0, 1, 2, 3, 4, 5]
+    values = [0, 1, 2, 3, 4, 5]
 
-    assert is_monotonic_non_decreasing(vals_1, length_marginal_increasing)
-    assert is_monotonic_non_decreasing(vals_1, length_marginal_decreasing)
-    assert is_monotonic_non_decreasing(vals_1, additive)
-    assert is_monotonic_non_decreasing(vals_1, budget_additive)
-    assert not is_monotonic_non_decreasing(vals_1, additive_divide_by_rank)
+    assert is_monotonic_non_decreasing(values, length_marginal_increasing)
+    assert is_monotonic_non_decreasing(values, length_marginal_decreasing)
+    assert is_monotonic_non_decreasing(values, additive)
+    assert is_monotonic_non_decreasing(values, budget_additive)
+    assert not is_monotonic_non_decreasing(values, additive_divide_by_rank)
 
 
 def test_nonnegative_rank_value():
