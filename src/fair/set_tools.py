@@ -96,10 +96,10 @@ def nonnegative_rank_value(ground: list, func: Callable):
     """
     powerset_ground = list(powerset(ground))
 
-    for i in range(len(powerset_ground)):
-        val = func(powerset_ground[i])
-        if val < 0:
+    for cand in powerset(ground):
+        if func(cand) < 0:
             return False
+
     return True
 
 
