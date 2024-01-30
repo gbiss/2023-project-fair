@@ -12,7 +12,7 @@ from fair.metrics import leximin, nash_welfare, utilitarian_welfare
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan
 
-NUM_STUDENTS = 3
+NUM_STUDENTS = 100
 MAX_COURSES_PER_TOPIC = 5
 MAX_COURSES_TOTAL = 6
 EXCEL_SCHEDULE_PATH = os.path.join(
