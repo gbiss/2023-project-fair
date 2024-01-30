@@ -12,9 +12,9 @@ from fair.metrics import leximin, nash_welfare, utilitarian_welfare
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan
 
-NUM_STUDENTS = 100
+NUM_STUDENTS = 3
 MAX_COURSES_PER_TOPIC = 5
-MAX_COURSES_TOTAL = 6
+MAX_COURSES_TOTAL = 5
 EXCEL_SCHEDULE_PATH = os.path.join(
     os.path.dirname(__file__), "../resources/fall2023schedule-2-cat.xlsx"
 )
