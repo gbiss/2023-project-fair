@@ -12,7 +12,7 @@ from fair.metrics import leximin, nash_welfare, utilitarian_welfare
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan
 
-NUM_STUDENTS = 50
+NUM_STUDENTS = 3
 MAX_COURSES_PER_TOPIC = 5
 MAX_COURSES_TOTAL = 6
 EXCEL_SCHEDULE_PATH = os.path.join(
@@ -78,8 +78,14 @@ X = general_yankee_swap(students, schedule)
 print("utilitarian welfare: ", utilitarian_welfare(X[0], students, schedule))
 print("nash welfare: ", nash_welfare(X[0], students, schedule))
 print("leximin vector: ", leximin(X[0], students, schedule))
-print("total bundles evaluated", sum([student.student.valuation._value_ct for student in students]))
-print("unique bundles evaluated", sum([student.student.valuation._unique_value_ct for student in students]))
+print(
+    "total bundles evaluated",
+    sum([student.student.valuation._value_ct for student in students]),
+)
+print(
+    "unique bundles evaluated",
+    sum([student.student.valuation._unique_value_ct for student in students]),
+)
 
 if FIND_OPTIMAL:
     orig_students = [student.student for student in students]

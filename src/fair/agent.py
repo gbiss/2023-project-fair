@@ -27,13 +27,12 @@ def exchange_contribution(
     Returns:
         bool: True if utility can be improved; False otherwise
     """
-    
+
     if og_item == new_item:
         return False
 
     for i in range(len(bundle)):
         if bundle[i] == new_item:
-            # print(bundle[i], new_item)
             return False
 
     T0 = bundle.copy()

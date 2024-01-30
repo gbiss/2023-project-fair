@@ -188,19 +188,20 @@ def build_exchange_graph(X, items, agents):
                     exchange_graph.add_edge(item_index, item_2_index)
     return exchange_graph
 
-def get_multiple_agents_desired_items(agents_indexes,agents,items):
+
+def get_multiple_agents_desired_items(agents_indexes, agents, items):
     lis = []
     for agent_index in agents_indexes:
         agent = agents[agent_index]
         lis = lis + agent.get_desired_items_indexes(items)
     return list(set(lis))
 
-def get_multiple_agents_bundles(agents_indexes,X):
+
+def get_multiple_agents_bundles(agents_indexes, X):
     lis = []
     for agent_index in agents_indexes:
-        lis = lis + get_bundle_indexes_from_allocation_matrix(X,agent_index)
+        lis = lis + get_bundle_indexes_from_allocation_matrix(X, agent_index)
     return list(set(lis))
-
 
 
 def update_exchange_graph(X, G, path_og, agents, items, agents_involved):
@@ -209,15 +210,19 @@ def update_exchange_graph(X, G, path_og, agents, items, agents_involved):
     last_item = path[-1]
     if X[last_item, len(agents)] == 0:
         G.remove_edge(last_item, "t")
-    agents_involved_desired_items = get_multiple_agents_desired_items(agents_involved,agents,items)
+    agents_involved_desired_items = get_multiple_agents_desired_items(
+        agents_involved, agents, items
+    )
     agents_involved_bundles = get_multiple_agents_bundles(agents_involved, X)
     for item_idx in agents_involved_bundles:
         item_1 = items[item_idx]
-        owners = list(get_owners_list(X,item_idx))
+        owners = list(get_owners_list(X, item_idx))
         if len(agents) in owners:
             owners.remove(len(agents))
-        owners_desired_items = get_multiple_agents_desired_items(owners,agents,items)
-        items_to_loop_over = list(set(agents_involved_desired_items+owners_desired_items))
+        owners_desired_items = get_multiple_agents_desired_items(owners, agents, items)
+        items_to_loop_over = list(
+            set(agents_involved_desired_items + owners_desired_items)
+        )
         for item_2_idx in items_to_loop_over:
             if item_2_idx != item_idx:
                 item_2 = items[item_2_idx]
