@@ -13,27 +13,27 @@ from fair.set_tools import (
 from fair.valuation import ConstraintSatifactionValuation
 
 
-def length_marginal_increasing(vals):
+def length_marginal_increasing(vals: list[int]):
     """FAIL submodular, PASS monotone non-decreasing"""
     return len(vals) ** 2
 
 
-def length_marginal_decreasing(vals):
+def length_marginal_decreasing(vals: list[int]):
     """PASS submodular, PASS monotone non-decreasing"""
     return math.sqrt(len(vals))
 
 
-def additive(vals):
+def additive(vals: list[int]):
     """PASS submodular, PASS monotone non-decreasing"""
     return sum(vals)
 
 
-def budget_additive(vals):
+def budget_additive(vals: list[int]):
     """PASS submodular, PASS monotone non-decreasing"""
     return min(sum(vals), 3)
 
 
-def additive_divide_by_rank(vals):
+def additive_divide_by_rank(vals: list[int]):
     """FAIL submodular, FAIL monotone non-decreasing"""
     return sum(vals) / (len(vals) + 1)
 
