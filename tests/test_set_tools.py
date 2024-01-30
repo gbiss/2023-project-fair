@@ -4,6 +4,7 @@ from fair.constraint import LinearConstraint
 from fair.feature import Course, Section, Slot, Weekday
 from fair.item import ScheduleItem
 from fair.set_tools import (
+    powerset,
     is_monotonic_non_decreasing,
     is_mrf,
     is_submodular,
@@ -36,6 +37,19 @@ def budget_additive(vals: list[int]):
 def additive_divide_by_rank(vals: list[int]):
     """FAIL submodular, FAIL monotone non-decreasing"""
     return sum(vals) / (len(vals) + 1)
+
+
+def test_powerset():
+    test_set1 = [0, 1, 2]
+    power_set1 = powerset(test_set1)
+    power_set1 = list(power_set1)
+    assert(power_set1 == [(), (0,), (1,), (2,), (0,1), (0,2), (1,2), (0,1,2)])
+    
+    test_set2 = [0, 1, 2, 3]
+    power_set2 = powerset(test_set2)
+    power_set2 = list(power_set2)
+    assert(power_set2 == [(), (0,), (1,), (2,), (3,), (0,1), (0,2), (0,3), (1,2), (1,3), (2,3),
+                          (0,1,2), (0,1,3), (0,2,3), (1,2,3), (0,1,2,3)])
 
 
 def test_mrf(course: Course, slot: Slot, weekday: Weekday, section: Section):
