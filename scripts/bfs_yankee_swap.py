@@ -5,7 +5,7 @@ import pandas as pd
 import numpy as np
 
 from fair.agent import LegacyStudent
-from fair.allocation import general_yankee_swap
+from fair.allocation import bfs_yankee_swap
 from fair.constraint import CourseTimeConstraint, MutualExclusivityConstraint
 from fair.feature import Course, Section, Slot, Weekday, slots_for_time_range
 from fair.item import ScheduleItem
@@ -13,7 +13,7 @@ from fair.metrics import leximin, nash_welfare, utilitarian_welfare
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan
 
-NUM_STUDENTS = 10
+NUM_STUDENTS = 500
 MAX_COURSES_PER_TOPIC = 5
 MAX_COURSES_TOTAL = 6
 EXCEL_SCHEDULE_PATH = os.path.join(
@@ -82,12 +82,12 @@ for i in range(NUM_STUDENTS):
     )
     students.append(legacy_student)
 
-X = general_yankee_swap(students, schedule)
+X = bfs_yankee_swap(students, schedule)
 bundles_eval=[student.valuation._value_ct for student in students0]
 unique_bundles_eval=[student.valuation._unique_value_ct for student in students0]
-YS_USW=utilitarian_welfare(X[0], students, schedule)
-YS_nash=nash_welfare(X[0], students, schedule)
-YS_leximin=leximin(X[0], students, schedule)
+YS_USW=utilitarian_welfare(X, students, schedule)
+YS_nash=nash_welfare(X, students, schedule)
+YS_leximin=leximin(X, students, schedule)
 
 print("utilitarian welfare: ", YS_USW)
 print("nash welfare: ", YS_nash)
@@ -99,7 +99,7 @@ print("unique bundles evaluated", sum(unique_bundles_eval ))
 if FIND_OPTIMAL:
     orig_students = [student.student for student in students]
     program = StudentAllocationProgram(orig_students, schedule).compile()
-    ind = program.convert_allocation(X[0])
+    ind = program.convert_allocation(X)
     opt_alloc = program.formulateUSW().solve()
     opt_USW = sum(opt_alloc) / len(orig_students)
     print("optimal utilitarian welfare", opt_USW)
@@ -116,5 +116,5 @@ print(YS_leximin)
 print(opt_leximin)
 # print('Ys allocation',X[0])
 # print(opt_alloc)
-print(X[0].shape, opt_alloc.shape)
-np.savez(f'simulations/YS_ILP_{NUM_STUDENTS}_3.npz',X=X[0],time_steps=X[1],num_agents_involved=X[2], bundles_eval=bundles_eval,unique_bundles_eval=unique_bundles_eval,eval_bundles=X[3], unique_eval_bundles=X[4], YS_USW=YS_USW, YS_nash=YS_nash, YS_leximin=YS_leximin, ilp_alloc=opt_alloc,ilp_USW=opt_USW, ilp_nash=opt_nash, ilp_leximin=opt_leximin)
+# print(X[0].shape, opt_alloc.shape)
+# np.savez(f'simulations/YS_ILP_{NUM_STUDENTS}_3.npz',X=X[0],time_steps=X[1],num_agents_involved=X[2], bundles_eval=bundles_eval,unique_bundles_eval=unique_bundles_eval,eval_bundles=X[3], unique_eval_bundles=X[4], YS_USW=YS_USW, YS_nash=YS_nash, YS_leximin=YS_leximin, ilp_alloc=opt_alloc,ilp_USW=opt_USW, ilp_nash=opt_nash, ilp_leximin=opt_leximin)

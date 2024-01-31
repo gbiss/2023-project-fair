@@ -490,13 +490,17 @@ def find_desired(i, bundle, list_of_yes, agents, items):
     list_of_yesses = list(list_of_yes.difference(bundle))
     low = 0
     high = len(list_of_yesses)
-    if agenti.valuation_index([*bundle, *list_of_yesses[low:high]], items) == len(
+    bfs_bundle_indexes=[*bundle, *list_of_yesses[low:high]]
+    bfs_bundle=[items[idx] for idx in bfs_bundle_indexes]
+    if agenti.valuation(bfs_bundle) == len(
         bundle
     ):
         return -1
     while high > low + 1:
         mid = int((low + high) / 2)
-        if agenti.valuation_index([*bundle, *list_of_yesses[low:mid]], items) > len(
+        bfs_bundle_indexes=[*bundle, *list_of_yesses[low:mid]]
+        bfs_bundle=[items[idx] for idx in bfs_bundle_indexes]
+        if agenti.valuation(bfs_bundle) > len(
             bundle
         ):
             high = mid
