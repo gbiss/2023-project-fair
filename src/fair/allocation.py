@@ -435,6 +435,8 @@ def general_yankee_swap(
     count = 0
     time_steps = []
     agents_involved_arr = []
+    eval_bundles = []
+    unique_eval_bundles = []
     start = time.process_time()
     while len(players) > 0:
         print("Iteration: %d" % count, end="\r")
@@ -453,7 +455,13 @@ def general_yankee_swap(
             players.remove(agent_picked)
             gain_vector[agent_picked] = float("-inf")
             time_steps.append(time.process_time() - start)
+            num_eval = sum([agent.student.valuation._value_ct for agent in agents])
+            num_unique_eval = sum(
+                [agent.student.valuation._unique_value_ct for agent in agents]
+            )
             agents_involved_arr.append(0)
+            eval_bundles.append(num_eval)
+            unique_eval_bundles.append(num_unique_eval)
         else:
             X, agents_involved = update_allocation(X, path, agents, items, agent_picked)
             G = update_exchange_graph(X, G, path, agents, items, agents_involved)
@@ -464,8 +472,14 @@ def general_yankee_swap(
                 nx.draw(G, with_labels=True)
                 plt.show()
             time_steps.append(time.process_time() - start)
+            num_eval = sum([agent.student.valuation._value_ct for agent in agents])
+            num_unique_eval = sum(
+                [agent.student.valuation._unique_value_ct for agent in agents]
+            )
+            eval_bundles.append(num_eval)
+            unique_eval_bundles.append(num_unique_eval)
             agents_involved_arr.append(len(agents_involved))
-    return X, time_steps, agents_involved_arr
+    return X, time_steps, agents_involved_arr, eval_bundles, unique_eval_bundles
 
 
 """Vignesh's implementation"""
