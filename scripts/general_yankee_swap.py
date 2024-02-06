@@ -9,11 +9,19 @@ from fair.allocation import general_yankee_swap
 from fair.constraint import CourseTimeConstraint, MutualExclusivityConstraint
 from fair.feature import Course, Section, Slot, Weekday, slots_for_time_range
 from fair.item import ScheduleItem
-from fair.metrics import leximin, nash_welfare, utilitarian_welfare
+from fair.metrics import (
+    leximin,
+    nash_welfare,
+    utilitarian_welfare,
+    EF_count,
+    EF_agents,
+    EF_1,
+    EF_X,
+)
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan
 
-NUM_STUDENTS = 10
+NUM_STUDENTS = 3
 MAX_COURSES_PER_TOPIC = 5
 MAX_COURSES_TOTAL = 6
 EXCEL_SCHEDULE_PATH = os.path.join(
@@ -46,7 +54,6 @@ for idx, row in df.iterrows():
     slt = slots_for_time_range(row["Mtg Time"], slot.times)
     sec = row["Section"]
     capacity = row["CICScapacity"]
-    # capacity=20
     dys = tuple([day.strip() for day in row["zc.days"].split(" ")])
     schedule.append(
         ScheduleItem(features, [crs, slt, dys, sec], index=count, capacity=capacity)
@@ -83,18 +90,17 @@ for i in range(NUM_STUDENTS):
     students.append(legacy_student)
 
 X = general_yankee_swap(students, schedule)
-bundles_eval=[student.valuation._value_ct for student in students0]
-unique_bundles_eval=[student.valuation._unique_value_ct for student in students0]
-YS_USW=utilitarian_welfare(X[0], students, schedule)
-YS_nash=nash_welfare(X[0], students, schedule)
-YS_leximin=leximin(X[0], students, schedule)
-
-print("utilitarian welfare: ", YS_USW)
-print("nash welfare: ", YS_nash)
-print("leximin vector: ", YS_leximin)
-print('sum:', sum(YS_leximin))
-print("total bundles evaluated", sum(bundles_eval))
-print("unique bundles evaluated", sum(unique_bundles_eval ))
+print("utilitarian welfare: ", utilitarian_welfare(X[0], students, schedule))
+print("nash welfare: ", nash_welfare(X[0], students, schedule))
+print("leximin vector: ", leximin(X[0], students, schedule))
+print(
+    "total bundles evaluated",
+    sum([student.student.valuation._value_ct for student in students]),
+)
+print(
+    "unique bundles evaluated",
+    sum([student.student.valuation._unique_value_ct for student in students]),
+)
 
 if FIND_OPTIMAL:
     orig_students = [student.student for student in students]
@@ -111,10 +117,3 @@ if FIND_OPTIMAL:
     print("optimal utilitarian welfare: ", opt_USW)
     print("ILP nash welfare: ", opt_nash)
     print("ILP leximin", opt_leximin)
-
-print(YS_leximin)
-print(opt_leximin)
-# print('Ys allocation',X[0])
-# print(opt_alloc)
-print(X[0].shape, opt_alloc.shape)
-np.savez(f'simulations/YS_ILP_{NUM_STUDENTS}_3.npz',X=X[0],time_steps=X[1],num_agents_involved=X[2], bundles_eval=bundles_eval,unique_bundles_eval=unique_bundles_eval,eval_bundles=X[3], unique_eval_bundles=X[4], YS_USW=YS_USW, YS_nash=YS_nash, YS_leximin=YS_leximin, ilp_alloc=opt_alloc,ilp_USW=opt_USW, ilp_nash=opt_nash, ilp_leximin=opt_leximin)

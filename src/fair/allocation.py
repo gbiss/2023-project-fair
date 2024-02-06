@@ -240,6 +240,7 @@ def update_exchange_graph(X, G, path_og, agents, items, agents_involved):
                         )
                         if willing_owner:
                             exchangeable = True
+                            break
                 if exchangeable:
                     if not G.has_edge(item_idx, item_2_idx):
                         G.add_edge(item_idx, item_2_idx)
