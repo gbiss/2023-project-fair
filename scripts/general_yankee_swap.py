@@ -14,8 +14,10 @@ from fair.metrics import (
     utilitarian_welfare,
     EF_count,
     EF_agents,
-    EF_1,
-    EF_X,
+    EF_1_count,
+    EF_1_agents,
+    EF_X_count,
+    EF_X_agents,
 )
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan
@@ -88,8 +90,10 @@ print("YS nash welfare: ", nash_welfare(X[0], students, schedule))
 print("YS leximin vector: ", leximin(X[0], students, schedule))
 print("YS EF_count: ", EF_count(X[0], students, schedule))
 print("YS EF_agents: ", EF_agents(X[0], students, schedule))
-print("YS EF_1: ", EF_1(X[0], students, schedule))
-print("YS EF_X: ", EF_X(X[0], students, schedule))
+print("YS EF_1_count: ", EF_1_count(X[0], students, schedule))
+print("YS EF_1_agents: ", EF_1_agents(X[0], students, schedule))
+print("YS EF_X_count: ", EF_X_count(X[0], students, schedule))
+print("YS EF_X_agents: ", EF_X_agents(X[0], students, schedule))
 print(
     "total bundles evaluated",
     sum([student.student.valuation._value_ct for student in students]),
@@ -115,5 +119,7 @@ if FIND_OPTIMAL:
     print("ILP leximin vector: ", leximin(opt_alloc, students, schedule))
     print("ILP EF_count: ", EF_count(opt_alloc, students, schedule))
     print("ILP EF_agents: ", EF_agents(opt_alloc, students, schedule))
-    print("ILP EF_1: ", EF_1(opt_alloc, students, schedule))
-    print("ILP EF_X: ", EF_X(opt_alloc, students, schedule))
+    print("ILP EF_1_count: ", EF_1_count(opt_alloc, students, schedule))
+    print("ILP EF_1_agents: ", EF_1_agents(opt_alloc, students, schedule))
+    print("ILP EF_X_count: ", EF_X_count(opt_alloc, students, schedule))
+    print("ILP EF_X_agents: ", EF_X_agents(opt_alloc, students, schedule))
