@@ -80,7 +80,7 @@ def EF_agents(X, agents, items):
     return envy_count
 
 
-def EF_1(X, agents, items):
+def EF_1_count(X, agents, items):
     envy_count = 0
     for agent_index in range(len(agents)):
         for agent_2_index in range(len(agents)):
@@ -108,7 +108,36 @@ def EF_1(X, agents, items):
     return envy_count
 
 
-def EF_X(X, agents, items):
+def EF_1_agents(X, agents, items):
+    envy_count = 0
+    for agent_index in range(len(agents)):
+        for agent_2_index in range(len(agents)):
+            if agent_index != agent_2_index:
+                agent = agents[agent_index]
+                current_bundle = get_bundle_from_allocation_matrix(
+                    X, items, agent_index
+                )
+                other_bundle = get_bundle_from_allocation_matrix(
+                    X, items, agent_2_index
+                )
+                current_utility = agent.valuation(current_bundle)
+                other_utility = agent.valuation(other_bundle)
+                if current_utility < other_utility:
+                    there_is_no_item = True
+                    for index, item in enumerate(other_bundle):
+                        new_bundle = other_bundle.copy()
+                        new_bundle.pop(index)
+                        new_utility = agent.valuation(new_bundle)
+                        if new_utility <= current_utility:
+                            there_is_no_item = False
+                            break
+                    if there_is_no_item:
+                        envy_count += 1
+                        break
+    return envy_count
+
+
+def EF_X_count(X, agents, items):
     envy_count = 0
     for agent_index in range(len(agents)):
         for agent_2_index in range(len(agents)):
@@ -133,4 +162,33 @@ def EF_X(X, agents, items):
                             break
                     if not_for_every_item:
                         envy_count += 1
+    return envy_count
+
+
+def EF_X_agents(X, agents, items):
+    envy_count = 0
+    for agent_index in range(len(agents)):
+        for agent_2_index in range(len(agents)):
+            if agent_index != agent_2_index:
+                agent = agents[agent_index]
+                current_bundle = get_bundle_from_allocation_matrix(
+                    X, items, agent_index
+                )
+                other_bundle = get_bundle_from_allocation_matrix(
+                    X, items, agent_2_index
+                )
+                current_utility = agent.valuation(current_bundle)
+                other_utility = agent.valuation(other_bundle)
+                if current_utility < other_utility:
+                    not_for_every_item = False
+                    for index, item in enumerate(other_bundle):
+                        new_bundle = other_bundle.copy()
+                        new_bundle.pop(index)
+                        new_utility = agent.valuation(new_bundle)
+                        if current_utility < new_utility:
+                            not_for_every_item = True
+                            break
+                    if not_for_every_item:
+                        envy_count += 1
+                        break
     return envy_count
