@@ -20,7 +20,7 @@ from fair.metrics import (
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan
 
-NUM_STUDENTS = 200
+NUM_STUDENTS = 3
 MAX_COURSES_PER_TOPIC = 5
 MAX_COURSES_TOTAL = 5
 EXCEL_SCHEDULE_PATH = os.path.join(
@@ -52,7 +52,6 @@ for idx, (_, row) in enumerate(df.iterrows()):
     slt = slots_for_time_range(row["Mtg Time"], slot.times)
     sec = row["Section"]
     capacity = row["CICScapacity"]
-    # capacity = 1
     dys = tuple([day.strip() for day in row["zc.days"].split(" ")])
     schedule.append(
         ScheduleItem(features, [crs, slt, dys, sec], index=idx, capacity=capacity)
