@@ -8,11 +8,19 @@ from fair.allocation import general_yankee_swap
 from fair.constraint import CourseTimeConstraint, MutualExclusivityConstraint
 from fair.feature import Course, Section, Slot, Weekday, slots_for_time_range
 from fair.item import ScheduleItem
-from fair.metrics import leximin, nash_welfare, utilitarian_welfare
+from fair.metrics import (
+    leximin,
+    nash_welfare,
+    utilitarian_welfare,
+    EF_count,
+    EF_agents,
+    EF_1,
+    EF_X,
+)
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan
 
-NUM_STUDENTS = 3
+NUM_STUDENTS = 200
 MAX_COURSES_PER_TOPIC = 5
 MAX_COURSES_TOTAL = 5
 EXCEL_SCHEDULE_PATH = os.path.join(
@@ -44,6 +52,7 @@ for idx, (_, row) in enumerate(df.iterrows()):
     slt = slots_for_time_range(row["Mtg Time"], slot.times)
     sec = row["Section"]
     capacity = row["CICScapacity"]
+    # capacity = 1
     dys = tuple([day.strip() for day in row["zc.days"].split(" ")])
     schedule.append(
         ScheduleItem(features, [crs, slt, dys, sec], index=idx, capacity=capacity)
@@ -75,9 +84,13 @@ for i in range(NUM_STUDENTS):
     students.append(legacy_student)
 
 X = general_yankee_swap(students, schedule)
-print("utilitarian welfare: ", utilitarian_welfare(X[0], students, schedule))
-print("nash welfare: ", nash_welfare(X[0], students, schedule))
-print("leximin vector: ", leximin(X[0], students, schedule))
+print("YS utilitarian welfare: ", utilitarian_welfare(X[0], students, schedule))
+print("YS nash welfare: ", nash_welfare(X[0], students, schedule))
+print("YS leximin vector: ", leximin(X[0], students, schedule))
+print("YS EF_count: ", EF_count(X[0], students, schedule))
+print("YS EF_agents: ", EF_agents(X[0], students, schedule))
+print("YS EF_1: ", EF_1(X[0], students, schedule))
+print("YS EF_X: ", EF_X(X[0], students, schedule))
 print(
     "total bundles evaluated",
     sum([student.student.valuation._value_ct for student in students]),
@@ -94,3 +107,14 @@ if FIND_OPTIMAL:
     opt_alloc = program.formulateUSW().solve()
     opt_USW = sum(opt_alloc) / len(orig_students)
     print("optimal utilitarian welfare", opt_USW)
+
+    opt_alloc = opt_alloc.reshape(len(students), len(schedule)).transpose()
+    print(
+        "ILP utilitarian welfare: ", utilitarian_welfare(opt_alloc, students, schedule)
+    )
+    print("ILP nash welfare: ", nash_welfare(opt_alloc, students, schedule))
+    print("ILP leximin vector: ", leximin(opt_alloc, students, schedule))
+    print("ILP EF_count: ", EF_count(opt_alloc, students, schedule))
+    print("ILP EF_agents: ", EF_agents(opt_alloc, students, schedule))
+    print("ILP EF_1: ", EF_1(opt_alloc, students, schedule))
+    print("ILP EF_X: ", EF_X(opt_alloc, students, schedule))
