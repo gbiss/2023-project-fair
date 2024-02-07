@@ -24,6 +24,17 @@ def initialize_allocation_matrix(items, agents):
     return X
 
 
+def initialize_edge_matrix(items):
+    n = len(items)
+    edge_matrix = []
+    for i in range(n):
+        edge_row = []
+        for j in range(n):
+            edge_row.append([])
+        edge_matrix.append(edge_row)
+    return edge_matrix
+
+
 def initialize_exchange_graph(items):
     exchange_graph = nx.DiGraph()
     for i in range(len(items)):
@@ -115,6 +126,11 @@ def find_agent(agents, items, X, current_item_index, last_item_index):
     )  # this should never happen. If the item was in the path, then someone must be willing to exchange it
 
 
+def find_agent_E(E, current_item_index, last_item_index):
+    agent_index = E[current_item_index][last_item_index][0]
+    return agent_index, E
+
+
 def update_allocation(X, path_og, agents, items, agent_picked):
     path = path_og.copy()
     path = path[1:-1]
@@ -134,6 +150,37 @@ def update_allocation(X, path_og, agents, items, agent_picked):
             X[last_item, agent_picked] = 1
 
     return X, agents_involved
+
+
+def update_allocation_E(X, G, E, path_og, agents, items, agent_picked):
+    path = path_og.copy()
+    path = path[1:-1]
+    last_item = path[-1]
+    agents_involved = [agent_picked]
+    X[last_item, len(agents)] -= 1
+    while len(path) > 0:
+        last_item = path.pop(len(path) - 1)
+        # print('last item: ', last_item)
+        if len(path) > 0:
+            next_to_last_item = path[-1]
+            current_agent, E = find_agent_E(E, next_to_last_item, last_item)
+            # print('current_agent:', current_agent)
+            agents_involved.append(current_agent)
+            X[last_item, current_agent] = 1
+            X[next_to_last_item, current_agent] = 0
+            for item_index in range(len(items)):
+                if current_agent in E[next_to_last_item][item_index]:
+                    # print('before:', E[next_to_last_item][item_index])
+                    E[next_to_last_item][item_index].remove(current_agent)
+                    # print('after:', E[next_to_last_item][item_index])
+                    if len(E[next_to_last_item][item_index]) == 0 and G.has_edge(
+                        next_to_last_item, item_index
+                    ):
+                        G.remove_edge(next_to_last_item, item_index)
+                        # print('remove edge:', next_to_last_item, item_index)
+        else:
+            X[last_item, agent_picked] = 1
+    return X, G, E, agents_involved
 
 
 """Graph functions"""
@@ -240,6 +287,7 @@ def update_exchange_graph(X, G, path_og, agents, items, agents_involved):
                         )
                         if willing_owner:
                             exchangeable = True
+                            break
                 if exchangeable:
                     if not G.has_edge(item_idx, item_2_idx):
                         G.add_edge(item_idx, item_2_idx)
@@ -247,6 +295,34 @@ def update_exchange_graph(X, G, path_og, agents, items, agents_involved):
                     if G.has_edge(item_idx, item_2_idx):
                         G.remove_edge(item_idx, item_2_idx)
     return G
+
+
+def update_exchange_graph_E(X, G, E, path_og, agents, items, agents_involved):
+    path = path_og.copy()
+    path = path[1:-1]
+    last_item = path[-1]
+    if X[last_item, len(agents)] == 0:
+        G.remove_edge(last_item, "t")
+    for agent_index in agents_involved:
+        # print('agents involved:', agents_involved)
+        agent = agents[agent_index]
+        agent_bundle = get_bundle_indexes_from_allocation_matrix(X, agent_index)
+        agent_bundle_items = get_bundle_from_allocation_matrix(X, items, agent_index)
+        # print('agent bundle: ', agent_bundle)
+        agent_desired_items = agent.get_desired_items_indexes(items)
+        # print('agent_desired_items: ', agent_desired_items)
+        for item1_idx in agent_bundle:
+            item1 = items[item1_idx]
+            for item2_idx in agent_desired_items:
+                item2 = items[item2_idx]
+                if item1_idx != item2_idx and agent.exchange_contribution(
+                    agent_bundle_items, item1, item2
+                ):
+                    E[item1_idx][item2_idx].append(agent_index)
+                    # print('this should not be empty:', E[item1_idx][item2_idx])
+                    if not G.has_edge(item1_idx, item2_idx):
+                        G.add_edge(item1_idx, item2_idx)
+    return G, E
 
 
 """Allocation algorithms"""
@@ -457,6 +533,56 @@ def general_yankee_swap(
         else:
             X, agents_involved = update_allocation(X, path, agents, items, agent_picked)
             G = update_exchange_graph(X, G, path, agents, items, agents_involved)
+            gain_vector[agent_picked] = get_gain_function(
+                X, agents, items, agent_picked, criteria, weights
+            )
+            if plot_exchange_graph:
+                nx.draw(G, with_labels=True)
+                plt.show()
+            time_steps.append(time.process_time() - start)
+            agents_involved_arr.append(len(agents_involved))
+    return X, time_steps, agents_involved_arr
+
+
+def general_yankee_swap_E(
+    agents, items, plot_exchange_graph=False, criteria="LorenzDominance", weights=0
+):
+    """General Yankee Swap"""
+    players = initialize_players(agents)
+    X = initialize_allocation_matrix(items, agents)
+    G = initialize_exchange_graph(items)
+    E = initialize_edge_matrix(items)
+    # print('initialized E:',E)
+    gain_vector = np.zeros([len(agents)])
+    count = 0
+    time_steps = []
+    agents_involved_arr = []
+    start = time.process_time()
+    while len(players) > 0:
+        print("Iteration: %d" % count, end="\r")
+        count += 1
+        agent_picked = np.argmax(gain_vector)
+        G = add_agent_to_exchange_graph(G, X, items, agents, agent_picked)
+        if plot_exchange_graph:
+            nx.draw(G, with_labels=True)
+            plt.show()
+
+        path = find_shortest_path(G, "s", "t")
+        G.remove_node("s")
+
+        if path == False:
+            players.remove(agent_picked)
+            gain_vector[agent_picked] = float("-inf")
+            time_steps.append(time.process_time() - start)
+            agents_involved_arr.append(0)
+        else:
+            X, G, E, agents_involved = update_allocation_E(
+                X, G, E, path, agents, items, agent_picked
+            )
+            G, E = update_exchange_graph_E(
+                X, G, E, path, agents, items, agents_involved
+            )
+            # print(E)
             gain_vector[agent_picked] = get_gain_function(
                 X, agents, items, agent_picked, criteria, weights
             )
