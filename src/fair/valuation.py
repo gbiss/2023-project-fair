@@ -47,12 +47,7 @@ class MemoableValuation:
         """
         self.constraints = constraints
         self.memoize = memoize
-        self._independent_memo = {}
-        self._value_memo = {}
-        self._independent_ct = 0
-        self._unique_independent_ct = 0
-        self._value_ct = 0
-        self._unique_value_ct = 0
+        self.reset()
 
     def _independent(self, bundle: List[BaseItem]):
         """Actual calculation of bundle independence
@@ -123,6 +118,15 @@ class MemoableValuation:
             self._unique_value_ct += 1
 
         return self._value_memo[hashable_bundle]
+
+    def reset(self):
+        """Reset caches and counters"""
+        self._independent_memo = {}
+        self._value_memo = {}
+        self._independent_ct = 0
+        self._unique_independent_ct = 0
+        self._value_ct = 0
+        self._unique_value_ct = 0
 
 
 class ConstraintSatifactionValuation(MemoableValuation):
