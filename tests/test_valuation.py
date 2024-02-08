@@ -67,6 +67,38 @@ def test_memoization(
     assert valuation._unique_independent_ct == before_independent
 
 
+def test_disable_memoize(
+    schedule_item250: ScheduleItem, all_items: List[ScheduleItem], course: Course
+):
+    constraint = PreferenceConstraint.from_item_lists(
+        all_items, [["250", "301"]], [1], course
+    )
+    valuation = ConstraintSatifactionValuation([constraint], memoize=False)
+    valuation.value([schedule_item250])
+    valuation.value([schedule_item250])
+
+    assert valuation._independent_ct == valuation._unique_independent_ct
+    assert valuation._value_ct == valuation._unique_value_ct
+
+
+def test_reset_memo_cache(
+    schedule_item250: ScheduleItem, all_items: List[ScheduleItem], course: Course
+):
+    constraint = PreferenceConstraint.from_item_lists(
+        all_items, [["250", "301"]], [1], course
+    )
+    valuation = ConstraintSatifactionValuation([constraint], memoize=False)
+    valuation.value([schedule_item250])
+    valuation.reset()
+
+    assert valuation._independent_memo == {}
+    assert valuation._value_memo == {}
+    assert valuation._independent_ct == 0
+    assert valuation._unique_independent_ct == 0
+    assert valuation._value_ct == 0
+    assert valuation._unique_value_ct == 0
+
+
 def test_valuation_compilation(
     bundle_250_301: list[ScheduleItem], all_courses_constraint: LinearConstraint
 ):

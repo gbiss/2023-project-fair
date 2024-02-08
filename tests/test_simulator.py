@@ -44,3 +44,47 @@ def test_renaissance_man(
             if item.value(course) in student.preferred_topics[i]
         ]
         assert student.value(items) == quant
+
+
+def test_renaissance_man_memoing(
+    course: Course,
+    slot: Slot,
+    weekday: Weekday,
+    schedule: ScheduleItem,
+):
+    topic_list = [["250", "301"], ["611"]]
+    quantities = [1, 1]
+    max_courses = 2
+    global_constraints = [
+        CourseTimeConstraint.from_items(schedule, slot, weekday),
+        MutualExclusivityConstraint.from_items(schedule, course),
+    ]
+
+    student_no_memo = RenaissanceMan(
+        topic_list,
+        quantities,
+        max_courses,
+        course,
+        global_constraints,
+        schedule,
+        memoize=False,
+    )
+    student_no_memo.value(schedule)
+
+    assert student_no_memo.valuation._value_memo == {}
+
+    student_with_memo = RenaissanceMan(
+        topic_list,
+        quantities,
+        max_courses,
+        course,
+        global_constraints,
+        schedule,
+    )
+    student_with_memo.value(schedule)
+
+    assert len(student_with_memo.valuation._value_memo) > 0
+
+    student_with_memo.valuation.reset()
+
+    assert len(student_with_memo.valuation._value_memo) == 0

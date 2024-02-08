@@ -12,12 +12,13 @@ from fair.valuation import ConstraintSatifactionValuation
 class SimulatedAgent(BaseAgent):
     """A randomly generated agent"""
 
-    def __init__(self, constraints: List[LinearConstraint]):
+    def __init__(self, constraints: List[LinearConstraint], memoize: bool = True):
         """
         Args:
             constraints (List[LinearConstraint]): constraints to be used in defining valuation
+            memoize (bool, optional): Should results be cached. Defaults to True
         """
-        super().__init__(ConstraintSatifactionValuation(constraints))
+        super().__init__(ConstraintSatifactionValuation(constraints, memoize))
 
 
 class RenaissanceMan(SimulatedAgent):
@@ -36,6 +37,7 @@ class RenaissanceMan(SimulatedAgent):
         schedule: List[ScheduleItem],
         seed: int | None = None,
         sparse: bool = False,
+        memoize: bool = True,
     ):
         """
         Args:
@@ -47,6 +49,7 @@ class RenaissanceMan(SimulatedAgent):
             schedule (List[ScheduleItem], optional): All possible items in the student's schedule. Defaults to None.
             seed (int | None, optional): Random seed. Defaults to None.
             sparse (bool, optional): Should sparse matrices be used for constraints. Defaults to False.
+            memoize (bool, optional): Should results be cached. Defaults to True
         """
         rng = np.random.default_rng(seed)
 
@@ -92,4 +95,4 @@ class RenaissanceMan(SimulatedAgent):
             self.topic_constraint,
         ]
 
-        super().__init__(constraints)
+        super().__init__(constraints, memoize)

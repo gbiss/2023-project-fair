@@ -39,18 +39,15 @@ class RankValuation(BaseValuation):
 class MemoableValuation:
     """A mixin that caches intermediate results"""
 
-    def __init__(self, constraints: List[BaseConstraint]):
+    def __init__(self, constraints: List[BaseConstraint], memoize: bool = True):
         """
         Args:
             constraints (List[BaseConstraint]): Constraints that limit independence
+            memoize (bool, optional): Should results be cached. Defaults to True
         """
         self.constraints = constraints
-        self._independent_memo = {}
-        self._value_memo = {}
-        self._independent_ct = 0
-        self._unique_independent_ct = 0
-        self._value_ct = 0
-        self._unique_value_ct = 0
+        self.memoize = memoize
+        self.reset()
 
     def _independent(self, bundle: List[BaseItem]):
         """Actual calculation of bundle independence
@@ -66,7 +63,7 @@ class MemoableValuation:
     def independent(self, bundle: List[BaseItem]):
         """Does the bundle receive maximal value
 
-        Retreives cached value if present, otherwise it calculates it
+        Retreives cached value if present and memoize is True, otherwise it calculates it
 
         Args:
             bundle (List[BaseItem]): Items in the bundle
@@ -74,9 +71,13 @@ class MemoableValuation:
         Returns:
             bool: True if bundle receives maximal value; False otherwise
         """
-        hashable_bundle = tuple(sorted(bundle))
-
         self._independent_ct += 1
+
+        if not self.memoize:
+            self._unique_independent_ct += 1
+            return self._independent(bundle)
+
+        hashable_bundle = tuple(sorted(bundle))
         if hashable_bundle not in self._independent_memo:
             self._independent_memo[hashable_bundle] = self._independent(bundle)
             self._unique_independent_ct += 1
@@ -97,7 +98,7 @@ class MemoableValuation:
     def value(self, bundle: List[BaseItem]):
         """Value of bundle
 
-        Retreives cached value if present, otherwise it calculates it
+        Retreives cached value if present and memoize is True, otherwise it calculates it
 
         Args:
             bundle (List[BaseItem]): Items in the bundle
@@ -105,25 +106,39 @@ class MemoableValuation:
         Returns:
             int: Bundle value
         """
-        hashable_bundle = tuple(sorted(bundle))
-
         self._value_ct += 1
+
+        if not self.memoize:
+            self._unique_value_ct += 1
+            return self._value(bundle)
+
+        hashable_bundle = tuple(sorted(bundle))
         if hashable_bundle not in self._value_memo:
             self._value_memo[hashable_bundle] = self._value(bundle)
             self._unique_value_ct += 1
 
         return self._value_memo[hashable_bundle]
 
+    def reset(self):
+        """Reset caches and counters"""
+        self._independent_memo = {}
+        self._value_memo = {}
+        self._independent_ct = 0
+        self._unique_independent_ct = 0
+        self._value_ct = 0
+        self._unique_value_ct = 0
+
 
 class ConstraintSatifactionValuation(MemoableValuation):
     """Valuation that limits independence with constraints"""
 
-    def __init__(self, constraints: List[BaseConstraint]):
+    def __init__(self, constraints: List[BaseConstraint], memoize: bool = True):
         """
         Args:
             constraints (List[BaseConstraint]): Constraints that limit independence
+            memoize (bool, optional): Should results be cached. Defaults to True
         """
-        super().__init__(constraints)
+        super().__init__(constraints, memoize)
 
     def _independent(self, bundle: List[BaseItem]):
         """Does the bundle receive maximal value
