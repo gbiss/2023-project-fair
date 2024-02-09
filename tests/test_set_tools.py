@@ -4,11 +4,11 @@ from fair.constraint import LinearConstraint
 from fair.feature import Course, Section, Slot, Weekday
 from fair.item import ScheduleItem
 from fair.set_tools import (
-    powerset,
     is_monotonic_non_decreasing,
     is_mrf,
     is_submodular,
     nonnegative_rank_value,
+    powerset,
     rank_value_leq_cardinality,
 )
 from fair.valuation import ConstraintSatifactionValuation
@@ -43,13 +43,29 @@ def test_powerset():
     test_set1 = [0, 1, 2]
     power_set1 = powerset(test_set1)
     power_set1 = list(power_set1)
-    assert(power_set1 == [(), (0,), (1,), (2,), (0,1), (0,2), (1,2), (0,1,2)])
-    
+    assert power_set1 == [(), (0,), (1,), (2,), (0, 1), (0, 2), (1, 2), (0, 1, 2)]
+
     test_set2 = [0, 1, 2, 3]
     power_set2 = powerset(test_set2)
     power_set2 = list(power_set2)
-    assert(power_set2 == [(), (0,), (1,), (2,), (3,), (0,1), (0,2), (0,3), (1,2), (1,3), (2,3),
-                          (0,1,2), (0,1,3), (0,2,3), (1,2,3), (0,1,2,3)])
+    assert power_set2 == [
+        (),
+        (0,),
+        (1,),
+        (2,),
+        (3,),
+        (0, 1),
+        (0, 2),
+        (0, 3),
+        (1, 2),
+        (1, 3),
+        (2, 3),
+        (0, 1, 2),
+        (0, 1, 3),
+        (0, 2, 3),
+        (1, 2, 3),
+        (0, 1, 2, 3),
+    ]
 
 
 def test_mrf(course: Course, slot: Slot, weekday: Weekday, section: Section):
@@ -69,6 +85,19 @@ def test_mrf(course: Course, slot: Slot, weekday: Weekday, section: Section):
     # is MRF
     values = [0, 1, 2, 3, 4, 5]
     assert is_mrf(values, length_marginal_decreasing)
+
+    # is MRF
+    features = [course, slot, weekday, section]
+    schedule = [
+        ScheduleItem(features, ["250", (1, 2), ("Mon",), 1], 0),
+        ScheduleItem(features, ["250", (1, 2), ("Mon",), 2], 1),
+        ScheduleItem(features, ["301", (4, 5), ("Mon",), 1], 2),
+    ]
+    A = [[1, 0, 0], [0, 1, 1]]
+    b = [1, 2]
+    constraint = LinearConstraint(A, b, 3)
+    valuation = ConstraintSatifactionValuation([constraint])
+    assert is_mrf(schedule, valuation.value)
 
 
 def test_submodular():
