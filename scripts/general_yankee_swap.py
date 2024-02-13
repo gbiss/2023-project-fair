@@ -12,9 +12,9 @@ from fair.metrics import leximin, nash_welfare, utilitarian_welfare
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan
 
-NUM_STUDENTS = 3
+NUM_STUDENTS = 20
 MAX_COURSES_PER_TOPIC = 5
-MAX_COURSES_TOTAL = 5
+MAX_COURSES_TOTAL = 6
 EXCEL_SCHEDULE_PATH = os.path.join(
     os.path.dirname(__file__), "../resources/fall2023schedule-2-cat.xlsx"
 )
@@ -75,9 +75,9 @@ for i in range(NUM_STUDENTS):
     students.append(legacy_student)
 
 X = general_yankee_swap(students, schedule)
-print("utilitarian welfare: ", utilitarian_welfare(X[0], students, schedule))
-print("nash welfare: ", nash_welfare(X[0], students, schedule))
-print("leximin vector: ", leximin(X[0], students, schedule))
+print("YS utilitarian welfare: ", utilitarian_welfare(X[0], students, schedule))
+print("YS nash welfare: ", nash_welfare(X[0], students, schedule))
+print("YS leximin vector: ", leximin(X[0], students, schedule))
 print(
     "total bundles evaluated",
     sum([student.student.valuation._value_ct for student in students]),
@@ -93,4 +93,12 @@ if FIND_OPTIMAL:
     ind = program.convert_allocation(X[0])
     opt_alloc = program.formulateUSW().solve()
     opt_USW = sum(opt_alloc) / len(orig_students)
-    print("optimal utilitarian welfare", opt_USW)
+    print("ILP Allocation count", opt_USW)
+
+    opt_alloc=opt_alloc.reshape(len(students), len(schedule)).transpose()
+    opt_USW=utilitarian_welfare(opt_alloc, students, schedule)
+    opt_nash=nash_welfare(opt_alloc, students, schedule)
+    opt_leximin=leximin(opt_alloc, students, schedule)
+    print("ILP utilitarian welfare: ", opt_USW)
+    print("ILP nash welfare: ", opt_nash)
+    print("ILP leximin", opt_leximin)
