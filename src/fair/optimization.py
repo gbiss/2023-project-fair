@@ -101,7 +101,7 @@ class IntegerLinearProgram:
             np.ndarray: optimal allocation
         """
         res = scipy.optimize.milp(
-            c=self.c, bounds=self.bounds, constraints=self.constraint
+            c=self.c, integrality=1, bounds=self.bounds, constraints=self.constraint
         )
 
         if not res.success:
