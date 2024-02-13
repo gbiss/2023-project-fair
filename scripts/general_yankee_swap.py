@@ -1,6 +1,7 @@
 import os
 from collections import defaultdict
 
+import numpy as np
 import pandas as pd
 
 from fair.agent import LegacyStudent
@@ -95,10 +96,25 @@ if FIND_OPTIMAL:
     opt_USW = sum(opt_alloc) / len(orig_students)
     print("ILP Allocation count", opt_USW)
 
-    opt_alloc=opt_alloc.reshape(len(students), len(schedule)).transpose()
-    opt_USW=utilitarian_welfare(opt_alloc, students, schedule)
-    opt_nash=nash_welfare(opt_alloc, students, schedule)
-    opt_leximin=leximin(opt_alloc, students, schedule)
+    # violoates no constraints
+    assert not np.sum(program.A @ ind > program.b) > 0
+    # solution is feasible
+    assert not np.sum(program.A @ opt_alloc > program.b.T) > 0
+
+    opt_alloc = opt_alloc.reshape(len(students), len(schedule)).transpose()
+    total_value = sum(
+        [
+            orig_students[j].valuation.value(
+                [schedule[i] for i in range(107) if opt_alloc[i, j]]
+            )
+            for j in range(20)
+        ]
+    )
+    allocated_courses = sum(sum(opt_alloc))
+    print("TOTAL VALUE:", total_value, "ALLOCATED COURSES:", allocated_courses)
+    opt_USW = utilitarian_welfare(opt_alloc, students, schedule)
+    opt_nash = nash_welfare(opt_alloc, students, schedule)
+    opt_leximin = leximin(opt_alloc, students, schedule)
     print("ILP utilitarian welfare: ", opt_USW)
     print("ILP nash welfare: ", opt_nash)
     print("ILP leximin", opt_leximin)
