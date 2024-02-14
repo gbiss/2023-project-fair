@@ -1,21 +1,41 @@
 import numpy as np
 
 from .allocation import get_bundle_from_allocation_matrix
+from .agent import BaseAgent
+from .item import ScheduleItem
 
+def utilitarian_welfare(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]):
+    """Compute utilitarian social welfare (USW), i.e., sum of utilities across all agents
 
-def utilitarian_welfare(X, agents, items):
+    Args:
+        X (type[np.ndarray]): Allocation matrix
+        agents (list[BaseAgent]): Agents from class BaseAgent
+        schedule (list[ScheduleItem]): Items from class BaseItem
+
+    Returns:
+        float: USW / len(agents)
+    """
     util = 0
     for agent_index in range(len(agents)):
         agent = agents[agent_index]
         bundle = get_bundle_from_allocation_matrix(X, items, agent_index)
         val = agent.valuation(bundle)
         util += val
-    return util / (
-        len(agents)
-    )  # The number of agents is given by dim(X[(0)])-1, so as to not consider agent 0
+    return util / (len(agents))  
 
 
-def nash_welfare(X, agents, items):
+def nash_welfare(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]):
+    """Compute Nash social welfare (NSW), i.e., number of agents with 0 utility and product of utilities across all agents with utility>0
+
+    Args:
+        X (type[np.ndarray]): Allocation matrix
+        agents (list[BaseAgent]): Agents from class BaseAgent
+        schedule (list[ScheduleItem]): Items from class BaseItem
+
+    Returns:
+        int: number of agents with utility 0
+        float: n-root of NSW
+    """
     util = 0
     num_zeros = 0
     for agent_index in range(len(agents)):
@@ -29,7 +49,17 @@ def nash_welfare(X, agents, items):
     return num_zeros, np.exp(util / (len(agents) - num_zeros))
 
 
-def leximin(X, agents, items):
+def leximin(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]):
+    """Compute Leximin vector, i.e. vector with agents utilities, sorted in decreasing order
+
+    Args:
+        X (type[np.ndarray]): Allocation matrix
+        agents (list[BaseAgent]): Agents from class BaseAgent
+        schedule (list[ScheduleItem]): Items from class BaseItem
+
+    Returns:
+        list[int]: utilities for all agents
+    """
     valuations = []
     for agent_index in range(len(agents)):
         agent = agents[agent_index]
