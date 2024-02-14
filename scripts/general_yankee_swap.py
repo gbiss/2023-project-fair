@@ -12,9 +12,9 @@ from fair.metrics import leximin, nash_welfare, utilitarian_welfare
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan
 
-NUM_STUDENTS = 200
+NUM_STUDENTS = 3
 MAX_COURSES_PER_TOPIC = 5
-MAX_COURSES_TOTAL = 6
+MAX_COURSES_TOTAL = 5
 EXCEL_SCHEDULE_PATH = os.path.join(
     os.path.dirname(__file__), "../resources/fall2023schedule-2-cat.xlsx"
 )
@@ -37,7 +37,6 @@ features = [course, slot, weekday, section]
 # construct schedule
 schedule = []
 topic_map = defaultdict(set)
-count = 0
 for idx, (_, row) in enumerate(df.iterrows()):
     crs = str(row["Catalog"])
     topic_map[row["Categories"]].add(crs)
@@ -46,9 +45,8 @@ for idx, (_, row) in enumerate(df.iterrows()):
     capacity = row["CICScapacity"]
     dys = tuple([day.strip() for day in row["zc.days"].split(" ")])
     schedule.append(
-        ScheduleItem(features, [crs, slt, dys, sec], index=count, capacity=capacity)
+        ScheduleItem(features, [crs, slt, dys, sec], index=idx, capacity=capacity)
     )
-    count += 1
 topics = sorted([sorted(list(courses)) for courses in topic_map.values()])
 
 # global constraints
