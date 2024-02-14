@@ -12,9 +12,9 @@ from fair.metrics import leximin, nash_welfare, utilitarian_welfare
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan
 
-NUM_STUDENTS = 100
-MAX_COURSES_PER_TOPIC = 2
-MAX_COURSES_TOTAL = 4
+NUM_STUDENTS = 200
+MAX_COURSES_PER_TOPIC = 5
+MAX_COURSES_TOTAL = 6
 EXCEL_SCHEDULE_PATH = os.path.join(
     os.path.dirname(__file__), "../resources/fall2023schedule-2-cat.xlsx"
 )
@@ -24,7 +24,6 @@ FIND_OPTIMAL = True
 # load schedule as DataFrame
 with open(EXCEL_SCHEDULE_PATH, "rb") as fd:
     df = pd.read_excel(fd)
-df = df[9:14]
 # construct features from DataFrame
 course = Course(df["Catalog"].astype(str).unique().tolist())
 
@@ -45,7 +44,6 @@ for idx, (_, row) in enumerate(df.iterrows()):
     slt = slots_for_time_range(row["Mtg Time"], slot.times)
     sec = row["Section"]
     capacity = row["CICScapacity"]
-    # capacity = 10
     dys = tuple([day.strip() for day in row["zc.days"].split(" ")])
     schedule.append(
         ScheduleItem(features, [crs, slt, dys, sec], index=count, capacity=capacity)
@@ -76,10 +74,7 @@ for i in range(NUM_STUDENTS):
     )
     students.append(legacy_student)
 
-# X = general_yankee_swap(students, schedule, plot_exchange_graph=False)
-# print(X)
 X = general_yankee_swap_E(students, schedule, plot_exchange_graph=False)
-print(X[2])
 print(
     "total bundles evaluated",
     sum([student.student.valuation._value_ct for student in students]),
