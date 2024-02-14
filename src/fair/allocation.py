@@ -315,13 +315,17 @@ def update_exchange_graph_E(X, G, E, path_og, agents, items, agents_involved):
             item1 = items[item1_idx]
             for item2_idx in agent_desired_items:
                 item2 = items[item2_idx]
-                if item1_idx != item2_idx and agent.exchange_contribution(
-                    agent_bundle_items, item1, item2
-                ):
-                    E[item1_idx][item2_idx].append(agent_index)
-                    # print('this should not be empty:', E[item1_idx][item2_idx])
-                    if not G.has_edge(item1_idx, item2_idx):
-                        G.add_edge(item1_idx, item2_idx)
+                if item1_idx != item2_idx:
+                    if agent_index in E[item1_idx][item2_idx]:
+                        if not agent.exchange_contribution(agent_bundle_items, item1, item2):
+                            E[item1_idx][item2_idx].remove(agent_index)
+                            if len(E[item1_idx][item2_idx])==0 and G.has_edge(item1_idx, item2_idx):
+                                G.remove_edge(item1_idx, item2_idx)
+                    else:
+                        if agent.exchange_contribution(agent_bundle_items, item1, item2):
+                            E[item1_idx][item2_idx].append(agent_index)
+                            if not G.has_edge(item1_idx, item2_idx):
+                                G.add_edge(item1_idx, item2_idx)
     return G, E
 
 
