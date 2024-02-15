@@ -24,8 +24,8 @@ from fair.simulation import RenaissanceMan
 
 NUM_STUDENTS = 3
 MAX_COURSES_PER_TOPIC = 5
-MIN_COURSES_TOTAL = 1
-MAX_COURSES_TOTAL = 5
+LOWER_MAX_COURSES_TOTAL = 1
+UPPER_MAX_COURSES_TOTAL = 5
 EXCEL_SCHEDULE_PATH = os.path.join(
     os.path.dirname(__file__), "../resources/fall2023schedule-2-cat.xlsx"
 )
@@ -72,8 +72,8 @@ for i in range(NUM_STUDENTS):
     student = RenaissanceMan(
         topics,
         [min(len(topic), MAX_COURSES_PER_TOPIC) for topic in topics],
-        MIN_COURSES_TOTAL,
-        MAX_COURSES_TOTAL,
+        LOWER_MAX_COURSES_TOTAL,
+        UPPER_MAX_COURSES_TOTAL,
         course,
         [course_time_constr, course_sect_constr],
         schedule,

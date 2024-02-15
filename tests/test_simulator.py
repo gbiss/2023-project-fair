@@ -13,8 +13,8 @@ def test_renaissance_man(
 ):
     topic_list = [["250", "301"], ["611"]]
     quantities = [1, 1]
-    min_courses = 1
-    max_courses = 2
+    lower_max_courses = 1
+    upper_max_courses = 2
     global_constraints = [
         CourseTimeConstraint.from_items(schedule, slot, weekday),
         MutualExclusivityConstraint.from_items(schedule, course),
@@ -25,8 +25,8 @@ def test_renaissance_man(
         student = RenaissanceMan(
             topic_list,
             quantities,
-            min_courses,
-            max_courses,
+            lower_max_courses,
+            upper_max_courses,
             course,
             global_constraints,
             schedule,
@@ -37,7 +37,14 @@ def test_renaissance_man(
 
     # student without global constraints can always be fully satisfied
     student = RenaissanceMan(
-        topic_list, quantities, min_courses, max_courses, course, [], schedule, 0
+        topic_list,
+        quantities,
+        lower_max_courses,
+        upper_max_courses,
+        course,
+        [],
+        schedule,
+        0,
     )
     for i, quant in enumerate(student.quantities):
         items = [
@@ -56,8 +63,8 @@ def test_renaissance_man_memoing(
 ):
     topic_list = [["250", "301"], ["611"]]
     quantities = [1, 1]
-    min_courses = 1
-    max_courses = 2
+    lower_max_courses = 1
+    upper_max_courses = 2
     global_constraints = [
         CourseTimeConstraint.from_items(schedule, slot, weekday),
         MutualExclusivityConstraint.from_items(schedule, course),
@@ -66,8 +73,8 @@ def test_renaissance_man_memoing(
     student_no_memo = RenaissanceMan(
         topic_list,
         quantities,
-        min_courses,
-        max_courses,
+        lower_max_courses,
+        upper_max_courses,
         course,
         global_constraints,
         schedule,
@@ -80,8 +87,8 @@ def test_renaissance_man_memoing(
     student_with_memo = RenaissanceMan(
         topic_list,
         quantities,
-        min_courses,
-        max_courses,
+        lower_max_courses,
+        upper_max_courses,
         course,
         global_constraints,
         schedule,
