@@ -9,15 +9,15 @@ from fair.constraint import CourseTimeConstraint, MutualExclusivityConstraint
 from fair.feature import Course, Section, Slot, Weekday, slots_for_time_range
 from fair.item import ScheduleItem
 from fair.metrics import (
+    EF_1_agents,
+    EF_1_count,
+    EF_agents,
+    EF_count,
+    EF_X_agents,
+    EF_X_count,
     leximin,
     nash_welfare,
     utilitarian_welfare,
-    EF_count,
-    EF_agents,
-    EF_1_count,
-    EF_1_agents,
-    EF_X_count,
-    EF_X_agents,
 )
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan

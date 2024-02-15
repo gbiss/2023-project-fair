@@ -1,10 +1,13 @@
 import numpy as np
 
-from .allocation import get_bundle_from_allocation_matrix
 from .agent import BaseAgent
+from .allocation import get_bundle_from_allocation_matrix
 from .item import ScheduleItem
 
-def utilitarian_welfare(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]):
+
+def utilitarian_welfare(
+    X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]
+):
     """Compute utilitarian social welfare (USW), i.e., sum of utilities across all agents
 
     Args:
@@ -21,10 +24,12 @@ def utilitarian_welfare(X: type[np.ndarray], agents: list[BaseAgent], items: lis
         bundle = get_bundle_from_allocation_matrix(X, items, agent_index)
         val = agent.valuation(bundle)
         util += val
-    return util / (len(agents))  
+    return util / (len(agents))
 
 
-def nash_welfare(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]):
+def nash_welfare(
+    X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]
+):
     """Compute Nash social welfare (NSW), i.e., number of agents with 0 utility and product of utilities across all agents with utility>0
 
     Args:
@@ -72,9 +77,9 @@ def leximin(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleIt
 
 
 def EF_count(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]):
-    """Compute envy count. Compare every agent to all other agents, add 1 to envy count if 
+    """Compute envy count. Compare every agent to all other agents, add 1 to envy count if
     the agent gets higher utlity from the other agents bundle.
-    NOTE: we can add 1 multiple times for the same agent if they envy multiple other agents. 
+    NOTE: we can add 1 multiple times for the same agent if they envy multiple other agents.
 
     Args:
         X (type[np.ndarray]): Allocation matrix
@@ -103,9 +108,9 @@ def EF_count(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleI
 
 
 def EF_agents(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]):
-    """Compute envy agents count. Compare every agent to all other agents, add 1 to envy count if 
+    """Compute envy agents count. Compare every agent to all other agents, add 1 to envy count if
     the agent gets higher utlity from another agent's bundle.
-    NOTE: we can add 1 only once for every agent. 
+    NOTE: we can add 1 only once for every agent.
 
     Args:
         X (type[np.ndarray]): Allocation matrix
@@ -135,9 +140,9 @@ def EF_agents(X: type[np.ndarray], agents: list[BaseAgent], items: list[Schedule
 
 
 def EF_1_count(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]):
-    """Compute EF-1 count. Compare every agent to all other agents, add 1 to envy count if 
+    """Compute EF-1 count. Compare every agent to all other agents, add 1 to envy count if
     there is no item the second agent could drop that would make the first agent stop envying them.
-    NOTE: we can add 1 multiple times for the same agents if they envy multiple other agents. 
+    NOTE: we can add 1 multiple times for the same agents if they envy multiple other agents.
 
     Args:
         X (type[np.ndarray]): Allocation matrix
@@ -174,10 +179,12 @@ def EF_1_count(X: type[np.ndarray], agents: list[BaseAgent], items: list[Schedul
     return envy_count
 
 
-def EF_1_agents(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]):
-    """Compute EF-1 agent count. Compare every agent to all other agents, add 1 to envy count if 
+def EF_1_agents(
+    X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]
+):
+    """Compute EF-1 agent count. Compare every agent to all other agents, add 1 to envy count if
     there is no item a second agent could drop that would make the first agent stop envying them.
-    NOTE: we can add 1 only once for every agent. 
+    NOTE: we can add 1 only once for every agent.
 
     Args:
         X (type[np.ndarray]): Allocation matrix
@@ -216,9 +223,9 @@ def EF_1_agents(X: type[np.ndarray], agents: list[BaseAgent], items: list[Schedu
 
 
 def EF_X_count(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]):
-    """Compute EF-X count. Compare every agent to all other agents, add 1 to envy count if 
-    there is at least one item that the second agents drops and the first agent still envies them. 
-    NOTE: we can add 1 multiple times for the same agents if they envy multiple other agents. 
+    """Compute EF-X count. Compare every agent to all other agents, add 1 to envy count if
+    there is at least one item that the second agents drops and the first agent still envies them.
+    NOTE: we can add 1 multiple times for the same agents if they envy multiple other agents.
 
     Args:
         X (type[np.ndarray]): Allocation matrix
@@ -255,10 +262,12 @@ def EF_X_count(X: type[np.ndarray], agents: list[BaseAgent], items: list[Schedul
     return envy_count
 
 
-def EF_X_agents(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]):
-    """Compute EF-X agent count. Compare every agent to all other agents, add 1 to envy count if 
-    there is at least one item that another agent drops and the first agent still envies them. 
-    NOTE: we can add 1 only once for every agent. 
+def EF_X_agents(
+    X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]
+):
+    """Compute EF-X agent count. Compare every agent to all other agents, add 1 to envy count if
+    there is at least one item that another agent drops and the first agent still envies them.
+    NOTE: we can add 1 only once for every agent.
 
     Args:
         X (type[np.ndarray]): Allocation matrix
