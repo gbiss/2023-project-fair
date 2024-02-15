@@ -182,8 +182,10 @@ def EF_1_count(X: type[np.ndarray], agents: list[BaseAgent], items: list[Schedul
 def EF_1_agents(
     X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]
 ):
-    """Compute EF-1 agent count. Compare every agent to all other agents, add 1 to envy count if
-    there is no item a second agent could drop that would make the first agent stop envying them.
+    """Compute EF-1 agent count
+
+    Compare every agent to all other agents, add 1 to envy count if there is no item a second agent
+    could drop that would make the first agent stop envying them.
     NOTE: we can add 1 only once for every agent.
 
     Args:
@@ -223,8 +225,10 @@ def EF_1_agents(
 
 
 def EF_X_count(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]):
-    """Compute EF-X count. Compare every agent to all other agents, add 1 to envy count if
-    there is at least one item that the second agents drops and the first agent still envies them.
+    """Compute EF-X count
+
+    Compare every agent to all other agents, add 1 to envy count if there is at least one
+    item that the second agents drops and the first agent still envies them.
     NOTE: we can add 1 multiple times for the same agents if they envy multiple other agents.
 
     Args:
@@ -265,8 +269,10 @@ def EF_X_count(X: type[np.ndarray], agents: list[BaseAgent], items: list[Schedul
 def EF_X_agents(
     X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]
 ):
-    """Compute EF-X agent count. Compare every agent to all other agents, add 1 to envy count if
-    there is at least one item that another agent drops and the first agent still envies them.
+    """Compute EF-X agent count
+
+    Compare every agent to all other agents, add 1 to envy count if there is at least one
+    item that another agent drops and the first agent still envies them.
     NOTE: we can add 1 only once for every agent.
 
     Args:
