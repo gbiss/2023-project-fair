@@ -197,6 +197,7 @@ def renaissance1(
     return RenaissanceMan(
         [["250", "301"], ["611"]],
         [1, 1],
+        1,
         2,
         course,
         global_constraints,
@@ -214,6 +215,7 @@ def renaissance2(
     return RenaissanceMan(
         [["250", "301"], ["611"]],
         [1, 1],
+        1,
         2,
         course,
         global_constraints,
