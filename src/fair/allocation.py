@@ -71,22 +71,30 @@ def initialize_exchange_graph(N: int):
     return exchange_graph
 
 
-"""Pick agent functions"""
+"""Retrieve/update information"""
 
+def get_gain_function(
+    X: type[np.ndarray],
+    agents: list[BaseAgent],
+    items: list[ScheduleItem],
+    agent_picked: int,
+    criteria: str,
+    weights: list[float],
+):
+    """Get gain function for a certain agent from the current allocation, according to the gain function criteria and agent assigned weight.
+    This function is used to update the gain function for the item that just played, to keep track of priority agents.
 
-def pick_agent(X: np.array, items, agents, players):
-    max_capacity = sum([item.capacity for item in items])
-    for player in players:
-        agent = agents[player]
-        bundle = get_bundle_from_allocation_matrix(X, items, player)
-        current_utility = agent.valuation(bundle)
-        if current_utility < max_capacity:
-            max_capacity = current_utility
-            agent_picked = player
-    return agent_picked
+    Args:
+        X (type[np.ndarray]): allocation matrix
+        agents (list[BaseAgent]): Agents from class BaseAgent
+        items (list[ScheduleItem]): Items from class BaseItem
+        agent_picked (int): index of the agent that just played
+        criteria (str): general yankee swap criteria
+        weights (list[float]): list of weights assigned to the agents, if any
 
-
-def get_gain_function(X, agents, items, agent_picked, criteria, weights):
+    Returns:
+        float: updated gain fucntion for the agent that just played
+    """
     agent = agents[agent_picked]
     bundle = get_bundle_from_allocation_matrix(X, items, agent_picked)
     val = agent.valuation(bundle)
@@ -104,16 +112,33 @@ def get_gain_function(X, agents, items, agent_picked, criteria, weights):
         return w_i / (val + 1)
 
 
-"""Retrieve information or update current allocation"""
+def get_owners_list(X: type[np.ndarray], item_index: int):
+    """From the exchange matrix, list of indeces of all agents that currently have certain item.
 
+    Args:
+        X (type[np.ndarray]): Allocation matrix
+        item_index (int): index of the item for which we want to get the owners
 
-def get_owners_list(X, item_index):
+    Returns:
+        list[int]: list of item's owners' indeces
+    """
     item_list = X[item_index]
     owners_list = np.nonzero(item_list)
     return owners_list[0]
 
 
-def get_bundle_from_allocation_matrix(X, items, agent_index):
+def get_bundle_from_allocation_matrix(
+    X: type[np.ndarray], items: list[ScheduleItem], agent_index: int
+):
+    """From the allocation matrix, get list of all items currently owned by a certain agent (bundle)
+
+    Args:
+        X (type[np.ndarray]): Allocation matrix
+        items (list[ScheduleItem]): List of items from class BaseItem
+        agent_index (int): index of the agent for which we want to get the current bundle
+    Returns:
+        list[ScheduleItem]: List of items from the BaseItem class currently owned by the agent
+    """
     bundle0 = []
     items_list = X[:, agent_index]
     for i in range(len(items_list)):
@@ -122,7 +147,15 @@ def get_bundle_from_allocation_matrix(X, items, agent_index):
     return bundle0
 
 
-def get_bundle_indexes_from_allocation_matrix(X, agent_index):
+def get_bundle_indexes_from_allocation_matrix(X: type[np.ndarray], agent_index: int):
+    """From the allocation matrix, get list of indices of all items currently owned by a certain agent (bundle)
+
+    Args:
+        X (type[np.ndarray]): Allocation matrix
+        agent_index (int): index of the agent for which we want to get the current bundle
+    Returns:
+        list[int]: List of indices of the items from the BaseItem class currently owned by the agent
+    """
     bundle_indexes = []
     items_list = X[:, agent_index]
     for i in range(len(items_list)):
@@ -131,7 +164,20 @@ def get_bundle_indexes_from_allocation_matrix(X, agent_index):
     return bundle_indexes
 
 
-def find_agent(X, agents, items, current_item_index, last_item_index):
+def find_agent(X:type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem], current_item_index: int, last_item_index:int):
+    """Find agent who is currently willing to exchange a current item for a certain other item.
+    This will depend on their current bundle, for which the allocation matrix is needed. 
+
+    Args:
+        X (type[np.ndarray]): allocation matrix
+        agents (list[BaseAgent]): List of agents from class BaseAgent
+        items (list[ScheduleItem]): List of items from class BaseItem
+        current_item_index (int): index of the item that we want to exchange
+        last_item_index (int): index of the item that we want to exchange current item for
+
+    Returns:
+        item: inde of the agent williing to do the exchange
+    """    
     owners = get_owners_list(X, current_item_index)
     for owner in owners:
         agent = agents[owner]
@@ -145,7 +191,9 @@ def find_agent(X, agents, items, current_item_index, last_item_index):
     )  # this should never happen. If the item was in the path, then someone must be willing to exchange it
 
 
-def update_allocation(X, path_og, agents, items, agent_picked):
+"""Update current allocation"""
+
+def update_allocation(X: type[np.ndarray], path_og, agents, items, agent_picked):
     path = path_og.copy()
     path = path[1:-1]
     last_item = path[-1]
@@ -197,7 +245,7 @@ def update_allocation_E(X, G, E, path_og, agents, items, agent_picked):
     return X, G, E, agents_involved
 
 
-"""Graph functions"""
+"""Graph functions for the exchange graph"""
 
 
 def find_shortest_path(G, start, end):
@@ -220,36 +268,6 @@ def add_agent_to_exchange_graph(G, X, items, agents, agent_picked):
         ):
             G.add_edge("s", i)
     return G
-
-
-def build_exchange_graph(X, items, agents):
-    exchange_graph = nx.DiGraph()
-    for i in range(len(items)):
-        exchange_graph.add_node(i)
-    exchange_graph.add_node("t")
-    for item_index in range(len(items)):
-        item_1 = items[item_index]
-        if X[item_index, len(agents)] > 0:
-            exchange_graph.add_edge(item_index, "t")
-        owners = get_owners_list(X, item_index)
-        for item_2_index in range(len(items)):
-            if item_2_index != item_index:
-                item_2 = items[item_2_index]
-                exchangeable = False
-                for owner in owners:
-                    if owner != len(agents):
-                        agent = agents[owner]
-                        bundle_owner = get_bundle_from_allocation_matrix(
-                            X, items, owner
-                        )
-                        willing_owner = agent.exchange_contribution(
-                            bundle_owner, item_1, item_2
-                        )
-                        if willing_owner:
-                            exchangeable = True
-                if exchangeable:
-                    exchange_graph.add_edge(item_index, item_2_index)
-    return exchange_graph
 
 
 def get_multiple_agents_desired_items(agents_indexes, agents, items):
@@ -426,102 +444,6 @@ def round_robin_weights(agents, items, weights):
     return X
 
 
-def yankee_swap_hold_graph(agents, items, plot_exchange_graph=False):
-    """Vanilla Yankee Swap holding the generation of ex. graph until first transfer occurs"""
-    players = list(range(len(agents)))
-    X = initialize_allocation_matrix(items, agents)
-    graph = False
-    count = 0
-    time_steps = []
-    agents_involved_arr = []
-    start = time.process_time()
-    while len(players) > 0:
-        count += 1
-        agent_picked = pick_agent(X, items, agents, players)
-        if not graph:
-            agent = agents[agent_picked]
-            list_desired_items = agent.get_desired_items_indexes(items)
-            bundle = get_bundle_from_allocation_matrix(X, items, agent_picked)
-            empty_seat_found = False
-            for desired_item in list_desired_items:
-                if (
-                    X[desired_item, 0] > 0
-                    and agent.marginal_contribution(bundle, items[desired_item]) > 0
-                ):
-                    X[desired_item, 0] -= 1
-                    X[desired_item, agent_picked] += 1
-                    time_steps.append(time.process_time() - start)
-                    agents_involved_arr.append(1)
-                    empty_seat_found = True
-                    break
-            if not empty_seat_found:
-                graph = True
-                G = build_exchange_graph(X, items, agents)
-        if graph:
-            G = add_agent_to_exchange_graph(G, X, items, agents, agent_picked)
-            if plot_exchange_graph:
-                nx.draw(G, with_labels=True)
-                plt.show()
-
-            path = find_shortest_path(G, "s", "t")
-            G.remove_node("s")
-
-            if path == False:
-                players.remove(agent_picked)
-                time_steps.append(time.process_time() - start)
-                agents_involved_arr.append(0)
-            else:
-                X, agents_involved = update_allocation(
-                    X, path, agents, items, agent_picked
-                )
-                G = update_exchange_graph(X, G, path, agents, items, agents_involved)
-                if plot_exchange_graph:
-                    nx.draw(G, with_labels=True)
-                    plt.show()
-                time_steps.append(time.process_time() - start)
-                agents_involved_arr.append(len(agents_involved))
-    return X, time_steps, agents_involved_arr
-
-
-def original_yankee_swap(agents, items, plot_exchange_graph=False):
-    """Vanilla Yankee Swap building the ex. graph from scratch in every iteration"""
-    players = list(range(len(agents)))
-    X = initialize_allocation_matrix(items, agents)
-    G = build_exchange_graph(X, items, agents)
-    if plot_exchange_graph:
-        nx.draw(G, with_labels=True)
-        plt.show()
-    count = 0
-    time_steps = []
-    agents_involved_arr = []
-    start = time.process_time()
-    while len(players) > 0:
-        count += 1
-        print("Iteration: %d" % count, end="\r")
-        agent_picked = pick_agent(X, items, agents, players)
-        G = add_agent_to_exchange_graph(G, X, items, agents, agent_picked)
-        if plot_exchange_graph:
-            nx.draw(G, with_labels=True)
-            plt.show()
-
-        path = find_shortest_path(G, "s", "t")
-        G.remove_node("s")
-
-        if path == False:
-            players.remove(agent_picked)
-            time_steps.append(time.process_time() - start)
-            agents_involved_arr.append(0)
-        else:
-            X, agents_involved = update_allocation(X, path, agents, items, agent_picked)
-            G = build_exchange_graph(X, items, agents)
-            if plot_exchange_graph:
-                nx.draw(G, with_labels=True)
-                plt.show()
-            time_steps.append(time.process_time() - start)
-            agents_involved_arr.append(len(agents_involved))
-    return X, time_steps, agents_involved_arr
-
-
 def general_yankee_swap(
     agents, items, plot_exchange_graph=False, criteria="LorenzDominance", weights=0
 ):
@@ -620,153 +542,3 @@ def general_yankee_swap_E(
             time_steps.append(time.process_time() - start)
             agents_involved_arr.append(len(agents_involved))
     return X, time_steps, agents_involved_arr
-
-
-"""Vignesh's implementation"""
-
-
-def find_desired(i, bundle, list_of_yes, agents, items):
-    agenti = agents[i]
-    list_of_yesses = list(list_of_yes.difference(bundle))
-    low = 0
-    high = len(list_of_yesses)
-    if agenti.valuation_index([*bundle, *list_of_yesses[low:high]], items) == len(
-        bundle
-    ):
-        return -1
-    while high > low + 1:
-        mid = int((low + high) / 2)
-        if agenti.valuation_index([*bundle, *list_of_yesses[low:mid]], items) > len(
-            bundle
-        ):
-            high = mid
-        else:
-            low = mid
-    return list_of_yesses[low]
-
-
-def get_distances(i, agents, items, allocation_matrix):
-    distances = {}
-    previous_agent = {}
-    previous_item = {}
-
-    n = len(agents)
-    m = len(items)
-
-    if np.sum(allocation_matrix[:, n]) == m:
-        return -1, previous_agent, previous_item
-
-    q = Queue()
-    q.put(-1)
-
-    list_of_yes = set(np.arange(m).flatten())
-
-    while not q.empty():
-        j = q.get()
-        if j == -1:
-            # list_of_yesses =  list_of_yes.copy()
-            bundle = [jdash for jdash in range(m) if allocation_matrix[jdash, i] == 1]
-            jprime = find_desired(i, bundle, list_of_yes, agents, items)
-            while jprime != -1:
-                list_of_yes.remove(jprime)
-                if jprime not in distances:
-                    previous_item[jprime] = -1
-                    previous_agent[jprime] = -1
-                    distances[jprime] = 1
-                    if allocation_matrix[jprime, n] != 0:
-                        return jprime, previous_agent, previous_item
-                    q.put(jprime)
-                jprime = find_desired(i, bundle, list_of_yes, agents, items)
-
-        else:
-            for iprime in [
-                idash for idash in range(n) if allocation_matrix[j, idash] == 1
-            ]:
-                # list_of_yesses =  list_of_yes.copy()
-                bundle = [
-                    jdash
-                    for jdash in range(len(items))
-                    if ((allocation_matrix[jdash, iprime] == 1) & (jdash != j))
-                ]
-                jprime = find_desired(iprime, bundle, list_of_yes, agents, items)
-                while jprime != -1:
-                    list_of_yes.remove(jprime)
-                    if jprime not in distances:
-                        previous_item[jprime] = j
-                        previous_agent[jprime] = iprime
-                        distances[jprime] = distances[j] + 1
-                        if allocation_matrix[jprime, n] != 0:
-                            return jprime, previous_agent, previous_item
-                        q.put(jprime)
-                    jprime = find_desired(iprime, bundle, list_of_yes, agents, items)
-    return -1, previous_agent, previous_item
-
-
-def augment_path(i, item, previous_agent, previous_item, allocation_matrix, agents):
-    n = len(agents)
-
-    new_allocation_matrix = np.copy(allocation_matrix)
-    item_to_move = item
-    agent_to_move_from = n
-
-    if previous_agent[item_to_move] != -1:
-        new_allocation_matrix[item_to_move, previous_agent[item_to_move]] = 1
-        new_allocation_matrix[
-            item_to_move,
-            agent_to_move_from,
-        ] -= 1
-
-        agent_to_move_from = previous_agent[item_to_move]
-        item_to_move = previous_item[item_to_move]
-
-    while previous_agent[item_to_move] != -1:
-        new_allocation_matrix[item_to_move, previous_agent[item_to_move]] = 1
-        new_allocation_matrix[item_to_move, agent_to_move_from] = 0
-
-        agent_to_move_from = previous_agent[item_to_move]
-        item_to_move = previous_item[item_to_move]
-
-    new_allocation_matrix[item_to_move, i] = 1
-    new_allocation_matrix[item_to_move, agent_to_move_from] -= 1
-
-    return new_allocation_matrix
-
-
-def bfs_yankee_swap(agents, items, criteria="LorenzDominance", weights=0):
-    n = len(agents)
-    m = len(items)
-    count = 0
-
-    # Initialize allocation matrix, players, and utility vector
-    allocation_matrix = np.zeros((m, n + 1), dtype=int)
-    allocation_matrix[:, n] = np.array([int(items[j].capacity) for j in range(m)])
-    U = set(np.arange(n).flatten())
-    u_vector = np.zeros(n, dtype=int)
-    utility_vector = np.zeros(n, dtype=float)
-
-    while len(U) != 0:
-        count += 1
-        print("Iteration: %d" % count, end="\r")
-        agent_picked = np.argmin(utility_vector)
-        item, previous_agent, previous_item = get_distances(
-            agent_picked, agents, items, allocation_matrix
-        )
-
-        if item != -1:
-            allocation_matrix = augment_path(
-                agent_picked,
-                item,
-                previous_agent,
-                previous_item,
-                allocation_matrix,
-                agents,
-            )
-            u_vector[agent_picked] += 1
-            utility_vector[agent_picked] += 1
-        else:
-            utility_vector[agent_picked] = 10000 * m
-            U.remove(agent_picked)
-
-    print("USW:", np.sum(u_vector))
-
-    return allocation_matrix
