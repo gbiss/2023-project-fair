@@ -10,6 +10,7 @@ from .item import ScheduleItem
 
 """Initializations functions"""
 
+
 def initialize_allocation_matrix(items: list[ScheduleItem], agents: list[BaseAgent]):
     """Initialize allocation matrix.
     Initially, no items are allocated, matrix X is all zeros, except for last column, which displays
@@ -60,7 +61,7 @@ def initialize_exchange_graph(N: int):
 
     Returns:
         nx.graph: networkx graph object
-    """    
+    """
     exchange_graph = nx.DiGraph()
     for i in range(N):
         exchange_graph.add_node(i)
@@ -72,15 +73,9 @@ def initialize_exchange_graph(N: int):
 
 """Pick agent functions"""
 
-def get_max_items(items):
-    max_items = 0
-    for i in range(len(items)):
-        max_items += items[i].capacity
-    return max_items
 
-
-def pick_agent(X, max_items, items, agents, players):
-    max_capacity = max_items
+def pick_agent(X: np.array, items, agents, players):
+    max_capacity = sum([item.capacity for item in items])
     for player in players:
         agent = agents[player]
         bundle = get_bundle_from_allocation_matrix(X, items, player)
@@ -136,7 +131,7 @@ def get_bundle_indexes_from_allocation_matrix(X, agent_index):
     return bundle_indexes
 
 
-def find_agent(agents, items, X, current_item_index, last_item_index):
+def find_agent(X, agents, items, current_item_index, last_item_index):
     owners = get_owners_list(X, current_item_index)
     for owner in owners:
         agent = agents[owner]
@@ -150,11 +145,6 @@ def find_agent(agents, items, X, current_item_index, last_item_index):
     )  # this should never happen. If the item was in the path, then someone must be willing to exchange it
 
 
-def find_agent_E(E, current_item_index, last_item_index):
-    agent_index = E[current_item_index][last_item_index][0]
-    return agent_index, E
-
-
 def update_allocation(X, path_og, agents, items, agent_picked):
     path = path_og.copy()
     path = path[1:-1]
@@ -166,7 +156,7 @@ def update_allocation(X, path_og, agents, items, agent_picked):
         # print('last item: ', last_item)
         if len(path) > 0:
             next_to_last_item = path[-1]
-            current_agent = find_agent(agents, items, X, next_to_last_item, last_item)
+            current_agent = find_agent(X, agents, items, next_to_last_item, last_item)
             agents_involved.append(current_agent)
             X[last_item, current_agent] = 1
             X[next_to_last_item, current_agent] = 0
@@ -187,7 +177,7 @@ def update_allocation_E(X, G, E, path_og, agents, items, agent_picked):
         # print('last item: ', last_item)
         if len(path) > 0:
             next_to_last_item = path[-1]
-            current_agent, E = find_agent_E(E, next_to_last_item, last_item)
+            current_agent = E[next_to_last_item][last_item][0]
             # print('current_agent:', current_agent)
             agents_involved.append(current_agent)
             X[last_item, current_agent] = 1
@@ -441,14 +431,13 @@ def yankee_swap_hold_graph(agents, items, plot_exchange_graph=False):
     players = list(range(len(agents)))
     X = initialize_allocation_matrix(items, agents)
     graph = False
-    max_items = get_max_items(items)
     count = 0
     time_steps = []
     agents_involved_arr = []
     start = time.process_time()
     while len(players) > 0:
         count += 1
-        agent_picked = pick_agent(X, max_items, items, agents, players)
+        agent_picked = pick_agent(X, items, agents, players)
         if not graph:
             agent = agents[agent_picked]
             list_desired_items = agent.get_desired_items_indexes(items)
@@ -502,7 +491,6 @@ def original_yankee_swap(agents, items, plot_exchange_graph=False):
     if plot_exchange_graph:
         nx.draw(G, with_labels=True)
         plt.show()
-    max_items = get_max_items(items)
     count = 0
     time_steps = []
     agents_involved_arr = []
@@ -510,7 +498,7 @@ def original_yankee_swap(agents, items, plot_exchange_graph=False):
     while len(players) > 0:
         count += 1
         print("Iteration: %d" % count, end="\r")
-        agent_picked = pick_agent(X, max_items, items, agents, players)
+        agent_picked = pick_agent(X, items, agents, players)
         G = add_agent_to_exchange_graph(G, X, items, agents, agent_picked)
         if plot_exchange_graph:
             nx.draw(G, with_labels=True)
