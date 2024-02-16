@@ -509,10 +509,20 @@ def update_exchange_graph_E(
 """Allocation algorithms"""
 
 
-def SPIRE_algorithm(agents, items):
+def SPIRE_algorithm(agents: list[BaseAgent], items: list[ScheduleItem]):
+    """SPIRE allocation algorithm.
+    In each round, give the playing agent all items they can add to their bundle that give them positive utility
+
+    Args:
+        agents (list[BaseAgent]): List of agents from class BaseAgent
+        items (list[ScheduleItem]): List of items from class BaseItem
+
+    Returns:
+         X (type[np.ndarray]): allocation matrix
+    """
     X = initialize_allocation_matrix(items, agents)
     agent_index = 0
-    for agent in agents:
+    for agent_index, agent in enumerate(agents):
         bundle = []
         desired_items = agent.get_desired_items_indexes(items)
         for item in desired_items:
@@ -525,11 +535,20 @@ def SPIRE_algorithm(agents, items):
                     X[item, agent_index] = 1
                     X[item, len(agents)] -= 1
                     bundle = new_bundle.copy()
-        agent_index += 1
     return X
 
 
-def round_robin(agents, items):
+def round_robin(agents: list[BaseAgent], items: list[ScheduleItem]):
+    """Round Robin allocation algorithm.
+    In each round, give the playing agent one item they can add to their bundle that give them positive utility, if any
+
+    Args:
+        agents (list[BaseAgent]): List of agents from class BaseAgent
+        items (list[ScheduleItem]): List of items from class BaseItem
+
+    Returns:
+         X (type[np.ndarray]): allocation matrix
+    """
     players = list(range(len(agents)))
     X = initialize_allocation_matrix(items, agents)
     while len(players) > 0:
@@ -554,7 +573,20 @@ def round_robin(agents, items):
     return X
 
 
-def round_robin_weights(agents, items, weights):
+def round_robin_weights(
+    agents: list[BaseAgent], items: list[ScheduleItem], weights: list[float]
+):
+    """Round Robin allocation algorithm, considering different weights among
+    In each round, give the playing agent one item they can add to their bundle that give them positive utility, if any
+
+    Args:
+        agents (list[BaseAgent]): List of agents from class BaseAgent
+        items (list[ScheduleItem]): List of items from class BaseItem
+        weights (list[float]): list of agents assigned weights
+
+    Returns:
+        X (type[np.ndarray]): allocation matrix
+    """
     players = list(range(len(agents)))
     X = initialize_allocation_matrix(items, agents)
     weights_aux = weights.copy()
@@ -584,9 +616,26 @@ def round_robin_weights(agents, items, weights):
 
 
 def general_yankee_swap(
-    agents, items, plot_exchange_graph=False, criteria="LorenzDominance", weights=0
+    agents: list[BaseAgent],
+    items: list[ScheduleItem],
+    criteria: str = "LorenzDominance",
+    weights: list[float] = [],
+    plot_exchange_graph: bool = False,
 ):
-    """General Yankee Swap"""
+    """General Yankee swap allocation algorithm.
+
+    Args:
+        agents (list[BaseAgent]): List of agents from class BaseAgent
+        items (list[ScheduleItem]): List of items from class BaseItem
+        criteria (str, optional): gain function criteria. Defaults to "LorenzDominance". See get_gain_function to see other alternatives
+        weights (list[float]): list of agents assigned weights
+        plot_exchange_graph (bool, optional): Defaults to False. Change to True to display exchange graph plot after every modification to it.
+
+    Returns:
+        X (type[np.ndarray]): allocation matrix
+        time_steps (list[float]): time elapsed until the end of every iteration
+        agents_involved_arr (list[int]): nuber of agents involved in every iteration
+    """
     N = len(items)
     M = len(agents)
     players = list(range(M))
@@ -599,7 +648,6 @@ def general_yankee_swap(
     start = time.process_time()
     while len(players) > 0:
         print("Iteration: %d" % count, end="\r")
-        # print("Iteration: %d" % count)
         count += 1
         agent_picked = np.argmax(gain_vector)
         G = add_agent_to_exchange_graph(X, G, agents, items, agent_picked)
@@ -632,11 +680,25 @@ def general_yankee_swap(
 def general_yankee_swap_E(
     agents: list[BaseAgent],
     items: list[ScheduleItem],
-    plot_exchange_graph: bool = False,
     criteria: str = "LorenzDominance",
     weights: list = [],
+    plot_exchange_graph: bool = False,
 ):
-    """General Yankee Swap"""
+    """General Yankee swap allocation algorithm, edge matrix version
+    Equivalent to general_yankee_swap, just different book keeping to speed things up
+
+    Args:
+        agents (list[BaseAgent]): List of agents from class BaseAgent
+        items (list[ScheduleItem]): List of items from class BaseItem
+        criteria (str, optional): gain function criteria. Defaults to "LorenzDominance". See get_gain_function to see other alternatives
+        weights (list[float]): list of agents assigned weights
+        plot_exchange_graph (bool, optional): Defaults to False. Change to True to display exchange graph plot after every modification to it.
+
+    Returns:
+        X (type[np.ndarray]): allocation matrix
+        time_steps (list[float]): time elapsed until the end of every iteration
+        agents_involved_arr (list[int]): nuber of agents involved in every iteration
+    """
     N = len(items)
     M = len(agents)
     players = list(range(M))
