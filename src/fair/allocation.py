@@ -5,17 +5,23 @@ import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 
-"""Initializations functions: Players, Allocation Matrix, and Exchange Graph"""
+from .agent import BaseAgent
+from .item import ScheduleItem
 
+"""Initializations functions"""
 
-def initialize_players(agents):
-    players = []
-    for i in range(len(agents)):
-        players.append(i)
-    return players
+def initialize_allocation_matrix(items: list[ScheduleItem], agents: list[BaseAgent]):
+    """Initialize allocation matrix.
+    Initially, no items are allocated, matrix X is all zeros, except for last column, which displays
+    course capacities.
 
+    Args:
+        items (list[ScheduleItem]): Items from class BaseItem
+        agents (list[BaseAgent]): Agents from class BaseAgent
 
-def initialize_allocation_matrix(items, agents):
+    Returns:
+        X: len(items) x (len(agents)+1) numpy array
+    """
     n = len(items)
     m = len(agents) + 1
     X = np.zeros([n, m], dtype=int)
@@ -24,35 +30,53 @@ def initialize_allocation_matrix(items, agents):
     return X
 
 
-def initialize_edge_matrix(items):
-    n = len(items)
+def initialize_edge_matrix(N: int):
+    """Initialize array that keeps track of the agents responsible for a specific edge between two
+    different items on the exchange graph.
+    Initially, there are no edges, thus edge matrix is a len(items) x len(items) array of empty lists.
+
+    Args:
+       N (int): Number of items
+
+    Returns:
+        list: N x N list of empty lists
+    """
     edge_matrix = []
-    for i in range(n):
+    for i in range(N):
         edge_row = []
-        for j in range(n):
+        for j in range(N):
             edge_row.append([])
         edge_matrix.append(edge_row)
     return edge_matrix
 
 
-def initialize_exchange_graph(items):
+def initialize_exchange_graph(N: int):
+    """Generate exchange graph. There is one node for every item and a sink node 't' representing the pile of unnasigned items.
+    Initially, there are no edges between items, and an edge from every item node to node 't'.
+    Disclaimer: The previous assumes that every items has capacity > 0
+
+    Args:
+        N (int): number of items
+
+    Returns:
+        nx.graph: networkx graph object
+    """    
     exchange_graph = nx.DiGraph()
-    for i in range(len(items)):
+    for i in range(N):
         exchange_graph.add_node(i)
     exchange_graph.add_node("t")
-    for i in range(len(items)):
+    for i in range(N):
         exchange_graph.add_edge(i, "t")
     return exchange_graph
 
+
+"""Pick agent functions"""
 
 def get_max_items(items):
     max_items = 0
     for i in range(len(items)):
         max_items += items[i].capacity
     return max_items
-
-
-"""Pick agent functions"""
 
 
 def pick_agent(X, max_items, items, agents, players):
@@ -317,12 +341,18 @@ def update_exchange_graph_E(X, G, E, path_og, agents, items, agents_involved):
                 item2 = items[item2_idx]
                 if item1_idx != item2_idx:
                     if agent_index in E[item1_idx][item2_idx]:
-                        if not agent.exchange_contribution(agent_bundle_items, item1, item2):
+                        if not agent.exchange_contribution(
+                            agent_bundle_items, item1, item2
+                        ):
                             E[item1_idx][item2_idx].remove(agent_index)
-                            if len(E[item1_idx][item2_idx])==0 and G.has_edge(item1_idx, item2_idx):
+                            if len(E[item1_idx][item2_idx]) == 0 and G.has_edge(
+                                item1_idx, item2_idx
+                            ):
                                 G.remove_edge(item1_idx, item2_idx)
                     else:
-                        if agent.exchange_contribution(agent_bundle_items, item1, item2):
+                        if agent.exchange_contribution(
+                            agent_bundle_items, item1, item2
+                        ):
                             E[item1_idx][item2_idx].append(agent_index)
                             if not G.has_edge(item1_idx, item2_idx):
                                 G.add_edge(item1_idx, item2_idx)
@@ -353,7 +383,7 @@ def SPIRE_algorithm(agents, items):
 
 
 def round_robin(agents, items):
-    players = initialize_players(agents)
+    players = list(range(len(agents)))
     X = initialize_allocation_matrix(items, agents)
     while len(players) > 0:
         for player in players:
@@ -378,7 +408,7 @@ def round_robin(agents, items):
 
 
 def round_robin_weights(agents, items, weights):
-    players = initialize_players(agents)
+    players = list(range(len(agents)))
     X = initialize_allocation_matrix(items, agents)
     weights_aux = weights.copy()
     while len(players) > 0:
@@ -408,7 +438,7 @@ def round_robin_weights(agents, items, weights):
 
 def yankee_swap_hold_graph(agents, items, plot_exchange_graph=False):
     """Vanilla Yankee Swap holding the generation of ex. graph until first transfer occurs"""
-    players = initialize_players(agents)
+    players = list(range(len(agents)))
     X = initialize_allocation_matrix(items, agents)
     graph = False
     max_items = get_max_items(items)
@@ -466,7 +496,7 @@ def yankee_swap_hold_graph(agents, items, plot_exchange_graph=False):
 
 def original_yankee_swap(agents, items, plot_exchange_graph=False):
     """Vanilla Yankee Swap building the ex. graph from scratch in every iteration"""
-    players = initialize_players(agents)
+    players = list(range(len(agents)))
     X = initialize_allocation_matrix(items, agents)
     G = build_exchange_graph(X, items, agents)
     if plot_exchange_graph:
@@ -508,10 +538,12 @@ def general_yankee_swap(
     agents, items, plot_exchange_graph=False, criteria="LorenzDominance", weights=0
 ):
     """General Yankee Swap"""
-    players = initialize_players(agents)
+    N = len(items)
+    M = len(agents)
+    players = list(range(M))
     X = initialize_allocation_matrix(items, agents)
-    G = initialize_exchange_graph(items)
-    gain_vector = np.zeros([len(agents)])
+    G = initialize_exchange_graph(N)
+    gain_vector = np.zeros([M])
     count = 0
     time_steps = []
     agents_involved_arr = []
@@ -549,15 +581,20 @@ def general_yankee_swap(
 
 
 def general_yankee_swap_E(
-    agents, items, plot_exchange_graph=False, criteria="LorenzDominance", weights=0
+    agents: list[BaseAgent],
+    items: list[ScheduleItem],
+    plot_exchange_graph: bool = False,
+    criteria: str = "LorenzDominance",
+    weights: list = [],
 ):
     """General Yankee Swap"""
-    players = initialize_players(agents)
+    N = len(items)
+    M = len(agents)
+    players = list(range(M))
     X = initialize_allocation_matrix(items, agents)
-    G = initialize_exchange_graph(items)
-    E = initialize_edge_matrix(items)
-    # print('initialized E:',E)
-    gain_vector = np.zeros([len(agents)])
+    G = initialize_exchange_graph(N)
+    E = initialize_edge_matrix(N)
+    gain_vector = np.zeros([M])
     count = 0
     time_steps = []
     agents_involved_arr = []
@@ -586,7 +623,6 @@ def general_yankee_swap_E(
             G, E = update_exchange_graph_E(
                 X, G, E, path, agents, items, agents_involved
             )
-            # print(E)
             gain_vector[agent_picked] = get_gain_function(
                 X, agents, items, agent_picked, criteria, weights
             )
