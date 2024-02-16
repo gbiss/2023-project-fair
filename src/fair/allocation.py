@@ -73,6 +73,7 @@ def initialize_exchange_graph(N: int):
 
 """Retrieve/update information"""
 
+
 def get_gain_function(
     X: type[np.ndarray],
     agents: list[BaseAgent],
@@ -164,9 +165,15 @@ def get_bundle_indexes_from_allocation_matrix(X: type[np.ndarray], agent_index: 
     return bundle_indexes
 
 
-def find_agent(X:type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem], current_item_index: int, last_item_index:int):
+def find_agent(
+    X: type[np.ndarray],
+    agents: list[BaseAgent],
+    items: list[ScheduleItem],
+    current_item_index: int,
+    last_item_index: int,
+):
     """Find agent who is currently willing to exchange a current item for a certain other item.
-    This will depend on their current bundle, for which the allocation matrix is needed. 
+    This will depend on their current bundle, for which the allocation matrix is needed.
 
     Args:
         X (type[np.ndarray]): allocation matrix
@@ -177,7 +184,7 @@ def find_agent(X:type[np.ndarray], agents: list[BaseAgent], items: list[Schedule
 
     Returns:
         item: inde of the agent williing to do the exchange
-    """    
+    """
     owners = get_owners_list(X, current_item_index)
     for owner in owners:
         agent = agents[owner]
@@ -192,6 +199,7 @@ def find_agent(X:type[np.ndarray], agents: list[BaseAgent], items: list[Schedule
 
 
 """Update current allocation"""
+
 
 def update_allocation(X: type[np.ndarray], path_og, agents, items, agent_picked):
     path = path_og.copy()
