@@ -4,7 +4,7 @@ from collections import defaultdict
 import pandas as pd
 
 from fair.agent import LegacyStudent
-from fair.allocation import general_yankee_swap, general_yankee_swap_E
+from fair.allocation import general_yankee_swap_E
 from fair.constraint import CourseTimeConstraint, MutualExclusivityConstraint
 from fair.feature import Course, Section, Slot, Weekday, slots_for_time_range
 from fair.item import ScheduleItem
@@ -12,7 +12,7 @@ from fair.metrics import leximin, nash_welfare, utilitarian_welfare
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan
 
-NUM_STUDENTS = 30
+NUM_STUDENTS = 3
 MAX_COURSES_PER_TOPIC = 5
 MAX_COURSES_TOTAL = 5
 EXCEL_SCHEDULE_PATH = os.path.join(
@@ -71,12 +71,6 @@ for i in range(NUM_STUDENTS):
         legacy_student.student.valuation.compile()
     )
     students.append(legacy_student)
-
-X = general_yankee_swap(students, schedule, plot_exchange_graph=False)
-
-print("utilitarian welfare: ", utilitarian_welfare(X[0], students, schedule))
-print("nash welfare: ", nash_welfare(X[0], students, schedule))
-print("leximin vector: ", leximin(X[0], students, schedule))
 
 X = general_yankee_swap_E(students, schedule, plot_exchange_graph=False)
 print(
