@@ -21,8 +21,7 @@ def utilitarian_welfare(
         float: USW / len(agents)
     """
     util = 0
-    for agent_index in range(len(agents)):
-        agent = agents[agent_index]
+    for agent_index, agent in enumerate(agents):
         bundle = get_bundle_from_allocation_matrix(X, items, agent_index)
         val = agent.valuation(bundle)
         util += val
@@ -48,8 +47,7 @@ def nash_welfare(
     """
     util = 0
     num_zeros = 0
-    for agent_index in range(len(agents)):
-        agent = agents[agent_index]
+    for agent_index, agent in enumerate(agents):
         bundle = get_bundle_from_allocation_matrix(X, items, agent_index)
         val = agent.valuation(bundle)
         if val == 0:
@@ -71,7 +69,7 @@ def leximin(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleIt
         list[int]: utilities for all agents
     """
     valuations = []
-    for agent_index in range(len(agents)):
+    for agent_index, agent in enumerate(agents):
         agent = agents[agent_index]
         bundle = get_bundle_from_allocation_matrix(X, items, agent_index)
         val = agent.valuation(bundle)
@@ -97,17 +95,14 @@ def EF_count(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleI
         list[int]: utilities for all agents
     """
     envy_count = 0
-    for agent_index in range(len(agents)):
+    for agent_index, agent in enumerate(agents):
+        current_bundle = get_bundle_from_allocation_matrix(X, items, agent_index)
+        current_utility = agent.valuation(current_bundle)
         for agent_2_index in range(len(agents)):
             if agent_index != agent_2_index:
-                agent = agents[agent_index]
-                current_bundle = get_bundle_from_allocation_matrix(
-                    X, items, agent_index
-                )
                 other_bundle = get_bundle_from_allocation_matrix(
                     X, items, agent_2_index
                 )
-                current_utility = agent.valuation(current_bundle)
                 other_utility = agent.valuation(other_bundle)
                 if current_utility < other_utility:
                     envy_count += 1
@@ -130,17 +125,14 @@ def EF_agents(X: type[np.ndarray], agents: list[BaseAgent], items: list[Schedule
         list[int]: utilities for all agents
     """
     envy_count = 0
-    for agent_index in range(len(agents)):
+    for agent_index, agent in enumerate(agents):
+        current_bundle = get_bundle_from_allocation_matrix(X, items, agent_index)
+        current_utility = agent.valuation(current_bundle)
         for agent_2_index in range(len(agents)):
             if agent_index != agent_2_index:
-                agent = agents[agent_index]
-                current_bundle = get_bundle_from_allocation_matrix(
-                    X, items, agent_index
-                )
                 other_bundle = get_bundle_from_allocation_matrix(
                     X, items, agent_2_index
                 )
-                current_utility = agent.valuation(current_bundle)
                 other_utility = agent.valuation(other_bundle)
                 if current_utility < other_utility:
                     envy_count += 1
@@ -164,17 +156,14 @@ def EF_1_count(X: type[np.ndarray], agents: list[BaseAgent], items: list[Schedul
         list[int]: utilities for all agents
     """
     envy_count = 0
-    for agent_index in range(len(agents)):
+    for agent_index, agent in enumerate(agents):
+        current_bundle = get_bundle_from_allocation_matrix(X, items, agent_index)
+        current_utility = agent.valuation(current_bundle)
         for agent_2_index in range(len(agents)):
             if agent_index != agent_2_index:
-                agent = agents[agent_index]
-                current_bundle = get_bundle_from_allocation_matrix(
-                    X, items, agent_index
-                )
                 other_bundle = get_bundle_from_allocation_matrix(
                     X, items, agent_2_index
                 )
-                current_utility = agent.valuation(current_bundle)
                 other_utility = agent.valuation(other_bundle)
                 if current_utility < other_utility:
                     there_is_no_item = True
@@ -208,17 +197,14 @@ def EF_1_agents(
         list[int]: utilities for all agents
     """
     envy_count = 0
-    for agent_index in range(len(agents)):
+    for agent_index, agent in enumerate(agents):
+        current_bundle = get_bundle_from_allocation_matrix(X, items, agent_index)
+        current_utility = agent.valuation(current_bundle)
         for agent_2_index in range(len(agents)):
             if agent_index != agent_2_index:
-                agent = agents[agent_index]
-                current_bundle = get_bundle_from_allocation_matrix(
-                    X, items, agent_index
-                )
                 other_bundle = get_bundle_from_allocation_matrix(
                     X, items, agent_2_index
                 )
-                current_utility = agent.valuation(current_bundle)
                 other_utility = agent.valuation(other_bundle)
                 if current_utility < other_utility:
                     there_is_no_item = True
@@ -251,17 +237,14 @@ def EF_X_count(X: type[np.ndarray], agents: list[BaseAgent], items: list[Schedul
         list[int]: utilities for all agents
     """
     envy_count = 0
-    for agent_index in range(len(agents)):
+    for agent_index, agent in enumerate(agents):
+        current_bundle = get_bundle_from_allocation_matrix(X, items, agent_index)
+        current_utility = agent.valuation(current_bundle)
         for agent_2_index in range(len(agents)):
             if agent_index != agent_2_index:
-                agent = agents[agent_index]
-                current_bundle = get_bundle_from_allocation_matrix(
-                    X, items, agent_index
-                )
                 other_bundle = get_bundle_from_allocation_matrix(
                     X, items, agent_2_index
                 )
-                current_utility = agent.valuation(current_bundle)
                 other_utility = agent.valuation(other_bundle)
                 if current_utility < other_utility:
                     not_for_every_item = False
@@ -295,17 +278,14 @@ def EF_X_agents(
         list[int]: utilities for all agents
     """
     envy_count = 0
-    for agent_index in range(len(agents)):
+    for agent_index, agent in enumerate(agents):
+        current_bundle = get_bundle_from_allocation_matrix(X, items, agent_index)
+        current_utility = agent.valuation(current_bundle)
         for agent_2_index in range(len(agents)):
             if agent_index != agent_2_index:
-                agent = agents[agent_index]
-                current_bundle = get_bundle_from_allocation_matrix(
-                    X, items, agent_index
-                )
                 other_bundle = get_bundle_from_allocation_matrix(
                     X, items, agent_2_index
                 )
-                current_utility = agent.valuation(current_bundle)
                 other_utility = agent.valuation(other_bundle)
                 if current_utility < other_utility:
                     not_for_every_item = False
