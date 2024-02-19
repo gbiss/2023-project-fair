@@ -30,7 +30,7 @@ seed = int(sys.argv[1])
 seed_order = int(sys.argv[2])
 print(sys.argv)
 random.seed(seed)
-NUM_STUDENTS = 100
+NUM_STUDENTS = 2000
 MAX_COURSES_PER_TOPIC = 5
 LOWER_MAX_COURSES_TOTAL = 2
 UPPER_MAX_COURSES_TOTAL = 5
@@ -99,7 +99,6 @@ for i in range(NUM_STUDENTS):
     students.append(legacy_student)
 
 X = general_yankee_swap_E(students, schedule)
-print(X)
 total_bundles = sum([student.student.valuation._value_ct for student in students])
 unique_bundles = sum(
     [student.student.valuation._unique_value_ct for student in students]

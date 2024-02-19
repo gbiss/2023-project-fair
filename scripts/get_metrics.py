@@ -30,7 +30,7 @@ seed = int(sys.argv[1])
 seed_order = int(sys.argv[2])
 print(sys.argv)
 random.seed(seed)
-NUM_STUDENTS = 100
+NUM_STUDENTS = 2000
 MAX_COURSES_PER_TOPIC = 5
 LOWER_MAX_COURSES_TOTAL = 2
 UPPER_MAX_COURSES_TOTAL = 5
