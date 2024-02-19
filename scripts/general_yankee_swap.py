@@ -4,7 +4,7 @@ from collections import defaultdict
 import pandas as pd
 
 from fair.agent import LegacyStudent
-from fair.allocation import general_yankee_swap
+from fair.allocation import general_yankee_swap_E
 from fair.constraint import CourseTimeConstraint, MutualExclusivityConstraint
 from fair.feature import Course, Section, Slot, Weekday, slots_for_time_range
 from fair.item import ScheduleItem
@@ -22,7 +22,7 @@ from fair.metrics import (
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan
 
-NUM_STUDENTS = 3
+NUM_STUDENTS = 30
 MAX_COURSES_PER_TOPIC = 5
 LOWER_MAX_COURSES_TOTAL = 1
 UPPER_MAX_COURSES_TOTAL = 5
@@ -35,7 +35,6 @@ FIND_OPTIMAL = True
 # load schedule as DataFrame
 with open(EXCEL_SCHEDULE_PATH, "rb") as fd:
     df = pd.read_excel(fd)
-
 # construct features from DataFrame
 course = Course(df["Catalog"].astype(str).unique().tolist())
 
@@ -59,7 +58,6 @@ for idx, (_, row) in enumerate(df.iterrows()):
     schedule.append(
         ScheduleItem(features, [crs, slt, dys, sec], index=idx, capacity=capacity)
     )
-
 topics = sorted([sorted(list(courses)) for courses in topic_map.values()])
 
 # global constraints
@@ -86,7 +84,7 @@ for i in range(NUM_STUDENTS):
     )
     students.append(legacy_student)
 
-X = general_yankee_swap(students, schedule)
+X = general_yankee_swap_E(students, schedule)
 print("YS utilitarian welfare: ", utilitarian_welfare(X[0], students, schedule))
 print("YS nash welfare: ", nash_welfare(X[0], students, schedule))
 print("YS leximin vector: ", leximin(X[0], students, schedule))
@@ -105,6 +103,9 @@ print(
     sum([student.student.valuation._unique_value_ct for student in students]),
 )
 
+print("utilitarian welfare: ", utilitarian_welfare(X[0], students, schedule))
+print("nash welfare: ", nash_welfare(X[0], students, schedule))
+print("leximin vector: ", leximin(X[0], students, schedule))
 if FIND_OPTIMAL:
     orig_students = [student.student for student in students]
     program = StudentAllocationProgram(orig_students, schedule).compile()
