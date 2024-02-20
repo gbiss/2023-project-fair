@@ -70,7 +70,6 @@ def leximin(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleIt
     """
     valuations = []
     for agent_index, agent in enumerate(agents):
-        agent = agents[agent_index]
         bundle = get_bundle_from_allocation_matrix(X, items, agent_index)
         val = agent.valuation(bundle)
         valuations.append(val)
