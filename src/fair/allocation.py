@@ -13,6 +13,7 @@ from .item import ScheduleItem
 
 def initialize_allocation_matrix(items: list[ScheduleItem], agents: list[BaseAgent]):
     """Initialize allocation matrix.
+
     Initially, no items are allocated, matrix X is all zeros, except for last column, which displays
     course capacities.
 
@@ -31,28 +32,10 @@ def initialize_allocation_matrix(items: list[ScheduleItem], agents: list[BaseAge
     return X
 
 
-def initialize_edge_matrix(N: int):
-    """Initialize array that keeps track of the agents responsible for a specific edge between two
-    different items on the exchange graph.
-    Initially, there are no edges, thus edge matrix is a len(items) x len(items) array of empty lists.
-
-    Args:
-       N (int): Number of items
-
-    Returns:
-        list: N x N list of empty lists
-    """
-    edge_matrix = []
-    for i in range(N):
-        edge_row = []
-        for j in range(N):
-            edge_row.append([])
-        edge_matrix.append(edge_row)
-    return edge_matrix
-
-
 def initialize_exchange_graph(N: int):
-    """Generate exchange graph. There is one node for every item and a sink node 't' representing the pile of unnasigned items.
+    """Generate exchange graph.
+
+    There is one node for every item and a sink node 't' representing the pile of unnasigned items.
     Initially, there are no edges between items, and an edge from every item node to node 't'.
     Disclaimer: The previous assumes that every items has capacity > 0
 
@@ -82,8 +65,11 @@ def get_gain_function(
     criteria: str,
     weights: list[float],
 ):
-    """Get gain function for a certain agent from the current allocation, according to the gain function criteria and agent assigned weight.
-    This function is used to update the gain function for the item that just played, to keep track of priority agents.
+    """
+    Get agent's current gain function value.
+
+    Get gain function for a certain agent from the current allocation, according to the gain function criteria and agent assigned weight.
+    This function is used to update the gain function for the agent that just played, to keep track of priority agents.
 
     Args:
         X (type[np.ndarray]): allocation matrix
@@ -114,14 +100,16 @@ def get_gain_function(
 
 
 def get_owners_list(X: type[np.ndarray], item_index: int):
-    """From the exchange matrix, list of indeces of all agents that currently have certain item.
+    """Get list of item's current owners.
+
+    From the exchange matrix, list of indices of all agents that currently have certain item.
 
     Args:
         X (type[np.ndarray]): Allocation matrix
         item_index (int): index of the item for which we want to get the owners
 
     Returns:
-        list[int]: list of item's owners' indeces
+        list[int]: list of item's owners' indices
     """
     item_list = X[item_index]
     owners_list = np.nonzero(item_list)
@@ -131,7 +119,9 @@ def get_owners_list(X: type[np.ndarray], item_index: int):
 def get_bundle_from_allocation_matrix(
     X: type[np.ndarray], items: list[ScheduleItem], agent_index: int
 ):
-    """Get list of all items currently owned by a certain agent (bundle), given the current allocation
+    """Get list of agent's current bundle
+
+    Get list of all items currently owned by a certain agent (bundle), given the current allocation
 
     Args:
         X (type[np.ndarray]): Allocation matrix
@@ -149,7 +139,9 @@ def get_bundle_from_allocation_matrix(
 
 
 def get_bundle_indexes_from_allocation_matrix(X: type[np.ndarray], agent_index: int):
-    """Get list of indices of all items currently owned by a certain agent (bundle), given the current allocation
+    """Get list of agent's current bundle's indices.
+
+    Get list of indices of all items currently owned by a certain agent (bundle), given the current allocation
 
     Args:
         X (type[np.ndarray]): Allocation matrix
@@ -208,7 +200,9 @@ def find_agent(
     current_item_index: int,
     last_item_index: int,
 ):
-    """Find index of an agent that is currently willing to exchange a current item for a certain other item.
+    """Find agent willing to do the exchange.
+
+    Find index of an agent that is currently willing to exchange a current item for a certain other item.
     This will depend on their current bundle, for which the allocation matrix is needed.
 
     Args:
@@ -244,7 +238,9 @@ def update_allocation(
     path_og: list[int],
     agent_picked: int,
 ):
-    """Execute the transfer path found, updating the allocation of items accordingly
+    """Update allocation matrix.
+
+    Execute the transfer path found, updating the allocation of items accordingly
 
     Args:
         X (type[np.ndarray]): allocation matrix
@@ -286,7 +282,9 @@ def update_allocation_E(
     path_og: list[int],
     agent_picked: int,
 ):
-    """Execute the transfer path found, updating the allocation of items and edge matrix accordingly.
+    """Udate allocation matrix, edge matrix, and exchange graph.
+
+    Execute the transfer path found, updating the allocation of items and edge matrix accordingly.
     Edge matrix is a list of lists containing the indices of agents responsible for each edge on the exchange graph
     This function is for the edge_matrix version of yankee swap
 
@@ -334,7 +332,9 @@ def update_allocation_E(
 
 
 def find_shortest_path(G: type[nx.Graph], start: str, end: str):
-    """Find and return shortest path from start to end nodes on graph G. Return False if there is no path
+    """Find shortest path on exchange graph.
+
+    Find and return shortest path from start to end nodes on graph G. Return False if there is no path
 
     Args:
         G (type[nx.Graph]): exchange graph
@@ -359,7 +359,9 @@ def add_agent_to_exchange_graph(
     items: list[ScheduleItem],
     agent_picked: int,
 ):
-    """Create node representing the agent currently playing, add edges from the node to items that would increase their utility
+    """Add picked agent to the exchange graph.
+
+    Create node representing the agent currently playing, add edges from the node to items that would increase their utility
 
     Args:
         X (type[np.ndarray]): allocation matrix
@@ -392,7 +394,9 @@ def update_exchange_graph(
     path_og: list[int],
     agents_involved: list[int],
 ):
-    """Given the updated allocation, path found and list of involved agents in the transfer path, update the exchange graph
+    """Update the exchange graph after the transfers made.
+
+    Given the updated allocation, path found and list of involved agents in the transfer path, update the exchange graph
 
     Args:
         X (type[np.ndarray]): allocation matrix
@@ -457,7 +461,10 @@ def update_exchange_graph_E(
     path_og: list[int],
     agents_involved: list[int],
 ):
-    """_summary_
+    """Update the exchange graph and edge matrix after the transfers made.
+
+    Given the updated allocation, path found and list of involved agents in the transfer path, update the exchange graph and edge matrix.
+    This function is for the edge_matrix version of yankee swap (general_yankee_swap_E)
 
     Args:
         X (type[np.ndarray]): allocation matrix
@@ -511,6 +518,7 @@ def update_exchange_graph_E(
 
 def SPIRE_algorithm(agents: list[BaseAgent], items: list[ScheduleItem]):
     """SPIRE allocation algorithm.
+
     In each round, give the playing agent all items they can add to their bundle that give them positive utility
 
     Args:
@@ -540,6 +548,7 @@ def SPIRE_algorithm(agents: list[BaseAgent], items: list[ScheduleItem]):
 
 def round_robin(agents: list[BaseAgent], items: list[ScheduleItem]):
     """Round Robin allocation algorithm.
+
     In each round, give the playing agent one item they can add to their bundle that give them positive utility, if any
 
     Args:
@@ -576,7 +585,8 @@ def round_robin(agents: list[BaseAgent], items: list[ScheduleItem]):
 def round_robin_weights(
     agents: list[BaseAgent], items: list[ScheduleItem], weights: list[float]
 ):
-    """Round Robin allocation algorithm, considering different weights among
+    """Round Robin allocation algorithm, considering different weights among agents.
+
     In each round, give the playing agent one item they can add to their bundle that give them positive utility, if any
 
     Args:
@@ -684,8 +694,9 @@ def general_yankee_swap_E(
     weights: list = [],
     plot_exchange_graph: bool = False,
 ):
-    """General Yankee swap allocation algorithm, edge matrix version
-    Equivalent to general_yankee_swap, just different book keeping to speed things up
+    """General Yankee swap allocation algorithm, edge matrix version.
+
+    Equivalent to general_yankee_swap, just different bookkeeping to speed things up
 
     Args:
         agents (list[BaseAgent]): List of agents from class BaseAgent
@@ -704,7 +715,7 @@ def general_yankee_swap_E(
     players = list(range(M))
     X = initialize_allocation_matrix(items, agents)
     G = initialize_exchange_graph(N)
-    E = initialize_edge_matrix(N)
+    E = [[[] for i in range(N)] for j in range(N)]
     gain_vector = np.zeros([M])
     count = 0
     time_steps = []
