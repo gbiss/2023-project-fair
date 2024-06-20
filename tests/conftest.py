@@ -1,6 +1,7 @@
 import os
 from typing import List
 
+import numpy as np
 import pytest
 
 from fair.constraint import (
@@ -161,6 +162,24 @@ def schedule(course: Course, slot: Slot, weekday: Weekday, section: Section):
 
 
 @pytest.fixture
+def simple_schedule(
+    schedule_item250: ScheduleItem,
+    schedule_item301: ScheduleItem,
+    schedule_item611: ScheduleItem,
+):
+    return [schedule_item250, schedule_item301, schedule_item611]
+
+
+@pytest.fixture
+def simple_schedule2(
+    schedule_item250_2: ScheduleItem,
+    schedule_item301: ScheduleItem,
+    schedule_item611: ScheduleItem,
+):
+    return [schedule_item250_2, schedule_item301, schedule_item611]
+
+
+@pytest.fixture
 def excel_schedule_path():
     return os.path.join(
         os.path.dirname(__file__), "../resources/fall2023schedule-2.xlsx"
@@ -184,6 +203,19 @@ def global_constraints(
 ):
     course_time_constr = CourseTimeConstraint.from_items(schedule, slot, weekday)
     course_sect_constr = MutualExclusivityConstraint.from_items(schedule, course)
+
+    return [course_time_constr, course_sect_constr]
+
+
+@pytest.fixture
+def simple_global_constraints(
+    simple_schedule: list[ScheduleItem],
+    course: Course,
+    slot: Slot,
+    weekday: Weekday,
+):
+    course_time_constr = CourseTimeConstraint.from_items(simple_schedule, slot, weekday)
+    course_sect_constr = MutualExclusivityConstraint.from_items(simple_schedule, course)
 
     return [course_time_constr, course_sect_constr]
 
@@ -222,3 +254,62 @@ def renaissance2(
         schedule,
         seed=1,
     )
+
+
+@pytest.fixture
+def student(
+    simple_schedule: list[ScheduleItem],
+    simple_global_constraints: list[LinearConstraint],
+    course: Course,
+):
+    return RenaissanceMan(
+        [["250", "301"]],
+        [1],
+        1,
+        1,
+        course,
+        simple_global_constraints,
+        simple_schedule,
+        seed=0,
+    )
+
+
+@pytest.fixture
+def student2(
+    simple_schedule: list[ScheduleItem],
+    simple_global_constraints: list[LinearConstraint],
+    course: Course,
+):
+    return RenaissanceMan(
+        [["301", "611"]],
+        [1],
+        1,
+        1,
+        course,
+        simple_global_constraints,
+        simple_schedule,
+        seed=1,
+    )
+
+
+@pytest.fixture
+def student3(
+    simple_schedule2: list[ScheduleItem],
+    simple_global_constraints: list[LinearConstraint],
+    course: Course,
+):
+    return RenaissanceMan(
+        [["250", "301"]],
+        [1],
+        1,
+        1,
+        course,
+        simple_global_constraints,
+        simple_schedule2,
+        seed=2,
+    )
+
+
+@pytest.fixture
+def bernoullis():
+    return np.array([[1, 0, 1], [0, 1, 1]])
