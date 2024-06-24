@@ -37,16 +37,7 @@ def random_questions() -> pd.Series:
     Returns:
         pd.Series: Responses to questions
     """
-    q1 = random.choice(
-        [
-            "Freshman",
-            "Sophomore",
-            "Junior",
-            "Senior",
-            "MS Student",
-            "MS/PhD or PhD Student",
-        ]
-    )
+    q1 = random.randint(1, 6)
     q2 = random.randint(0, 7)
     q3 = random.randint(0, 7)
     q4 = ",".join([str(i) for i in random.choice(powerset(range(1, 5)))])
