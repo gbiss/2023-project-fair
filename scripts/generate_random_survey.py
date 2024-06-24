@@ -41,7 +41,7 @@ def random_questions() -> pd.Series:
         [
             "Freshman",
             "Sophomore",
-            "Junion",
+            "Junior",
             "Senior",
             "MS Student",
             "MS/PhD or PhD Student",
