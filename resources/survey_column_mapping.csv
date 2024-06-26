@@ -1,0 +1,125 @@
+question|description
+1|Please indicate your current status at UMass:
+2|How many CICS classes are you planning to enroll in before the add/drop period of the Fall 2024 semester? (You might want to take more classes than you are planing to keep by the end of the semester)
+3|How many CICS classes are you planning to stay enrolled in after the add/drop period of the Fall 2024 semester?
+4|Which categories of courses are you interested in taking? Select all that apply
+5#1_1|Before 9:00 AM
+5#1_2|9:00AM-10:00AM
+5#1_3|10:00AM-11:00AM
+5#1_4|11:00AM-12:00PM
+5#1_5|12:00PM-1:00PM
+5#1_6|1:00PM-2:00PM
+5#1_7|2:00PM-3:00PM
+5#1_8|3:00PM-4:00PM
+5#1_9|4:00PM-5:00PM
+5#1_10|5:00PM-6:00PM
+5#1_11|After 6:00PM
+7 _1|<strong>Course:&nbsp;</strong>CICS 110-01 Foundations of Programming &nbsp;<strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp;<strong>Instructor:&nbsp;</strong>Reilly
+7 _2|<strong>Course:&nbsp;</strong>CICS 110-02 Foundations of Programming &nbsp;<strong>Schedule:&nbsp;</strong>TueThu 11:30 AM - 12:45 PM &nbsp;<strong>Instructor:&nbsp;</strong>Reilly
+7 _3|<strong>Course:&nbsp;</strong>CICS 110-03 Foundations of Programming &nbsp;<strong>Schedule:&nbsp;</strong>MonWed 09:05 AM - 10:20 AM &nbsp;<strong>Instructor:&nbsp;</strong>Parvini
+7 _4|<strong>Course:&nbsp;</strong>CICS 110-04 Foundations of Programming &nbsp;<strong>Schedule:&nbsp;</strong>TueThu 01:00 PM - 02:15 PM &nbsp;<strong>Instructor:&nbsp;</strong>STAFF
+7 _5|<strong>Course:&nbsp;</strong>CICS 110-05 Foundations of Programming &nbsp;<strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp;<strong>Instructor:&nbsp;</strong>STAFF
+7 _6|<strong>Course:&nbsp;</strong>CICS 110-06 Foundations of Programming &nbsp;<strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp;<strong>Instructor:&nbsp;</strong>STAFF
+7 _7|<strong>Course:&nbsp;</strong>CICS 110-07 Foundations of Programming &nbsp;<strong>Schedule:&nbsp;</strong>TueThu 10:00 AM - 11:15 AM &nbsp;<strong>Instructor:&nbsp;</strong>Chiu
+7 _8|<strong>Course:&nbsp;</strong>CICS 160-01 Object-Oriented Programming &nbsp;<strong>Schedule:&nbsp;</strong>TueThu 08:30 AM - 09:45 AM &nbsp;<strong>Instructor:&nbsp;</strong>Davila
+7 _9|<strong>Course:&nbsp;</strong>CICS 160-02 Object-Oriented Programming &nbsp;<strong>Schedule:&nbsp;</strong>TueThu 05:30 PM - 06:45 PM &nbsp;<strong>Instructor:&nbsp;</strong>Reilly
+7 _10|<strong>Course:&nbsp;</strong>CICS 208 Defending Democracy in a Digital World &nbsp;<strong>Schedule:&nbsp;</strong>MonWed 02:30 PM - 03:45 PM &nbsp;<strong>Instructor:&nbsp;</strong>Zuckerman
+7 _11|<strong>Course:&nbsp;</strong>CICS 210-01 Data Structures &nbsp;<strong>Schedule:&nbsp;</strong>MonWed 05:30 PM - 06:45 PM &nbsp;<strong>Instructor:&nbsp;</strong>Golin
+7 _12|<strong>Course:&nbsp;</strong>CICS 210-02 Data Structures &nbsp;<strong>Schedule:&nbsp;</strong>TueThu 04:00 PM - 05:15 PM &nbsp;<strong>Instructor:&nbsp;</strong>Richards
+7 _13|<strong>Course:&nbsp;</strong>CICS 237- Introduction to Research in the Discipline &nbsp;<strong>Schedule:&nbsp;</strong>Tue 10:00 AM - 11:15 AM &nbsp;<strong>Instructor:&nbsp;</strong>Thota
+7 _14|<strong>Course:&nbsp;</strong>CICS 256-01 Make: A Hands-on Introduction to Physical Computing &nbsp;<strong>Schedule:&nbsp;</strong>TueThu 01:00 PM - 02:15 PM &nbsp;<strong>Instructor:&nbsp;</strong>Wang
+7 _15|<strong>Course:&nbsp;</strong>CICS 291T-01 Seminar - CICS Transfer Success &nbsp;<strong>Schedule:&nbsp;</strong>Wed 10:00 AM - 10:50 AM &nbsp;<strong>Instructor:&nbsp;</strong>Anderson
+7 _16|<strong>Course:&nbsp;</strong>CICS 298A-01 Practicum - Leadership: Communicating Across Expertise &nbsp;<strong>Schedule:&nbsp;</strong>Fri 11:30 AM - 12:45 PM &nbsp;<strong>Instructor:&nbsp;</strong>Anderson
+7 _17|<strong>Course:&nbsp;</strong>CICS 298A-02 Practicum - Leadership: Communicating Across Expertise &nbsp;<strong>Schedule:&nbsp;</strong>Wed 11:30 AM - 12:45 PM &nbsp;<strong>Instructor:&nbsp;</strong>Anderson
+7 _18|<strong>Course:&nbsp;</strong>CICS 298A-03 Practicum - Leadership: Communicating Across Expertise &nbsp;<strong>Schedule:&nbsp;</strong>Fri 02:30 PM - 03:45 PM &nbsp;<strong>Instructor:&nbsp;</strong> Anderson
+7 _19|<strong>Course:&nbsp;</strong>CICS 305-01, 02 Social Issues in Computing &nbsp;<strong>Schedule:&nbsp;</strong>TueThu 11:30 AM - 12:45 PM &nbsp;<strong>Instructor:&nbsp;</strong>Mei
+7 _20|<strong>Course:&nbsp;</strong>CICS 305-03, 04 Social Issues in Computing &nbsp;<strong>Schedule:&nbsp;</strong>TueThu 10:00 AM - 11:15 AM &nbsp;<strong>Instructor:&nbsp;</strong>Trim
+7 _21|<strong>Course:&nbsp;</strong>CICS 305-05, 06 Social Issues in Computing &nbsp;<strong>Schedule:&nbsp;</strong>MonWed 02:30 PM - 03:45 PM &nbsp;<strong>Instructor:&nbsp;</strong>Obara
+7 _22|<strong>Course:&nbsp;</strong>CICS 305-07, 08 Social Issues in Computing &nbsp;<strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp;<strong>Instructor:&nbsp;</strong>Obara
+7 _23|<strong>Course:&nbsp;</strong>CICS 305-09, 10 Social Issues in Computing &nbsp;<strong>Schedule:&nbsp;</strong>TueThu 04:00 PM - 05:15 PM &nbsp;<strong>Instructor:&nbsp;</strong>Butler
+7 _24|<strong>Course:&nbsp;</strong>CICS 305-11, 12 Social Issues in Computing &nbsp;<strong>Schedule:&nbsp;</strong>TueThu 01:00 PM - 02:15 PM &nbsp;<strong>Instructor:&nbsp;</strong>Mei
+7 _25|<strong>Course:&nbsp;</strong>CICS 305-13, 14 Social Issues in Computing &nbsp;<strong>Schedule:&nbsp;</strong>TueThu 02:30 PM - 03:45 PM &nbsp;<strong>Instructor:&nbsp;</strong>Butler
+7 _26|<strong>Course:&nbsp;</strong>CICS 305-15, 16 Social Issues in Computing &nbsp;<strong>Schedule:&nbsp;</strong>MonWedFri 10:10 AM - 11:00 AM &nbsp;<strong>Instructor:&nbsp;</strong>Sutcliffe
+7 _27|<strong>Course:&nbsp;</strong>CICS 305-17, 18 Social Issues in Computing &nbsp;<strong>Schedule:&nbsp;</strong>MonWedFri 11:15 AM - 12:05 PM &nbsp;<strong>Instructor:&nbsp;</strong>Gunther
+7 _28|<strong>Course:&nbsp;</strong>CICS 305-19, 20 Social Issues in Computing &nbsp;<strong>Schedule:&nbsp;</strong>MonWedFri 12:20 PM - 01:10 PM &nbsp;<strong>Instructor:&nbsp;</strong>Gunther
+7 _29|<strong>Course:&nbsp;</strong>CICS 305-21, 22 Social Issues in Computing &nbsp;<strong>Schedule:&nbsp;</strong>TueThu 11:30 AM - 12:45 PM &nbsp;<strong>Instructor:&nbsp;</strong>STAFF
+7 _30|<strong>Course:&nbsp;</strong>CICS 305-23, 24 Social Issues in Computing &nbsp;<strong>Schedule:&nbsp;</strong>MonWedFri 09:05 AM - 09:55 AM &nbsp;<strong>Instructor:&nbsp;</strong>Sutcliffe
+7_1|<strong>Course:&nbsp;</strong>COMPSCI 119-01 Introduction to Programming &nbsp; <strong>Schedule:&nbsp;</strong>MonWedFri 01:25 PM - 02:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Poh
+7_2|<strong>Course:&nbsp;</strong>COMPSCI 198C Practicum - Introduction to the C Programming Language &nbsp; <strong>Schedule:&nbsp;</strong>BY ARRANGEMENT &nbsp; <strong>Instructor:&nbsp;</strong>Chiu, Richards
+7_3|<strong>Course:&nbsp;</strong>COMPSCI 220-01 Programming Methodology &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Minea
+7_4|<strong>Course:&nbsp;</strong>COMPSCI 230-01 Computer Systems Principles &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 04:00 PM - 05:15 PM <strong> &nbsp;Instructor:&nbsp;</strong>Chiu
+7_5|<strong>Course:&nbsp;</strong>COMPSCI 230-02 Computer Systems Principles &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 02:30 PM - 03:45 PM <strong> &nbsp;Instructor:&nbsp;</strong>Bovornkeeratiroj
+7_6|<strong>Course:&nbsp;</strong>COMPSCI 240-01 Reasoning Under Uncertainty &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 02:30 PM - 03:45 PM &nbsp; <strong>Instructor:&nbsp;</strong>Lan
+7_7|<strong>Course:&nbsp;</strong>COMPSCI 240-02 Reasoning Under Uncertainty &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Parvini
+7_8|<strong>Course:&nbsp;</strong>COMPSCI 250-01 Introduction to Computation <strong>Schedule:&nbsp;</strong>MonWedFri 01:25 PM - 02:15 PM &nbsp; <strong>Instructors:&nbsp;</strong>Barrington
+7_9|<strong>Course:&nbsp;</strong>COMPSCI 250-02 Introduction to Computation &nbsp; <strong>Schedule: </strong>MonWedFri 10:10 AM - 11:00 AM &nbsp; <strong>Instructors:&nbsp;</strong>Golin
+7_10|<strong>Course:&nbsp;</strong>COMPSCI 311-01 Introduction to Algorithms &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 11:30 AM - 12:45 PM &nbsp; <strong>Instructor:&nbsp;</strong>Siegelmann
+7_11|<strong>Course:&nbsp;</strong>COMPSCI 311-02 Introduction to Algorithms &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 02:30 PM - 03:45 PM &nbsp; <strong>Instructor:&nbsp;</strong>Parvini
+7_12|<strong>Course:&nbsp;</strong>COMPSCI 320-01 Introduction to Software Engineering &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 01:00 PM - 02:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Brun
+7_13|<strong>Course:&nbsp;</strong>COMPSCI 320-02 Introduction to Software Engineering &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 11:30 AM - 12:45 PM &nbsp; <strong>Instructor:&nbsp;</strong>Davila
+7_14|<strong>Course:&nbsp;</strong>COMPSCI 320-03 Introduction to Software Engineering &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Anderson
+7_15|<strong>Course:&nbsp;</strong>COMPSCI 320-04 Introduction to Software Engineering &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Conboy
+7_16|<strong>Course:&nbsp;</strong>COMPSCI 325-01 Introduction to Human Computer Interaction &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 11:30 AM - 12:45 PM &nbsp; <strong>Instructor:&nbsp;</strong>Karkar
+7_17|<strong>Course:&nbsp;</strong>COMPSCI 326-01 Web Programming &nbsp; <strong>Schedule:&nbsp;</strong>Tue 01:00 PM - 02:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Richards
+7_18|<strong>Course:&nbsp;</strong>COMPSCI 326-02 Web Programming &nbsp; <strong>Schedule:&nbsp;</strong>Thu 01:00 PM - 02:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Richards
+7_19|<strong>Course:&nbsp;</strong>COMPSCI 328 Mobile Health Sensing and Analytics &nbsp; <strong>Schedule:&nbsp;</strong>MonWedFri 01:25 PM - 02:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Ganesan
+7_20|<strong>Course:&nbsp;</strong>COMPSCI 335 Inside the Box: How Computers Work &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Weems
+7_21|<strong>Course:&nbsp;</strong>COMPSCI 345-01 Practice and Applications of Data Management &nbsp; <strong>Schedule:&nbsp;</strong>Mon 10:10 AM - 12:05 PM &nbsp; <strong>Instructor:&nbsp;</strong>Meliou
+7_22|<strong>Course:&nbsp;</strong>COMPSCI 345-02 Practice and Applications of Data Management &nbsp; <strong>Schedule:&nbsp;</strong>Wed 10:10 AM - 12:05 PM &nbsp; <strong>Instructor:&nbsp;</strong>Meliou
+7_23|<strong>Course:&nbsp;</strong>COMPSCI 360-01 Introduction to Computer and Network Security &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 10:00 AM - 11:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Ma
+7_24|<strong>Course:&nbsp;</strong>COMPSCI 363 Computer Crime Law &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 01:00 PM - 02:30 PM &nbsp; <strong>Instructor:&nbsp;</strong>Cable
+7_25|<strong>Course:&nbsp;</strong>COMPSCI 377-01 Operating Systems &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 10:00 AM - 11:15 AM <strong> &nbsp;Instructor:&nbsp;</strong> Bovornkeeratiroj
+7_26|<strong>Course:&nbsp;</strong>COMPSCI 383-01 Artificial Intelligence &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 11:30 AM - 12:45 PM &nbsp; <strong>Instructor:&nbsp;</strong>McNichols
+7_27|<strong>Course:&nbsp;</strong>COMPSCI 410-01 Compiler Techniques &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Guan
+7_28|<strong>Course:&nbsp;</strong>COMPSCI 420-01 Software Entrepreneurship &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Rattigan
+7_29|<strong>Course:&nbsp;</strong>COMPSCI 429-01 Software Engineering Project Management &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 01:00 PM - 02:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Brun
+7_30|<strong>Course:&nbsp;</strong>COMPSCI 429-02 Software Engineering Project Management &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 11:30 AM - 12:45 PM &nbsp; <strong>Instructor:&nbsp;</strong>Davila
+7_31|<strong>Course:&nbsp;</strong>COMPSCI 429-03 Software Engineering Project Management &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Anderson
+7_32|<strong>Course:&nbsp;</strong>COMPSCI 429-04 Software Engineering Project Management &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Conboy
+7_33|<strong>Course:&nbsp;</strong>COMPSCI 445-01 Information Systems &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Serafini
+7_34|<strong>Course:&nbsp;</strong>COMPSCI 446-01 Search Engines &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Allan
+7_35|<strong>Course:&nbsp;</strong>COMPSCI 453-01 Computer Networks &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 02:30 PM - 03:45 PM &nbsp; <strong>Instructor:&nbsp;</strong>Kermani
+7_36|<strong>Course:&nbsp;</strong>COMPSCI 461-01 Secure Distributed Systems &nbsp; <strong>Schedule:&nbsp;</strong>BY ARRANGEMENT &nbsp; <strong>Instructor:&nbsp;</strong>Stone
+7_37|<strong>Course:&nbsp;</strong>COMPSCI 485-01 Q Applications of Natural Language Processing &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 11:30 AM - 12:45 PM &nbsp; <strong>Instructor:&nbsp;</strong>O'Connor
+7_38|<strong>Course:&nbsp;</strong>COMPSCI 490Q-01 Quantum Information Science &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 10:10 AM - 11:25 AM &nbsp; <strong>Instructor:&nbsp;</strong>Rozpedek
+7_39|<strong>Course:&nbsp;</strong>COMPSCI 514-01, 02 Algorithms for Data Science &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 01:00 PM - 02:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Musco
+7_40|<strong>Course:&nbsp;</strong>COMPSCI 514-03, 04 Algorithms for Data Science &nbsp; <strong>Schedule:&nbsp;</strong>BY ARRANGEMENT (Online) &nbsp; <strong>Instructor:&nbsp;</strong>McGregor
+7_41|<strong>Course:&nbsp;</strong>COMPSCI 515 Algorithms, Game Theory and Fairness &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 01:00 PM - 02:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Zick
+7_42|<strong>Course:&nbsp;</strong>COMPSCI 520-01, 02 Theory and Practice of Software Engineering &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 10:00 AM - 11:15 AM &nbsp; <strong>Instructor:&nbsp;</strong>Zhai
+7_43|<strong>Course:&nbsp;</strong>COMPSCI 528-01, 02 Mobile and Ubiquitous Computing &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Nguyen
+7_44|<strong>Course:&nbsp;</strong>COMPSCI 532-01, 02 Systems for Data Science &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Klemperer
+7_45|<strong>Course:&nbsp;</strong>COMPSCI 560-01 Introduction to Computer and Network Security &nbsp; <strong>Schedule:&nbsp;</strong>Tue 05:30 PM - 06:45 PM &nbsp; <strong>Instructor:&nbsp;</strong>Kermani
+7_46|<strong>Course:&nbsp;</strong>COMPSCI 563-01 Internet Law and Policy &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 10:00 AM - 11:15 AM &nbsp; <strong>Instructor:&nbsp;</strong>Cable
+7_47|<strong>Course:&nbsp;</strong>COMPSCI 575-01 Combinatorics and Graph Theory &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 01:00 PM - 02:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Wilson
+7_48|<strong>Course:&nbsp;</strong>COMPSCI 589-01, 02 Machine Learning &nbsp; <strong>Schedule:&nbsp;</strong>BY ARRANGEMENT (Online) &nbsp; <strong>Instructor:&nbsp;</strong>Domke
+7_49|<strong>Course:&nbsp;</strong>COMPSCI 590X-01, 02 Decarbonization and Data Science &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 02:30 PM - 03:45 PM &nbsp; <strong>Instructor:&nbsp;</strong>Taneja
+7_50|<strong>Course:&nbsp;</strong>COMPSCI 602-01 Research Methods in Empirical Computer Science &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Jensen
+7_51|<strong>Course:&nbsp;</strong>COMPSCI 610-01 Compiler Techniques &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Guan
+7_52|<strong>Course:&nbsp;</strong>COMPSCI 611-01 Advanced Algorithms &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 02:30 PM - 03:45 PM &nbsp; <strong>Instructor:&nbsp;</strong>Le
+7_53|<strong>Course:&nbsp;</strong>COMPSCI 646-01 Information Retrieval &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 02:30 PM - 03:45 PM &nbsp; <strong>Instructor:&nbsp;</strong>Rahimi
+7_54|<strong>Course:&nbsp;</strong>COMPSCI 648-01 Quantum Information Systems  &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 12:20 PM - 01:35 PM &nbsp; <strong>Instructor:&nbsp;</strong>Krastanov
+7_55|<strong>Course:&nbsp;</strong>COMPSCI 653-01 Computer Networking &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 04:00 PM - 05:15 PM &nbsp; <strong>Instructors:&nbsp;</strong>Venkataramani
+7_56|<strong>Course:&nbsp;</strong>COMPSCI 655-01 Performance Evaluation &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 10:10 AM - 11:25 PM &nbsp; <strong>Instructor:&nbsp;</strong>Towsley
+7_57|<strong>Course:&nbsp;</strong>COMPSCI 660-01 Advanced Information Assurance &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 11:30 AM - 12:45 PM &nbsp; <strong>Instructor:&nbsp;</strong>Houmansadr
+7_58|<strong>Course:&nbsp;</strong>COMPSCI 661-01 Secure Distributed Systems  &nbsp; <strong>Schedule:&nbsp;</strong>Tue 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Stone
+7_59|<strong>Course:&nbsp;</strong>COMPSCI 666-01 Theory and Practice of Cryptography &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 02:30 PM - 03:45 PM <strong> &nbsp;Instructor:&nbsp;</strong>O'Neil
+7_60|<strong>Course:&nbsp;</strong>COMPSCI 670-01 Computer Vision &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Van Horn
+7_61|<strong>Course:&nbsp;</strong>COMPSCI 677-01 Distributed and Operating Systems &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 02:30 PM - 03:45 PM &nbsp; <strong>Instructor:&nbsp;</strong>Klemperer
+7_62|<strong>Course:&nbsp;</strong>COMPSCI 682-01 Neural Networks: A Modern Introduction &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 01:00 PM - 02:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Gan, Maji
+7_63|<strong>Course:&nbsp;</strong>COMPSCI 687-01, 02 Reinforcement Learning &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Castro da Silva
+7_64|<strong>Course:&nbsp;</strong>COMPSCI 688-01 Probabilistic Graphical Models &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Sheldon
+7_65|<strong>Course:&nbsp;</strong>COMPSCI 689-01 Machine Learning &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 10:00 AM - 11:15 AM &nbsp; <strong>Instructor:&nbsp;</strong>Marlin
+7_66|<strong>Course:&nbsp;</strong>COMPSCI 690K-01 Advanced Robot Dynamics and Control &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 02:30 PM - 03:45 PM &nbsp; <strong>Instructor:&nbsp;</strong>Kim
+7_67|<strong>Course:&nbsp;</strong>COMPSCI 692P-01 Seminar- Hot Topics in Software Engineering Research  &nbsp; <strong>Schedule:&nbsp;</strong>Thu 02:30 PM - 03:30 PM <strong> &nbsp;Instructor:&nbsp;</strong>Brun, Zhai
+7_68|<strong>Course:&nbsp;</strong>COMPSCI 692X-01 Seminar - Machine Learning on Biological Sequence Data &nbsp; <strong>Schedule:&nbsp;</strong>Mon 02:30 PM - 03:30 PM &nbsp; <strong>Instructor:&nbsp;</strong>Green
+7_69|<strong>Course:&nbsp;</strong>COMPSCI 698W-01 Practicum - CS Research Writing Practicum  &nbsp; <strong>Schedule:&nbsp;</strong>MonWed 10:10 AM - 11:25 AM <strong> &nbsp;Instructors:&nbsp;</strong>Obara
+7_70|<strong>Course:&nbsp;</strong>COMPSCI 879-01 Teaching Assistants as Tomorrow&#39;s Faculty &nbsp; <strong>Schedule:&nbsp;</strong>Wed 05:30 PM - 06:20 PM &nbsp; <strong>Instructor:&nbsp;</strong>Thota
+7_71|<strong>Course:&nbsp;</strong>COMPSCI 891M-01 Seminar - Theory of Computation &nbsp; <strong>Schedule:&nbsp;</strong>Thu 04:00 PM - 05:00 PM &nbsp; <strong>Instructor:&nbsp;</strong>Le
+7 _1.1|<strong>Course:&nbsp;</strong>INFO 101-01 Introduction to Informatics &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 01:00 PM - 02:15 PM <strong> &nbsp;Instructor:&nbsp;</strong>Trim
+7 _2.1|<strong>Course:&nbsp;</strong>INFO 150-01 A Mathematical Foundation for Informatics &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 04:00 PM - 05:15 PM &nbsp; <strong>Instructor:&nbsp;</strong>Barrington
+7 _3.1|<strong>Course:&nbsp;</strong>INFO 203-01 A Networked World &nbsp; <strong>Schedule:&nbsp;</strong>TueThu 10:00 AM - 11:15 AM &nbsp; <strong>Instructor:&nbsp;</strong>Hajiesmaili
+7 _4.1|<strong>Course:&nbsp;</strong>INFO 248-01<strong>&nbsp;</strong>Introduction to Data Science <strong>Schedule:&nbsp;</strong>MonWed 02:30 PM - 03:45 PM &nbsp; <strong>Instructor:&nbsp;</strong>Anderson
+7 _5.1|<strong>Course:&nbsp;</strong>INFO 324-01 Introduction to Clinical Health Informatics  &nbsp; <strong>Schedule: </strong>TueThu 02:30 PM - 03:45 PM <strong> &nbsp;Instructor:&nbsp;</strong>Lee
+7 _6.1|<strong>Course:&nbsp;</strong>INFO 348-01 Data Analytics with Python  &nbsp; <strong>Schedule: </strong>MonWed 02:30 PM - 03:45 PM <strong> &nbsp;Instructor:&nbsp;</strong>Rattigan
+7 _7.1|<strong>Course:&nbsp;</strong>INFO 390C Introduction to Computational Biology and Bioinformatics  &nbsp; <strong>Schedule: </strong>TueThu 11:30 AM - 12:45 PM <strong> &nbsp;Instructor:&nbsp;</strong>Green
+8|Please include any additional comments which may be relevant to your individual preferences of course selection; i.e., courses which you would prefer to only take together, courses you would like to take only if not paired with another given course, or any other information which may be helpful in representing your specific enrollment preferences.
