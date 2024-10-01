@@ -82,7 +82,8 @@ for i in range(NUM_STUDENTS):
     students.append(legacy_student)
 
 surveys = [
-    SingleTopicSurvey.from_student(schedule, student.student) for student in students
+    SingleTopicSurvey.from_student(schedule, student.student, 0, 1)
+    for student in students
 ]
 corpus = Corpus(surveys)
 mbeta = corpus.kde_distribution(SAMPLE_PER_STUDENT, NUM_SUB_KERNELS)

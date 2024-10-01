@@ -9,7 +9,7 @@ from fair.stats.survey import Corpus, SingleTopicSurvey
 def test_single_topic_survey(
     simple_schedule: list[ScheduleItem], student: RenaissanceMan, course: Course
 ):
-    survey = SingleTopicSurvey.from_student(simple_schedule, student)
+    survey = SingleTopicSurvey.from_student(simple_schedule, student, 0, 1)
     preference_mask = [
         item.value(course) in student.preferred_courses for item in simple_schedule
     ]
@@ -26,9 +26,9 @@ def test_corpus_validation(
     student2: RenaissanceMan,
     student3: RenaissanceMan,
 ):
-    survey1 = SingleTopicSurvey.from_student(simple_schedule, student)
-    survey2 = SingleTopicSurvey.from_student(simple_schedule, student2)
-    survey3 = SingleTopicSurvey.from_student(simple_schedule2, student3)
+    survey1 = SingleTopicSurvey.from_student(simple_schedule, student, 0, 1)
+    survey2 = SingleTopicSurvey.from_student(simple_schedule, student2, 0, 1)
+    survey3 = SingleTopicSurvey.from_student(simple_schedule2, student3, 0, 1)
     corpus1 = Corpus([survey1, survey2])
     corpus2 = Corpus([survey1, survey3])
 

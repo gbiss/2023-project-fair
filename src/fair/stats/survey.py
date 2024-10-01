@@ -16,7 +16,10 @@ class SingleTopicSurvey(BaseSurvey):
 
     @staticmethod
     def from_student(
-        schedule: list[ScheduleItem], student: RenaissanceMan
+        schedule: list[ScheduleItem],
+        student: RenaissanceMan,
+        response_lower_extent: int,
+        response_upper_extent: int,
     ) -> "SingleTopicSurvey":
         """Create a survey from an existing RenaissanceMan student
 
@@ -25,16 +28,29 @@ class SingleTopicSurvey(BaseSurvey):
         Args:
             schedule (list[ScheduleItem]): Schedule from which student was created
             student (RenaissanceMan): Student from which survey will be created
+            response_lower_extent (int): Minimum possible response value
+            response_upper_extent (int): Maximum possible response value
 
         Returns:
             SingleTopicSurvey: A new survey object
         """
         responses = [student.valuation.independent([item]) for item in schedule]
 
-        return SingleTopicSurvey(schedule, responses, student.total_courses)
+        return SingleTopicSurvey(
+            schedule,
+            responses,
+            student.total_courses,
+            response_lower_extent,
+            response_upper_extent,
+        )
 
     def __init__(
-        self, schedule: list[ScheduleItem], responses: list[int], limit: int
+        self,
+        schedule: list[ScheduleItem],
+        responses: list[int],
+        limit: int,
+        response_lower_extent: int,
+        response_upper_extent: int,
     ) -> None:
         """A survey that groups all responses into a single topic
 
@@ -42,17 +58,21 @@ class SingleTopicSurvey(BaseSurvey):
             schedule (list[ScheduleItem]): Schedule from which to draw course information
             responses (list[int]): Student survey responses
             limit (int): Total courses desired
+            response_lower_extent (int): Minimum possible response value
+            response_upper_extent (int): Maximum possible response value
         """
         self.schedule = schedule
         self.response_map = {schedule[i]: responses[i] for i in range(len(schedule))}
         self.limit = limit
+        self.response_lower_extent = response_lower_extent
+        self.response_upper_extent = response_upper_extent
         self.m = len(self.schedule)
 
     def data(self) -> np.ndarray:
         """Create data vector from responses
 
         Raises:
-            ValueError: It must be possible for the normalized sum to equal limit
+            ValueError: Upper extent must be greater than lower extent for normalization
 
         Returns:
             np.ndarray: Vector of normalized responses
@@ -60,14 +80,15 @@ class SingleTopicSurvey(BaseSurvey):
         data = np.array([self.response_map[item] for item in self.schedule])
         sm = data.sum()
 
-        if self.limit > 0 and sm == 0:
+        if self.response_upper_extent <= self.response_lower_extent:
             raise ValueError(
-                "There must exist some positive response when limit exceeds zero"
+                "Upper extent must be greater than lower extent for normalization"
             )
 
-        # normalize data so that sample sum equals limit
-        if sm > 0:
-            data = self.limit * data / sm
+        # normalize data
+        data = (data - self.response_lower_extent) / (
+            self.response_upper_extent - self.response_lower_extent
+        )
 
         return data.reshape((1, self.m))
 
