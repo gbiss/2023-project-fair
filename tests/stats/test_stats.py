@@ -16,6 +16,7 @@ from fair.stats import (
     integer,
     mBetaApprox,
     mBetaExact,
+    mBetaMixture,
     transformation,
 )
 
@@ -112,6 +113,59 @@ def test_mbeta(bernoullis: np.ndarray):
     assert isinstance(mbeta(), statsmodels.distributions.copula.api.CopulaDistribution)
     assert len(mbeta.sample()) == m
     assert mbeta.sample(2).shape == (2, m)
+
+
+def test_random_seed_exact(bernoullis: np.ndarray):
+    m = 3
+    n = 10
+    eps = 0.01
+    gamma = np.ones((2**m,)) / eps
+    gamma[1] = 10
+    gamma[5] = 1
+    mbeta1 = mBetaExact(gamma, seed=0)
+    mbeta2 = mBetaExact(gamma, seed=0)
+    mbeta3 = mBetaExact(gamma, seed=1)
+
+    assert np.array_equal(mbeta1.sample(n), mbeta2.sample(n))
+    assert not np.array_equal(mbeta2.sample(n), mbeta3.sample(n))
+
+
+def test_random_seed_approx(bernoullis: np.ndarray):
+    n = 10
+    _, m = bernoullis.shape
+    R = Correlation(m)
+    nu = Shape(1)
+    mu = Mean(m)
+    mbeta4 = mBetaApprox(R, mu, nu, seed=0)
+    mbeta4.update(bernoullis)
+    R = Correlation(m)
+    nu = Shape(1)
+    mu = Mean(m)
+    mbeta5 = mBetaApprox(R, mu, nu, seed=0)
+    mbeta5.update(bernoullis)
+
+    assert np.array_equal(mbeta4.sample(n), mbeta5.sample(n))
+
+
+def test_random_seed_mBetaMixture():
+    m = 3
+    n = 10
+    eps = 0.01
+    gamma = np.ones((2**m,)) / eps
+    gamma[1] = 10
+    gamma[5] = 1
+    mbeta1 = mBetaExact(gamma, seed=0)
+    mbeta2 = mBetaExact(gamma, seed=0)
+    mbeta3 = mBetaExact(gamma, seed=0)
+    mbeta4 = mBetaExact(gamma, seed=0)
+    mbeta5 = mBetaExact(gamma, seed=0)
+    mbeta6 = mBetaExact(gamma, seed=0)
+    mBetaMixture1 = mBetaMixture([mbeta1, mbeta2], seed=0)
+    mBetaMixture2 = mBetaMixture([mbeta3, mbeta4], seed=0)
+    mBetaMixture3 = mBetaMixture([mbeta5, mbeta6], seed=1)
+
+    assert np.array_equal(mBetaMixture1.sample(n), mBetaMixture2.sample(n))
+    assert not np.array_equal(mBetaMixture1.sample(n), mBetaMixture3.sample(n))
 
 
 def test_aggregates_not_enough_for_U():

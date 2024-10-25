@@ -96,11 +96,13 @@ class SingleTopicSurvey(BaseSurvey):
 class Corpus:
     """A collection of surveys"""
 
-    def __init__(self, surveys: list[BaseSurvey]):
+    def __init__(self, surveys: list[BaseSurvey], seed: int | None = None):
         """
         Args:
             surveys (list[BaseSurvey]): Survey list
+            seed (int | None, optional): Random seed. Defaults to None.
         """
+        self.seed = seed
         self.surveys = surveys
 
     def _valid(self):
@@ -138,9 +140,9 @@ class Corpus:
         R = Correlation(m)
         nu = Shape(0.001)
         mu = Mean(m)
-        mbeta = mBetaApprox(R, mu, nu)
+        mbeta = mBetaApprox(R, mu, nu, self.seed)
         for survey in self.surveys:
-            sample = bernoulli_samples(survey.data())
+            sample = bernoulli_samples(survey.data(), seed=self.seed)
             mbeta.update(sample)
 
         return mbeta
@@ -174,10 +176,10 @@ class Corpus:
                 R = Correlation(m)
                 nu = Shape(0.001)
                 mu = Mean(m)
-                mbeta = mBetaApprox(R, mu, nu)
-                sample = bernoulli_samples(survey.data(), n)
+                mbeta = mBetaApprox(R, mu, nu, self.seed)
+                sample = bernoulli_samples(survey.data(), n, self.seed)
                 mbeta.update(sample)
                 mbetas.append(mbeta)
-            mbeta_kdes.append(mBetaMixture(mbetas))
+            mbeta_kdes.append(mBetaMixture(mbetas, self.seed))
 
-        return mBetaMixture(mbeta_kdes)
+        return mBetaMixture(mbeta_kdes, self.seed)
