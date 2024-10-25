@@ -516,7 +516,7 @@ def update_exchange_graph_E(
 """Allocation algorithms"""
 
 
-def SPIRE_algorithm(agents: list[BaseAgent], items: list[ScheduleItem]):
+def serial_dictatorship(agents: list[BaseAgent], items: list[ScheduleItem]):
     """SPIRE allocation algorithm.
 
     In each round, give the playing agent all items they can add to their bundle that give them positive utility

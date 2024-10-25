@@ -4,7 +4,7 @@ from collections import defaultdict
 import pandas as pd
 
 from fair.agent import LegacyStudent
-from fair.allocation import general_yankee_swap
+from fair.allocation import general_yankee_swap, serial_dictatorship, round_robin
 from fair.constraint import CourseTimeConstraint, MutualExclusivityConstraint
 from fair.feature import Course, Section, Slot, Weekday, slots_for_time_range
 from fair.item import ScheduleItem
@@ -105,10 +105,32 @@ print(
     sum([student.student.valuation._unique_value_ct for student in students]),
 )
 
+X_SD= serial_dictatorship(students, schedule)
+print("SD utilitarian welfare: ", utilitarian_welfare(X_SD, students, schedule))
+print("SD nash welfare: ", nash_welfare(X_SD, students, schedule))
+print("SD leximin vector: ", leximin(X_SD, students, schedule))
+print("SD EF_count: ", EF_count(X_SD, students, schedule))
+print("SD EF_agents: ", EF_agents(X_SD, students, schedule))
+print("SD EF_1_count: ", EF_1_count(X_SD, students, schedule))
+print("SD EF_1_agents: ", EF_1_agents(X_SD, students, schedule))
+print("SD EF_X_count: ", EF_X_count(X_SD, students, schedule))
+print("SD EF_X_agents: ", EF_X_agents(X_SD, students, schedule))
+
+X_RR= round_robin(students, schedule)
+print("RR utilitarian welfare: ", utilitarian_welfare(X_RR, students, schedule))
+print("RR nash welfare: ", nash_welfare(X_RR, students, schedule))
+print("RR leximin vector: ", leximin(X_RR, students, schedule))
+print("RR EF_count: ", EF_count(X_RR, students, schedule))
+print("RR EF_agents: ", EF_agents(X_RR, students, schedule))
+print("RR EF_1_count: ", EF_1_count(X_RR, students, schedule))
+print("RR EF_1_agents: ", EF_1_agents(X_RR, students, schedule))
+print("RR EF_X_count: ", EF_X_count(X_RR, students, schedule))
+print("RR EF_X_agents: ", EF_X_agents(X_RR, students, schedule))
+
+
 if FIND_OPTIMAL:
     orig_students = [student.student for student in students]
     program = StudentAllocationProgram(orig_students, schedule).compile()
-    ind = program.convert_allocation(X[0])
     opt_alloc = program.formulateUSW().solve()
     opt_USW = sum(opt_alloc) / len(orig_students)
     print("optimal utilitarian welfare", opt_USW)
