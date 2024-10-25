@@ -105,7 +105,7 @@ print(
     sum([student.student.valuation._unique_value_ct for student in students]),
 )
 
-X_SD= serial_dictatorship(students, schedule)
+X_SD = serial_dictatorship(students, schedule)
 print("SD utilitarian welfare: ", utilitarian_welfare(X_SD, students, schedule))
 print("SD nash welfare: ", nash_welfare(X_SD, students, schedule))
 print("SD leximin vector: ", leximin(X_SD, students, schedule))
@@ -116,7 +116,7 @@ print("SD EF_1_agents: ", EF_1_agents(X_SD, students, schedule))
 print("SD EF_X_count: ", EF_X_count(X_SD, students, schedule))
 print("SD EF_X_agents: ", EF_X_agents(X_SD, students, schedule))
 
-X_RR= round_robin(students, schedule)
+X_RR = round_robin(students, schedule)
 print("RR utilitarian welfare: ", utilitarian_welfare(X_RR, students, schedule))
 print("RR nash welfare: ", nash_welfare(X_RR, students, schedule))
 print("RR leximin vector: ", leximin(X_RR, students, schedule))
