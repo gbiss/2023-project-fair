@@ -5,21 +5,26 @@ from scipy import stats
 from statsmodels.distributions.copula.api import CopulaDistribution, GaussianCopula
 
 
-def bernoulli_samples(theta: np.ndarray, n: int = 1):
+def bernoulli_samples(theta: np.ndarray, n: int = 1, seed: int | None = None):
     """Generate Bernoulli samples from parameter vector theta
 
     Args:
         theta (np.ndarray): Bernoulli parameters
         n (int, optional): Number of samples. Defaults to 1.
+        seed (int | None, optional): Random seed. Defaults to None.
 
     Returns:
         np.ndarray: nXm matrix of samples, one per row
     """
+    rng = np.random.default_rng(seed)
     theta = theta.flatten()
     m = len(theta)
 
     return np.hstack(
-        [stats.bernoulli(theta[i]).rvs(n).reshape((n, 1)) for i in range(m)]
+        [
+            stats.bernoulli(theta[i]).rvs(n, random_state=rng).reshape((n, 1))
+            for i in range(m)
+        ]
     )
 
 
@@ -420,12 +425,14 @@ class mBeta:
 class mBetaExact(mBeta):
     """Exact mBeta distribution"""
 
-    def __init__(self, gamma: np.ndarray) -> None:
+    def __init__(self, gamma: np.ndarray, seed: int | None = None) -> None:
         """Exact mBeta from gamma parameters
 
         Args:
             gamma (np.ndarray): Gamma must contain non-zeros
+            seed (int | None, optional): Random seed. Defaults to None.
         """
+        self.rng = np.random.default_rng(seed)
         self.gamma = gamma
         self.m = int(np.log2(len(self.gamma)))
         self.H = transformation(self.m)
@@ -440,7 +447,7 @@ class mBetaExact(mBeta):
         Returns:
             np.ndarray: nXlen(gamma) matrix of samples
         """
-        return (self.H @ self._dist.rvs(n).T).T
+        return (self.H @ self._dist.rvs(n, random_state=self.rng).T).T
 
 
 class mBetaApprox(mBeta):
@@ -449,14 +456,18 @@ class mBetaApprox(mBeta):
     Approximation based on Gaussian copula
     """
 
-    def __init__(self, R: Correlation, mu: Mean, nu: Shape) -> None:
+    def __init__(
+        self, R: Correlation, mu: Mean, nu: Shape, seed: int | None = None
+    ) -> None:
         """Prior approximate mBeta distribution
 
         Args:
             R (Correlation): Correlation object
             mu (Mean): Mean object
             nu (Shape): Shape object
+            seed (int | None, optional): Random seed. Defaults to None.
         """
+        self.seed = seed
         self.R = R
         self.mu = mu
         self.nu = nu
@@ -506,9 +517,9 @@ class mBetaApprox(mBeta):
         """
         if n == 1:
             # there is a bug where 1 sample throws a dimension mismatch error
-            return self._dist.rvs(2)[0, :]
+            return self._dist.rvs(2, random_state=self.seed)[0, :]
         else:
-            return self._dist.rvs(n)
+            return self._dist.rvs(n, random_state=self.seed)
 
     def __call__(self) -> CopulaDistribution:
         """Value of approximate mBeta
@@ -522,12 +533,14 @@ class mBetaApprox(mBeta):
 class mBetaMixture(mBeta):
     """A mixture of mBeta distributions"""
 
-    def __init__(self, mBetas: list[mBeta]) -> None:
+    def __init__(self, mBetas: list[mBeta], seed: int | None = None) -> None:
         """A collection of mBetas
 
         Args:
             mBetas (list[mBeta]): Component mBeta objects
+            seed (int | None, optional): Random seed. Defaults to None.
         """
+        self.rng = np.random.default_rng(seed)
         self.mBetas = mBetas
 
     def sample(self, n: int = 1) -> np.ndarray:
@@ -541,7 +554,7 @@ class mBetaMixture(mBeta):
         """
         samples = []
         for i in range(n):
-            mBeta = random.choice(self.mBetas)
+            mBeta = self.rng.choice(self.mBetas)
             samples.append(mBeta.sample())
 
         return np.vstack(samples)
