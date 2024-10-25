@@ -1,6 +1,6 @@
 from fair.agent import LegacyStudent
 from fair.allocation import (
-    SPIRE_algorithm,
+    serial_dictatorship,
     general_yankee_swap,
     general_yankee_swap_E,
     round_robin,
@@ -82,7 +82,7 @@ def test_round_robin_swap(
     assert set(courses2) <= set(renaissance2.preferred_courses)
 
 
-def test_spire_swap(
+def test_serial_dictatorship_swap(
     renaissance1: RenaissanceMan,
     renaissance2: RenaissanceMan,
     schedule: list[ScheduleItem],
@@ -91,7 +91,7 @@ def test_spire_swap(
     leg_student1 = LegacyStudent(renaissance1, renaissance1.preferred_courses, course)
     leg_student2 = LegacyStudent(renaissance2, renaissance2.preferred_courses, course)
 
-    X = SPIRE_algorithm([leg_student1, leg_student2], schedule)
+    X = serial_dictatorship([leg_student1, leg_student2], schedule)
     alloc1 = X[:, 0]
     alloc2 = X[:, 1]
 
