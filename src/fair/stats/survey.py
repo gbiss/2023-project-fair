@@ -96,13 +96,15 @@ class SingleTopicSurvey(BaseSurvey):
 class Corpus:
     """A collection of surveys"""
 
-    def __init__(self, surveys: list[BaseSurvey], rng: np.random.Generator):
+    def __init__(
+        self, surveys: list[BaseSurvey], rng: np.random.Generator | None = None
+    ):
         """
         Args:
             surveys (list[BaseSurvey]): Survey list
-            rng (np.random.Generator): Random number generator
+            rng (np.random.Generator | None): Random number generator. Defaults to None.
         """
-        self.rng = rng
+        self.rng = np.random.default_rng(None) if rng is None else rng
         self.surveys = surveys
 
     def _valid(self):

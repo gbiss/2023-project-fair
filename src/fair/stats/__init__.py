@@ -5,17 +5,20 @@ from scipy import stats
 from statsmodels.distributions.copula.api import CopulaDistribution, GaussianCopula
 
 
-def bernoulli_samples(theta: np.ndarray, rng: np.random.Generator, n: int = 1):
+def bernoulli_samples(
+    theta: np.ndarray, rng: np.random.Generator | None = None, n: int = 1
+):
     """Generate Bernoulli samples from parameter vector theta
 
     Args:
         theta (np.ndarray): Bernoulli parameters
-        rng (np.random.Generator): Random number generator
+        rng (np.random.Generator | None): Random number generator. Defaults to None.
         n (int, optional): Number of samples. Defaults to 1.
 
     Returns:
         np.ndarray: nXm matrix of samples, one per row
     """
+    rng = np.random.default_rng(None) if rng is None else rng
     theta = theta.flatten()
     m = len(theta)
 
@@ -424,14 +427,16 @@ class mBeta:
 class mBetaExact(mBeta):
     """Exact mBeta distribution"""
 
-    def __init__(self, gamma: np.ndarray, rng: np.random.Generator) -> None:
+    def __init__(
+        self, gamma: np.ndarray, rng: np.random.Generator | None = None
+    ) -> None:
         """Exact mBeta from gamma parameters
 
         Args:
             gamma (np.ndarray): Gamma must contain non-zeros
-            rng (np.random.Generator): Random number generator
+            rng (np.random.Generator | None): Random number generator. Defaults to None.
         """
-        self.rng = rng
+        self.rng = np.random.default_rng(None) if rng is None else rng
         self.gamma = gamma
         self.m = int(np.log2(len(self.gamma)))
         self.H = transformation(self.m)
@@ -460,7 +465,7 @@ class mBetaApprox(mBeta):
         R: Correlation,
         mu: Mean,
         nu: Shape,
-        rng: np.random.Generator,
+        rng: np.random.Generator | None = None,
     ) -> None:
         """Prior approximate mBeta distribution
 
@@ -468,9 +473,9 @@ class mBetaApprox(mBeta):
             R (Correlation): Correlation object
             mu (Mean): Mean object
             nu (Shape): Shape object
-            rng (np.random.Generator): Random number generator
+            rng (np.random.Generator | None): Random number generator. Defaults to None.
         """
-        self.rng = rng
+        self.rng = np.random.default_rng(None) if rng is None else rng
         self.R = R
         self.mu = mu
         self.nu = nu
