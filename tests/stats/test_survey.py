@@ -34,3 +34,28 @@ def test_corpus_validation(
 
     assert corpus1._valid()
     assert not corpus2._valid()
+
+
+def test_random_corpus(
+    simple_schedule: list[ScheduleItem],
+    student: RenaissanceMan,
+    student2: RenaissanceMan,
+):
+    survey1 = SingleTopicSurvey.from_student(simple_schedule, student, 0, 1)
+    survey2 = SingleTopicSurvey.from_student(simple_schedule, student2, 0, 1)
+    corpus00 = Corpus([survey1, survey2], np.random.default_rng(0))
+    corpus01 = Corpus([survey1, survey2], np.random.default_rng(0))
+    corpus02 = Corpus([survey1, survey2], np.random.default_rng(0))
+    corpus1 = Corpus([survey1, survey2], np.random.default_rng(1))
+
+    assert np.array_equal(
+        corpus00.kde_distribution().sample(2), corpus01.kde_distribution().sample(2)
+    )
+
+    assert not np.array_equal(
+        corpus00.kde_distribution().sample(2), corpus00.kde_distribution().sample(2)
+    )
+
+    assert not np.array_equal(
+        corpus02.kde_distribution().sample(2), corpus1.kde_distribution().sample(2)
+    )

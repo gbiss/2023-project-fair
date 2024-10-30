@@ -96,13 +96,15 @@ class SingleTopicSurvey(BaseSurvey):
 class Corpus:
     """A collection of surveys"""
 
-    def __init__(self, surveys: list[BaseSurvey], seed: int | None = None):
+    def __init__(
+        self, surveys: list[BaseSurvey], rng: np.random.Generator | None = None
+    ):
         """
         Args:
             surveys (list[BaseSurvey]): Survey list
-            seed (int | None, optional): Random seed. Defaults to None.
+            rng (np.random.Generator | None): Random number generator. Defaults to None.
         """
-        self.seed = seed
+        self.rng = np.random.default_rng(None) if rng is None else rng
         self.surveys = surveys
 
     def _valid(self):
@@ -140,9 +142,9 @@ class Corpus:
         R = Correlation(m)
         nu = Shape(0.001)
         mu = Mean(m)
-        mbeta = mBetaApprox(R, mu, nu, self.seed)
+        mbeta = mBetaApprox(R, mu, nu, self.rng)
         for survey in self.surveys:
-            sample = bernoulli_samples(survey.data(), seed=self.seed)
+            sample = bernoulli_samples(survey.data(), self.rng)
             mbeta.update(sample)
 
         return mbeta
@@ -176,10 +178,10 @@ class Corpus:
                 R = Correlation(m)
                 nu = Shape(0.001)
                 mu = Mean(m)
-                mbeta = mBetaApprox(R, mu, nu, self.seed)
-                sample = bernoulli_samples(survey.data(), n, self.seed)
+                mbeta = mBetaApprox(R, mu, nu, self.rng)
+                sample = bernoulli_samples(survey.data(), self.rng, n)
                 mbeta.update(sample)
                 mbetas.append(mbeta)
-            mbeta_kdes.append(mBetaMixture(mbetas, self.seed))
+            mbeta_kdes.append(mBetaMixture(mbetas, self.rng))
 
-        return mBetaMixture(mbeta_kdes, self.seed)
+        return mBetaMixture(mbeta_kdes, self.rng)
