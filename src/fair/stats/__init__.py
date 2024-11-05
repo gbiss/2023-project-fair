@@ -2,6 +2,7 @@ import random
 
 import numpy as np
 from scipy import stats
+from scipy.stats._result_classes import ECDFResult
 from statsmodels.distributions.copula.api import CopulaDistribution, GaussianCopula
 
 
@@ -566,3 +567,74 @@ class mBetaMixture(mBeta):
             samples.append(mBeta.sample())
 
         return np.vstack(samples)
+
+
+class GOF(mBeta):
+    """Goodness of fit test for mBeta distribution as described in section 2
+    https://arxiv.org/pdf/2003.06684
+    """
+
+    def __init__(
+        self, null: mBeta, alt: mBeta, rng: np.random.Generator = None
+    ) -> None:
+        """
+        Args:
+            null (mBeta): null mBeta distribution
+            alt (mBeta): alternative mBeta distribution
+            rng (np.random.Generator | None): Random number generator. Defaults to None.
+        """
+        self.rng = np.random.default_rng(None) if rng is None else rng
+        self.null = null
+        self.alt = alt
+
+    def _null_ecdf(self, n_samples: int = 100, t_samples: int = 100) -> ECDFResult:
+        """Empirical CDF of null distribution
+
+        Args:
+            n_samples (int, optional): Number of samples to draw. Defaults to 100.
+            t_samples (int, optional): Number of statistics to draw. Defaults to 100.
+
+        Returns:
+            ECDFResult: Empirical CDF of null distribution
+        """
+        samples = [
+            self._test_statistic(self.null, self.null, n_samples)
+            for i in range(t_samples)
+        ]
+
+        return stats.ecdf(samples)
+
+    def _test_statistic(
+        self, null: mBeta = None, actual: mBeta = None, n_samples: int = 100
+    ) -> float:
+        """Test goodness of fit
+
+        Args:
+            null (mBeta): null distribution
+            alt (mBeta): alternative distribution
+            n_samples (int, optional): Number of samples to draw. Defaults to 100.
+
+        Returns:
+            float: p-value
+        """
+        null = self.null if null is None else null
+        actual = self.alt if actual is None else actual
+        u_values = null.sample(n_samples)
+        v_values = actual.sample(n_samples)
+
+        return stats.wasserstein_distance_nd(u_values, v_values)
+
+    def p_value(self, n_samples: int = 100, t_samples: int = 100) -> np.ndarray:
+        """Compute p-value
+
+        Args:
+            n_samples (int, optional): Number of samples to draw. Defaults to 100.
+            t_samples (int, optional): Number of statistics to draw. Defaults to 100.
+
+        Returns:
+            float: p-value
+        """
+        null_ecdf = self._null_ecdf(n_samples, t_samples)
+        test_statistic = self._test_statistic(self.null, self.alt, n_samples)
+
+        return 1 - null_ecdf.cdf.evaluate(test_statistic)
