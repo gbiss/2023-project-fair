@@ -574,16 +574,12 @@ class GOF(mBeta):
     https://arxiv.org/pdf/2003.06684
     """
 
-    def __init__(
-        self, null: mBeta, alt: mBeta, rng: np.random.Generator = None
-    ) -> None:
+    def __init__(self, null: mBeta, alt: mBeta) -> None:
         """
         Args:
             null (mBeta): null mBeta distribution
             alt (mBeta): alternative mBeta distribution
-            rng (np.random.Generator | None): Random number generator. Defaults to None.
         """
-        self.rng = np.random.default_rng(None) if rng is None else rng
         self.null = null
         self.alt = alt
 
