@@ -601,7 +601,7 @@ class GOF(mBeta):
         return stats.ecdf(samples)
 
     def _test_statistic(
-        self, null: mBeta = None, actual: mBeta = None, n_samples: int = 100
+        self, null: mBeta = None, alt: mBeta = None, n_samples: int = 100
     ) -> float:
         """Test goodness of fit
 
@@ -614,9 +614,9 @@ class GOF(mBeta):
             float: p-value
         """
         null = self.null if null is None else null
-        actual = self.alt if actual is None else actual
+        alt = self.alt if alt is None else alt
         u_values = null.sample(n_samples)
-        v_values = actual.sample(n_samples)
+        v_values = alt.sample(n_samples)
 
         return stats.wasserstein_distance_nd(u_values, v_values)
 
