@@ -603,7 +603,7 @@ class GOF(mBeta):
     def _test_statistic(
         self, null_dist: mBeta = None, alt_dist: mBeta = None, n_samples: int = 100
     ) -> float:
-        """Test goodness of fit
+        """Test goodness of fit according to the Wasserstein_distance criteria
 
         Args:
             null (mBeta): null distribution
