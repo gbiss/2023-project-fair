@@ -2,6 +2,7 @@ import random
 
 import numpy as np
 from scipy import stats
+from scipy.stats._result_classes import ECDFResult
 from statsmodels.distributions.copula.api import CopulaDistribution, GaussianCopula
 
 
@@ -566,3 +567,70 @@ class mBetaMixture(mBeta):
             samples.append(mBeta.sample())
 
         return np.vstack(samples)
+
+
+class GOF(mBeta):
+    """Goodness of fit test for mBeta distribution as described in section 2
+    https://arxiv.org/pdf/2003.06684
+    """
+
+    def __init__(self, null_dist: mBeta, alt_dist: mBeta) -> None:
+        """
+        Args:
+            null (mBeta): null mBeta distribution
+            alt (mBeta): alternative mBeta distribution
+        """
+        self.null_dist = null_dist
+        self.alt_dist = alt_dist
+
+    def _null_ecdf(self, n_samples: int = 100, t_samples: int = 100) -> ECDFResult:
+        """Empirical CDF of null distribution
+
+        Args:
+            n_samples (int, optional): Number of samples to draw. Defaults to 100.
+            t_samples (int, optional): Number of statistics to draw. Defaults to 100.
+
+        Returns:
+            ECDFResult: Empirical CDF of null distribution
+        """
+        samples = [
+            self._test_statistic(self.null_dist, self.null_dist, n_samples)
+            for i in range(t_samples)
+        ]
+
+        return stats.ecdf(samples)
+
+    def _test_statistic(
+        self, null_dist: mBeta = None, alt_dist: mBeta = None, n_samples: int = 100
+    ) -> float:
+        """Test goodness of fit according to the Wasserstein_distance criteria
+
+        Args:
+            null (mBeta): null distribution
+            alt (mBeta): alternative distribution
+            n_samples (int, optional): Number of samples to draw. Defaults to 100.
+
+        Returns:
+            float: p-value
+        """
+        null_dist = self.null_dist if null_dist is None else null_dist
+        alt_dist = self.alt_dist if alt_dist is None else alt_dist
+        u_values = null_dist.sample(n_samples)
+        v_values = alt_dist.sample(n_samples)
+
+        return stats.wasserstein_distance_nd(u_values, v_values)
+
+    def p_value(self, n_samples: int = 100, t_samples: int = 100) -> np.ndarray:
+        """Compute p-value
+
+        Args:
+            n_samples (int, optional): Number of samples to draw. Defaults to 100.
+            t_samples (int, optional): Number of statistics to draw. Defaults to 100.
+
+        Returns:
+            float: p-value
+        """
+        null_ecdf = self._null_ecdf(n_samples, t_samples)
+        test_statistic = self._test_statistic(self.null_dist, self.alt_dist, n_samples)
+
+        return 1 - null_ecdf.cdf.evaluate(test_statistic)

@@ -3,6 +3,7 @@ import scipy
 import statsmodels
 
 from fair.stats import (
+    GOF,
     Correlation,
     Covariance,
     Marginal,
@@ -166,6 +167,39 @@ def test_random_mBetaMixture():
 
     assert np.array_equal(mBetaMixture1.sample(n), mBetaMixture2.sample(n))
     assert not np.array_equal(mBetaMixture1.sample(n), mBetaMixture3.sample(n))
+
+
+def test_goodness_of_fit_same():
+    m = 3
+    n = 10
+    eps = 0.01
+    gamma = np.ones((2**m,)) / eps
+    gamma[1] = 10
+    gamma[5] = 1
+    mbeta_null = mBetaExact(gamma, np.random.default_rng(0))
+    mbeta_alt = mBetaExact(gamma, np.random.default_rng(0))
+    gof = GOF(mbeta_null, mbeta_alt)
+    pval = gof.p_value(n, n)
+
+    assert pval > 0.5
+
+
+def test_goodness_of_fit_different():
+    m = 3
+    n = 10
+    eps = 0.01
+    gamma = np.ones((2**m,)) / eps
+    gamma[1] = 10
+    gamma[5] = 1
+    mbeta_null = mBetaExact(gamma, np.random.default_rng(0))
+    gamma = np.ones((2**m,)) / eps
+    gamma[2] = 10
+    gamma[3] = 1
+    mbeta_alt = mBetaExact(gamma, np.random.default_rng(0))
+    gof = GOF(mbeta_null, mbeta_alt)
+    pval = gof.p_value(n, n)
+
+    assert pval < 0.05
 
 
 def test_aggregates_not_enough_for_U():
