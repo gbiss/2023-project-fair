@@ -574,14 +574,14 @@ class GOF(mBeta):
     https://arxiv.org/pdf/2003.06684
     """
 
-    def __init__(self, null: mBeta, alt: mBeta) -> None:
+    def __init__(self, null_dist: mBeta, alt_dist: mBeta) -> None:
         """
         Args:
             null (mBeta): null mBeta distribution
             alt (mBeta): alternative mBeta distribution
         """
-        self.null = null
-        self.alt = alt
+        self.null_dist = null_dist
+        self.alt_dist = alt_dist
 
     def _null_ecdf(self, n_samples: int = 100, t_samples: int = 100) -> ECDFResult:
         """Empirical CDF of null distribution
@@ -594,14 +594,14 @@ class GOF(mBeta):
             ECDFResult: Empirical CDF of null distribution
         """
         samples = [
-            self._test_statistic(self.null, self.null, n_samples)
+            self._test_statistic(self.null_dist, self.null_dist, n_samples)
             for i in range(t_samples)
         ]
 
         return stats.ecdf(samples)
 
     def _test_statistic(
-        self, null: mBeta = None, alt: mBeta = None, n_samples: int = 100
+        self, null_dist: mBeta = None, alt_dist: mBeta = None, n_samples: int = 100
     ) -> float:
         """Test goodness of fit
 
@@ -613,10 +613,10 @@ class GOF(mBeta):
         Returns:
             float: p-value
         """
-        null = self.null if null is None else null
-        alt = self.alt if alt is None else alt
-        u_values = null.sample(n_samples)
-        v_values = alt.sample(n_samples)
+        null_dist = self.null_dist if null_dist is None else null_dist
+        alt_dist = self.alt_dist if alt_dist is None else alt_dist
+        u_values = null_dist.sample(n_samples)
+        v_values = alt_dist.sample(n_samples)
 
         return stats.wasserstein_distance_nd(u_values, v_values)
 
@@ -631,6 +631,6 @@ class GOF(mBeta):
             float: p-value
         """
         null_ecdf = self._null_ecdf(n_samples, t_samples)
-        test_statistic = self._test_statistic(self.null, self.alt, n_samples)
+        test_statistic = self._test_statistic(self.null_dist, self.alt_dist, n_samples)
 
         return 1 - null_ecdf.cdf.evaluate(test_statistic)
