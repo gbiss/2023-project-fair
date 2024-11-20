@@ -150,7 +150,7 @@ def create_sub_students(og_students, new_schedule, course_strings, course):
     )
     new_students = []
     for student in og_students:
-        preferred = student1.preferred_courses
+        preferred = student.preferred_courses
         new_student = SubStudent(
             student.student.quantities,
             [
@@ -174,26 +174,23 @@ def create_sub_students(og_students, new_schedule, course_strings, course):
     return new_students
 
 
-student1_idx = 2
-student1 = students[student1_idx]
+def yankee_swap_sub_problem(X, students, schedule, student_idx_1, student_idx_2):
+    student1 = students[student_idx_1]
+    student2 = students[student_idx_2]
 
-student2_idx = 49
-student2 = students[student2_idx]
+    current_bundle_1 = get_bundle_from_allocation_matrix(X[0], schedule, student_idx_1)
+    current_bundle_2 = get_bundle_from_allocation_matrix(X[0], schedule, student_idx_2)
 
-current_bundle_1 = get_bundle_from_allocation_matrix(X[0], schedule, student1_idx)
-current_bundle_2 = get_bundle_from_allocation_matrix(X[0], schedule, student2_idx)
+    new_schedule, course_strings, course = create_sub_schedule(
+        current_bundle_1, current_bundle_2
+    )
 
-# create new schedule
+    new_students = create_sub_students(
+        [student1, student2], new_schedule, course_strings, course
+    )
+
+    X_sub, _, _ = general_yankee_swap_E(new_students, new_schedule)
+    return X_sub
 
 
-new_schedule, course_strings, course = create_sub_schedule(
-    current_bundle_1, current_bundle_2
-)
-
-
-new_students = create_sub_students(
-    [student1, student2], new_schedule, course_strings, course
-)
-
-X_sub, _, _ = general_yankee_swap_E(new_students, new_schedule)
-print(X_sub)
+print(yankee_swap_sub_problem(X, students, schedule, 0, 1))
