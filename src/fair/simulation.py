@@ -98,3 +98,74 @@ class RenaissanceMan(SimulatedAgent):
         ]
 
         super().__init__(constraints, memoize)
+
+
+class SubStudent(SimulatedAgent):
+    """Randomly generate a Renaissance man student
+
+    The Renaissance man prefers courses from multiple topics, up to a maximum quantity per topic.
+    """
+
+    def __init__(
+        self,
+        quantities,
+        preferred_topics,
+        preferred_courses,
+        total_courses,
+        course: Course,
+        global_constraints: List[LinearConstraint],
+        schedule: List[ScheduleItem],
+        sparse: bool = False,
+        memoize: bool = True,
+    ):
+        """
+        Args:
+            topic_list (List[List[ScheduleItem]]): A list of lists of course items, one per topic
+            max_quantities (List[int]): The maximum number of courses desired per topic
+            lower_max_courses (int): Lower bound for random selection of maximum number of courses (inclusive)
+            upper_max_courses (int): Upper bound for random selection of maximum number of courses (inclusive)
+            course (Course): Feature for course
+            global_constraints (List[LinearConstraint]): Constraints not specific to this agent
+            schedule (List[ScheduleItem], optional): All possible items in the student's schedule. Defaults to None.
+            seed (int | None, optional): Random seed. Defaults to None.
+            sparse (bool, optional): Should sparse matrices be used for constraints. Defaults to False.
+            memoize (bool, optional): Should results be cached. Defaults to True
+        """
+
+        self.quantities = quantities
+        self.preferred_topics = preferred_topics
+        self.preferred_courses = preferred_courses
+        self.total_courses = total_courses
+
+        all_courses = [item.value(course) for item in schedule]
+
+        self.all_courses_constraint = PreferenceConstraint.from_item_lists(
+            schedule,
+            [all_courses],
+            [self.total_courses],
+            course,
+            sparse,
+        )
+        undesirable_courses = list(set(all_courses).difference(self.preferred_courses))
+        self.undesirable_courses_constraint = PreferenceConstraint.from_item_lists(
+            schedule,
+            [undesirable_courses],
+            [0],
+            course,
+            sparse,
+        )
+        self.topic_constraint = PreferenceConstraint.from_item_lists(
+            schedule,
+            self.preferred_topics,
+            self.quantities,
+            course,
+            sparse,
+        )
+
+        constraints = global_constraints + [
+            self.all_courses_constraint,
+            self.undesirable_courses_constraint,
+            self.topic_constraint,
+        ]
+
+        super().__init__(constraints, memoize)
