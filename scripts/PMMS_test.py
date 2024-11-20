@@ -22,7 +22,7 @@ from fair.metrics import (
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan, SubStudent
 
-NUM_STUDENTS = 6
+NUM_STUDENTS = 50
 MAX_COURSES_PER_TOPIC = 15
 LOWER_MAX_COURSES_TOTAL = 5
 UPPER_MAX_COURSES_TOTAL = 10
@@ -35,7 +35,7 @@ FIND_OPTIMAL = True
 # load schedule as DataFrame
 with open(EXCEL_SCHEDULE_PATH, "rb") as fd:
     df = pd.read_excel(fd)
-df = df[:15]
+df = df[8:15]
 # construct features from DataFrame
 course = Course(df["Catalog"].astype(str).unique().tolist())
 
@@ -120,102 +120,80 @@ if FIND_OPTIMAL:
 
 from fair.allocation import get_bundle_from_allocation_matrix
 
-student1_idx = 0
-student1 = students[0]
+
+def create_sub_schedule(bundle_1, bundle_2):
+
+    sub_schedule = [*bundle_1, *bundle_2]
+    set_sub_schedule = list(set(sub_schedule))
+
+    course_strings = sorted([item.values[0] for item in set_sub_schedule])
+    course = Course(course_strings)
+    section = Section(sorted(list(set([item.values[3] for item in set_sub_schedule]))))
+    features = [course, slot, weekday, section]
+
+    new_schedule = []
+    for i, item in enumerate(set_sub_schedule):
+        new_schedule.append(
+            ScheduleItem(
+                features, item.values, index=i, capacity=sub_schedule.count(item)
+            )
+        )
+    return new_schedule, course_strings, course
 
 
-student2_idx = 1
-student2 = students[1]
+def create_sub_students(og_students, new_schedule, course_strings, course):
+    course_time_constr = CourseTimeConstraint.from_items(
+        new_schedule, slot, weekday, SPARSE
+    )
+    course_sect_constr = MutualExclusivityConstraint.from_items(
+        new_schedule, course, SPARSE
+    )
+    new_students = []
+    for student in og_students:
+        preferred = student1.preferred_courses
+        new_student = SubStudent(
+            student.student.quantities,
+            [
+                [item for item in pref if item in course_strings]
+                for pref in student.student.preferred_topics
+            ],
+            list(set(course_strings) & set(preferred)),
+            student.student.total_courses,
+            course,
+            [course_time_constr, course_sect_constr],
+            new_schedule,
+            sparse=SPARSE,
+        )
+        legacy_student = LegacyStudent(
+            new_student, new_student.preferred_courses, course
+        )
+        legacy_student.student.valuation.valuation = (
+            legacy_student.student.valuation.compile()
+        )
+        new_students.append(legacy_student)
+    return new_students
 
 
-preferred1 = student1.preferred_courses
-preferred2 = student2.preferred_courses
+student1_idx = 2
+student1 = students[student1_idx]
+
+student2_idx = 49
+student2 = students[student2_idx]
+
 current_bundle_1 = get_bundle_from_allocation_matrix(X[0], schedule, student1_idx)
 current_bundle_2 = get_bundle_from_allocation_matrix(X[0], schedule, student2_idx)
 
 # create new schedule
-sub_schedule = [*current_bundle_1, *current_bundle_2]
-set_sub_schedule = list(set(sub_schedule))
 
 
-course = Course(sorted([item.values[0] for item in set_sub_schedule]))
-section = Section(sorted(list(set([item.values[3] for item in set_sub_schedule]))))
-features = [course, slot, weekday, section]
-
-new_schedule = []
-# Reset course capacities
-for i, item in enumerate(set_sub_schedule):
-    new_schedule.append(
-        ScheduleItem(features, item.values, index=i, capacity=sub_schedule.count(item))
-    )
-    print(sub_schedule.count(item))
-
-new_students = []
-
-print(student1.student.preferred_topics)
-print(student2.student.preferred_topics)
-new_str = [item.values[0] for item in set_sub_schedule]
-print(new_str)
-print(
-    [
-        [item for item in pref if item in new_str]
-        for pref in student1.student.preferred_topics
-    ]
-)
-print(
-    [
-        [item for item in pref if item in new_str]
-        for pref in student2.student.preferred_topics
-    ]
+new_schedule, course_strings, course = create_sub_schedule(
+    current_bundle_1, current_bundle_2
 )
 
 
-print(preferred2)
-print(list(set([item.values[0] for item in set_sub_schedule]) & set(preferred2)))
-
-
-course_time_constr = CourseTimeConstraint.from_items(
-    new_schedule, slot, weekday, SPARSE
+new_students = create_sub_students(
+    [student1, student2], new_schedule, course_strings, course
 )
-course_sect_constr = MutualExclusivityConstraint.from_items(
-    new_schedule, course, SPARSE
-)
-print([item.capacity for item in new_schedule])
-
-print(list(set([item.values[0] for item in new_schedule]) & set(preferred1)))
-student_1 = SubStudent(
-    student1.student.quantities,
-    [
-        [item for item in pref if item in new_str]
-        for pref in student1.student.preferred_topics
-    ],
-    list(set([item.values[0] for item in new_schedule]) & set(preferred1)),
-    student1.student.total_courses,
-    course,
-    [course_time_constr, course_sect_constr],
-    new_schedule,
-    sparse=SPARSE,
-)
-legacy_student = LegacyStudent(student_1, student_1.preferred_courses, course)
-legacy_student.student.valuation.valuation = legacy_student.student.valuation.compile()
-new_students.append(legacy_student)
-
-student_2 = SubStudent(
-    student2.student.quantities,
-    [
-        [item for item in pref if item in new_str]
-        for pref in student1.student.preferred_topics
-    ],
-    list(set([item.values[0] for item in new_schedule]) & set(preferred2)),
-    student2.student.total_courses,
-    course,
-    [course_time_constr, course_sect_constr],
-    new_schedule,
-    sparse=SPARSE,
-)
-legacy_student = LegacyStudent(student_2, student_2.preferred_courses, course)
-legacy_student.student.valuation.valuation = legacy_student.student.valuation.compile()
-new_students.append(legacy_student)
 
 X_sub, _, _ = general_yankee_swap_E(new_students, new_schedule)
 print(X_sub)
