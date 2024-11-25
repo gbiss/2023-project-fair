@@ -140,40 +140,48 @@ def create_sub_schedule(bundle_1, bundle_2):
     return new_schedule, course_strings, course
 
 
-def create_sub_students(student, new_schedule, course_strings, course):
+def create_sub_student(student, new_schedule, course_strings, course):
     course_time_constr = CourseTimeConstraint.from_items(
         new_schedule, slot, weekday, SPARSE
     )
     course_sect_constr = MutualExclusivityConstraint.from_items(
         new_schedule, course, SPARSE
     )
-    new_students = []
-    for i in range(2):
-        preferred = student.preferred_courses
-        new_student = SubStudent(
-            student.student.quantities,
-            [
-                [item for item in pref if item in course_strings]
-                for pref in student.student.preferred_topics
-            ],
-            list(set(course_strings) & set(preferred)),
-            student.student.total_courses,
-            course,
-            [course_time_constr, course_sect_constr],
-            new_schedule,
-            sparse=SPARSE,
-        )
-        legacy_student = LegacyStudent(
-            new_student, new_student.preferred_courses, course
-        )
-        legacy_student.student.valuation.valuation = (
-            legacy_student.student.valuation.compile()
-        )
-        new_students.append(legacy_student)
-    return new_students
+    preferred = student.preferred_courses
+    new_student = SubStudent(
+        student.student.quantities,
+        [
+            [item for item in pref if item in course_strings]
+            for pref in student.student.preferred_topics
+        ],
+        list(set(course_strings) & set(preferred)),
+        student.student.total_courses,
+        course,
+        [course_time_constr, course_sect_constr],
+        new_schedule,
+        sparse=SPARSE,
+    )
+    legacy_student = LegacyStudent(new_student, new_student.preferred_courses, course)
+    legacy_student.student.valuation.valuation = (
+        legacy_student.student.valuation.compile()
+    )
+    return legacy_student
 
 
-def yankee_swap_sub_problem(X, students, schedule, student_idx_1, student_idx_2):
+def yankee_swap_sub_problem(student, new_schedule, course_strings, course):
+
+    sub_student = create_sub_student(student, new_schedule, course_strings, course)
+    X_sub, _, _ = general_yankee_swap_E([sub_student, sub_student], new_schedule)
+    bundle_1 = get_bundle_from_allocation_matrix(X_sub, new_schedule, 0)
+    bundle_2 = get_bundle_from_allocation_matrix(X_sub, new_schedule, 1)
+
+    return min([student.valuation(bundle_1), student.valuation(bundle_2)])
+
+
+def pairwise_maximin_share(X, students, schedule, student_idx_1, student_idx_2):
+
+    PMMS = {}
+
     student1 = students[student_idx_1]
     student2 = students[student_idx_2]
 
@@ -184,19 +192,14 @@ def yankee_swap_sub_problem(X, students, schedule, student_idx_1, student_idx_2)
         current_bundle_1, current_bundle_2
     )
 
-    new_students1 = create_sub_students(student1, new_schedule, course_strings, course)
+    PMMS[student1] = yankee_swap_sub_problem(
+        student1, new_schedule, course_strings, course
+    )
+    PMMS[student2] = yankee_swap_sub_problem(
+        student2, new_schedule, course_strings, course
+    )
 
-    new_students2 = create_sub_students(student2, new_schedule, course_strings, course)
-
-    X_sub_1, _, _ = general_yankee_swap_E(new_students1, new_schedule)
-    X_sub_2, _, _ = general_yankee_swap_E(new_students2, new_schedule)
-
-    print(X_sub_1)
-    print(X_sub_2)
-    bundle_1 = get_bundle_from_allocation_matrix(X_sub_1, new_schedule, 0)
-    bundle_2 = get_bundle_from_allocation_matrix(X_sub_1, new_schedule, 1)
-    print([new_students1[0].valuation(bundle_1), new_students1[1].valuation(bundle_2)])
-    return X_sub_1, X_sub_2
+    return PMMS
 
 
 print(schedule)
@@ -205,4 +208,4 @@ print([student.preferred_courses for student in students])
 print(X_YS)
 print(X_SD)
 
-print(yankee_swap_sub_problem(X_SD, students, schedule, 0, 3))
+print(pairwise_maximin_share(X_SD, students, schedule, 0, 3))
