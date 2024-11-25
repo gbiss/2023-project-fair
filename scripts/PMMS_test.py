@@ -22,7 +22,7 @@ from fair.metrics import (
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan, SubStudent
 
-NUM_STUDENTS = 50
+NUM_STUDENTS = 4
 MAX_COURSES_PER_TOPIC = 15
 LOWER_MAX_COURSES_TOTAL = 5
 UPPER_MAX_COURSES_TOTAL = 10
@@ -88,10 +88,10 @@ for i in range(NUM_STUDENTS):
     )
     students.append(legacy_student)
 
-X = general_yankee_swap_E(students, schedule)
-print("YS utilitarian welfare: ", utilitarian_welfare(X[0], students, schedule))
-print("YS nash welfare: ", nash_welfare(X[0], students, schedule))
-print("YS leximin vector: ", leximin(X[0], students, schedule))
+X_YS, _, _ = general_yankee_swap_E(students, schedule)
+print("YS utilitarian welfare: ", utilitarian_welfare(X_YS, students, schedule))
+print("YS nash welfare: ", nash_welfare(X_YS, students, schedule))
+print("YS leximin vector: ", leximin(X_YS, students, schedule))
 
 X_SD = serial_dictatorship(students, schedule)
 print("SD utilitarian welfare: ", utilitarian_welfare(X_SD, students, schedule))
@@ -122,9 +122,8 @@ from fair.allocation import get_bundle_from_allocation_matrix
 
 
 def create_sub_schedule(bundle_1, bundle_2):
-
     sub_schedule = [*bundle_1, *bundle_2]
-    set_sub_schedule = list(set(sub_schedule))
+    set_sub_schedule = sorted(list(set(sub_schedule)), key=lambda item: item.values[0])
 
     course_strings = sorted([item.values[0] for item in set_sub_schedule])
     course = Course(course_strings)
@@ -141,7 +140,7 @@ def create_sub_schedule(bundle_1, bundle_2):
     return new_schedule, course_strings, course
 
 
-def create_sub_students(og_students, new_schedule, course_strings, course):
+def create_sub_students(student, new_schedule, course_strings, course):
     course_time_constr = CourseTimeConstraint.from_items(
         new_schedule, slot, weekday, SPARSE
     )
@@ -149,7 +148,7 @@ def create_sub_students(og_students, new_schedule, course_strings, course):
         new_schedule, course, SPARSE
     )
     new_students = []
-    for student in og_students:
+    for i in range(2):
         preferred = student.preferred_courses
         new_student = SubStudent(
             student.student.quantities,
@@ -178,19 +177,32 @@ def yankee_swap_sub_problem(X, students, schedule, student_idx_1, student_idx_2)
     student1 = students[student_idx_1]
     student2 = students[student_idx_2]
 
-    current_bundle_1 = get_bundle_from_allocation_matrix(X[0], schedule, student_idx_1)
-    current_bundle_2 = get_bundle_from_allocation_matrix(X[0], schedule, student_idx_2)
+    current_bundle_1 = get_bundle_from_allocation_matrix(X, schedule, student_idx_1)
+    current_bundle_2 = get_bundle_from_allocation_matrix(X, schedule, student_idx_2)
 
     new_schedule, course_strings, course = create_sub_schedule(
         current_bundle_1, current_bundle_2
     )
 
-    new_students = create_sub_students(
-        [student1, student2], new_schedule, course_strings, course
-    )
+    new_students1 = create_sub_students(student1, new_schedule, course_strings, course)
 
-    X_sub, _, _ = general_yankee_swap_E(new_students, new_schedule)
-    return X_sub
+    new_students2 = create_sub_students(student2, new_schedule, course_strings, course)
+
+    X_sub_1, _, _ = general_yankee_swap_E(new_students1, new_schedule)
+    X_sub_2, _, _ = general_yankee_swap_E(new_students2, new_schedule)
+
+    print(X_sub_1)
+    print(X_sub_2)
+    bundle_1 = get_bundle_from_allocation_matrix(X_sub_1, new_schedule, 0)
+    bundle_2 = get_bundle_from_allocation_matrix(X_sub_1, new_schedule, 1)
+    print([new_students1[0].valuation(bundle_1), new_students1[1].valuation(bundle_2)])
+    return X_sub_1, X_sub_2
 
 
-print(yankee_swap_sub_problem(X, students, schedule, 0, 1))
+print(schedule)
+print([student.preferred_courses for student in students])
+
+print(X_YS)
+print(X_SD)
+
+print(yankee_swap_sub_problem(X_SD, students, schedule, 0, 3))

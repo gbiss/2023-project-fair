@@ -420,7 +420,6 @@ class Marginal:
 
 
 class mBeta:
-
     def sample(self, n: int) -> None:
         raise NotImplementedError
 

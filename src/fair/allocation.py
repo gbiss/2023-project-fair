@@ -714,7 +714,6 @@ def general_yankee_swap_E(
     M = len(agents)
     players = list(range(M))
     X = initialize_allocation_matrix(items, agents)
-    print(X)
     G = initialize_exchange_graph(N)
     E = [[[] for i in range(N)] for j in range(N)]
     gain_vector = np.zeros([M])
