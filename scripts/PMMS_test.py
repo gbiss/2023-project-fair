@@ -2,6 +2,7 @@ import os
 from collections import defaultdict
 
 import pandas as pd
+import numpy as np
 
 from fair.agent import LegacyStudent
 from fair.allocation import general_yankee_swap_E, serial_dictatorship, round_robin
@@ -56,7 +57,7 @@ for idx, (_, row) in enumerate(df.iterrows()):
     slt = slots_for_time_range(row["Mtg Time"], slot.times)
     sec = row["Section"]
     # capacity = row["CICScapacity"]
-    capacity = 2
+    capacity = 1
     dys = tuple([day.strip() for day in row["zc.days"].split(" ")])
     schedule.append(
         ScheduleItem(features, [crs, slt, dys, sec], index=idx, capacity=capacity)
@@ -88,6 +89,8 @@ for i in range(NUM_STUDENTS):
     )
     students.append(legacy_student)
 
+students[3], students[2] = students[2], students[3]
+
 X_YS, _, _ = general_yankee_swap_E(students, schedule)
 print("YS utilitarian welfare: ", utilitarian_welfare(X_YS, students, schedule))
 print("YS nash welfare: ", nash_welfare(X_YS, students, schedule))
@@ -111,12 +114,10 @@ if FIND_OPTIMAL:
     opt_USW = sum(opt_alloc) / len(orig_students)
     print("optimal utilitarian welfare", opt_USW)
 
-    opt_alloc = opt_alloc.reshape(len(students), len(schedule)).transpose()
-    print(
-        "ILP utilitarian welfare: ", utilitarian_welfare(opt_alloc, students, schedule)
-    )
-    print("ILP nash welfare: ", nash_welfare(opt_alloc, students, schedule))
-    print("ILP leximin vector: ", leximin(opt_alloc, students, schedule))
+    X_ILP = opt_alloc.reshape(len(students), len(schedule)).transpose()
+    print("ILP utilitarian welfare: ", utilitarian_welfare(X_ILP, students, schedule))
+    print("ILP nash welfare: ", nash_welfare(X_ILP, students, schedule))
+    print("ILP leximin vector: ", leximin(X_ILP, students, schedule))
 
 from fair.allocation import get_bundle_from_allocation_matrix
 
@@ -172,21 +173,17 @@ def yankee_swap_sub_problem(student, new_schedule, course_strings, course):
 
     sub_student = create_sub_student(student, new_schedule, course_strings, course)
     X_sub, _, _ = general_yankee_swap_E([sub_student, sub_student], new_schedule)
+    print(X_sub)
+
     bundle_1 = get_bundle_from_allocation_matrix(X_sub, new_schedule, 0)
     bundle_2 = get_bundle_from_allocation_matrix(X_sub, new_schedule, 1)
 
-    return min([student.valuation(bundle_1), student.valuation(bundle_2)])
+    return min([sub_student.valuation(bundle_1), sub_student.valuation(bundle_2)])
 
 
-def pairwise_maximin_share(X, students, schedule, student_idx_1, student_idx_2):
+def pairwise_maximin_share(student1, student2, current_bundle_1, current_bundle_2):
 
     PMMS = {}
-
-    student1 = students[student_idx_1]
-    student2 = students[student_idx_2]
-
-    current_bundle_1 = get_bundle_from_allocation_matrix(X, schedule, student_idx_1)
-    current_bundle_2 = get_bundle_from_allocation_matrix(X, schedule, student_idx_2)
 
     new_schedule, course_strings, course = create_sub_schedule(
         current_bundle_1, current_bundle_2
@@ -202,10 +199,32 @@ def pairwise_maximin_share(X, students, schedule, student_idx_1, student_idx_2):
     return PMMS
 
 
+def PMMS_violations(X, students, schedule):
+    PMMS_matrix = np.zeros((len(students), len(students)))
+    for i, student_1 in enumerate(students):
+        bundle_1 = get_bundle_from_allocation_matrix(X, schedule, i)
+
+        for j in range(i + 1, len(students)):
+            student_2 = students[j]
+            bundle_2 = get_bundle_from_allocation_matrix(X, schedule, j)
+
+            if len(bundle_1) == 0 and len(bundle_2) == 0:
+                continue
+
+            PMMS = pairwise_maximin_share(student_1, student_2, bundle_1, bundle_2)
+            PMMS_matrix[i, j] = student_1.valuation(bundle_1) - PMMS[student_1]
+            PMMS_matrix[j, i] = student_2.valuation(bundle_2) - PMMS[student_2]
+
+    print(PMMS_matrix)
+
+    return np.sum(PMMS_matrix < 0), np.sum(np.any(PMMS_matrix < 0, axis=1))
+
+
 print(schedule)
 print([student.preferred_courses for student in students])
 
 print(X_YS)
 print(X_SD)
 
-print(pairwise_maximin_share(X_SD, students, schedule, 0, 3))
+
+print(PMMS_violations(X_SD, students, schedule))
