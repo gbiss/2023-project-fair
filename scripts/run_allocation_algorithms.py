@@ -93,7 +93,7 @@ for i in range(NUM_STUDENTS):
     students.append(legacy_student)
 students[3], students[2] = students[2], students[3]
 
-X_YS, _,_ = general_yankee_swap_E(students, schedule)
+X_YS, _, _ = general_yankee_swap_E(students, schedule)
 print("YS utilitarian welfare: ", utilitarian_welfare(X_YS, students, schedule))
 print("YS nash welfare: ", nash_welfare(X_YS, students, schedule))
 print("YS leximin vector: ", leximin((X_YS), students, schedule))
@@ -135,9 +135,7 @@ if FIND_OPTIMAL:
     program = StudentAllocationProgram(orig_students, schedule).compile()
     opt_alloc = program.formulateUSW().solve()
     X_ILP = opt_alloc.reshape(len(students), len(schedule)).transpose()
-    print(
-        "ILP utilitarian welfare: ", utilitarian_welfare(X_ILP, students, schedule)
-    )
+    print("ILP utilitarian welfare: ", utilitarian_welfare(X_ILP, students, schedule))
     print("ILP nash welfare: ", nash_welfare(X_ILP, students, schedule))
     print("ILP leximin vector: ", leximin(X_ILP, students, schedule))
     print("ILP EF_count: ", EF_count(X_ILP, students, schedule))
@@ -146,4 +144,7 @@ if FIND_OPTIMAL:
     print("ILP EF_1_agents: ", EF_1_agents(X_ILP, students, schedule))
     print("ILP EF_X_count: ", EF_X_count(X_ILP, students, schedule))
     print("ILP EF_X_agents: ", EF_X_agents(X_ILP, students, schedule))
-    print("ILP PMMS violations (total, agents): ", PMMS_violations(X_ILP, students, schedule))
+    print(
+        "ILP PMMS violations (total, agents): ",
+        PMMS_violations(X_ILP, students, schedule),
+    )

@@ -80,7 +80,9 @@ def leximin(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleIt
     valuations.reverse()
     return valuations
 
+
 ##ENVY METRICS
+
 
 def EF_count(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]):
     """Compute envy count
@@ -305,20 +307,23 @@ def EF_X_agents(
     return envy_count
 
 
-#FUNCTIONS TO COMPUTE PAIRWISE MAXIMIN SHARE
+# FUNCTIONS TO COMPUTE PAIRWISE MAXIMIN SHARE
+
 
 def create_sub_schedule(bundle_1: list[ScheduleItem], bundle_2: list[ScheduleItem]):
-    """Given two subsets of the total number of items, create a new sub schedule considering the items in the union of both sets (considering repetitions).
-    This function is necessary to solve a subproblem considering a schedule with only the items currently own by two agents in order to compute PMMS metric.
-
+    """Given two subsets of the set of items, create a new sub schedule considering the items in the union of both sets.
+    Capacities of the new schedule are determined by repetitions of the items through both bundles.
+    This function is necessary to compute PMMS metric. Creates a schedule with the items currently own by two agents, in order to solve subproblem.
 
     Args:
         bundle_1 (list[ScheduleItem]): Items from class BaseItem
         bundle_2 (list[ScheduleItem]): Items from class BaseItem
 
     Returns:
-        _type_: _description_
-    """    
+        new_schedule (list[ScheduleItem]): Items from class BaseItem, new reduced schedule
+        course_strings (list[str]): List of course strings of the new schedule
+        course (type[Course]): Course instance of the new schedule
+    """
     sub_schedule = [*bundle_1, *bundle_2]
     set_sub_schedule = sorted(list(set(sub_schedule)), key=lambda item: item.values[0])
 
@@ -340,24 +345,29 @@ def create_sub_schedule(bundle_1: list[ScheduleItem], bundle_2: list[ScheduleIte
     return new_schedule, course_strings, course
 
 
-def yankee_swap_sub_problem(agent: type[BaseAgent], new_schedule: list[ScheduleItem], course_strings: list[str], course: type[Course]):
-    """_summary_
+def yankee_swap_sub_problem(
+    agent: type[BaseAgent],
+    new_schedule: list[ScheduleItem],
+    course_strings: list[str],
+    course: type[Course],
+):
+    """Given an agent and information of a reduced schedule (new_schedule, course_strings, course), compute their MMS for the reduced problem,
+    considering 2 identical agents competing for the items in the reduced schedule.
+    We do this by computing a leximin allocation through yankee swap.
 
     Args:
-        agent (type[BaseAgent]): _description_
-        new_schedule (list[ScheduleItem]): _description_
-        course_strings (list[str]): _description_
-        course (type[Course]): _description_
+        agent (type[BaseAgent]): Agent from the class BaseAgent
+        new_schedule (list[ScheduleItem]): Items from class BaseItem, new reduced schedule
+        course_strings (list[str]): List of course strings of the new schedule
+        course (type[Course]): Course instance of the new schedule
 
     Returns:
-        _type_: _description_
-    """    
+        int: Agent's MMS for the subproblem
+    """
     course_time_constr = CourseTimeConstraint.from_items(
         new_schedule, new_schedule[0].features[1], new_schedule[0].features[2]
     )
-    course_sect_constr = MutualExclusivityConstraint.from_items(
-        new_schedule, course
-    )
+    course_sect_constr = MutualExclusivityConstraint.from_items(new_schedule, course)
     preferred = agent.preferred_courses
     new_student = SubStudent(
         agent.student.quantities,
@@ -375,8 +385,8 @@ def yankee_swap_sub_problem(agent: type[BaseAgent], new_schedule: list[ScheduleI
     legacy_student.student.valuation.valuation = (
         legacy_student.student.valuation.compile()
     )
-    sub_student=legacy_student
-    
+    sub_student = legacy_student
+
     X_sub, _, _ = general_yankee_swap_E([sub_student, sub_student], new_schedule)
 
     bundle_1 = get_bundle_from_allocation_matrix(X_sub, new_schedule, 0)
@@ -385,7 +395,12 @@ def yankee_swap_sub_problem(agent: type[BaseAgent], new_schedule: list[ScheduleI
     return min([sub_student.valuation(bundle_1), sub_student.valuation(bundle_2)])
 
 
-def pairwise_maximin_share(agent1: type[BaseAgent] , agent2: type[BaseAgent], current_bundle_1: list[ScheduleItem], current_bundle_2: list[ScheduleItem]):
+def pairwise_maximin_share(
+    agent1: type[BaseAgent],
+    agent2: type[BaseAgent],
+    current_bundle_1: list[ScheduleItem],
+    current_bundle_2: list[ScheduleItem],
+):
     """Given two agents and their current bundles, compute their Pairwise Maximin Share (PMMS)
 
     Args:
@@ -396,7 +411,7 @@ def pairwise_maximin_share(agent1: type[BaseAgent] , agent2: type[BaseAgent], cu
 
     Returns:
         PMMS[BaseAgent] (type[int]): for agents 1 and 2, return their PMMS for the subproblem
-    """   
+    """
 
     PMMS = {}
 
@@ -404,31 +419,29 @@ def pairwise_maximin_share(agent1: type[BaseAgent] , agent2: type[BaseAgent], cu
         current_bundle_1, current_bundle_2
     )
 
-    PMMS[agent1] = yankee_swap_sub_problem(
-        agent1, new_schedule, course_strings, course
-    )
-    PMMS[agent2] = yankee_swap_sub_problem(
-        agent2, new_schedule, course_strings, course
-    )
+    PMMS[agent1] = yankee_swap_sub_problem(agent1, new_schedule, course_strings, course)
+    PMMS[agent2] = yankee_swap_sub_problem(agent2, new_schedule, course_strings, course)
 
     return PMMS
 
 
-def PMMS_violations(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]):
-    """Compute number of violations of the Pairwise Maximin Share (PMMS) for an allocaiton X
+def PMMS_violations(
+    X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]
+):
+    """Compute number of violations of the Pairwise Maximin Share (PMMS) for an allocation X
 
-   Compare every agent to all agents of higher index and determine whether they receive their PMMS. 
-   Runs intermediate functions to compute PMMS and returns tuple with the number of comparison which did not comply with the PMMS, 
-   and the number of agents that for at least one comparison, did not receive their PMMS. 
+    Compare every agent to all agents of higher index and determine whether they receive their PMMS.
+    Runs intermediate functions to compute PMMS and returns tuple with the number of comparison which did not comply with the PMMS,
+    and the number of agents that for at least one comparison, did not receive their PMMS.
 
-    Args:
-        X (type[np.ndarray]): Allocation matrix
-        agents (list[BaseAgent]): Agents from class BaseAgent
-        schedule (list[ScheduleItem]): Items from class BaseItem
+     Args:
+         X (type[np.ndarray]): Allocation matrix
+         agents (list[BaseAgent]): Agents from class BaseAgent
+         schedule (list[ScheduleItem]): Items from class BaseItem
 
-    Returns:
-        int: Number of PMMS violations
-        int: Number of agents who did not receive their PMMS in every comparison
+     Returns:
+         int: Number of PMMS violations
+         int: Number of agents who did not receive their PMMS in every comparison
     """
     PMMS_matrix = np.zeros((len(agents), len(agents)))
     for i, student_1 in enumerate(agents):

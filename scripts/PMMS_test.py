@@ -67,7 +67,6 @@ for idx, (_, row) in enumerate(df.iterrows()):
 topics = sorted([sorted(list(courses)) for courses in topic_map.values()])
 
 
-
 # global constraints
 course_time_constr = CourseTimeConstraint.from_items(schedule, slot, weekday, SPARSE)
 course_sect_constr = MutualExclusivityConstraint.from_items(schedule, course, SPARSE)
@@ -121,7 +120,6 @@ if FIND_OPTIMAL:
     print("ILP utilitarian welfare: ", utilitarian_welfare(X_ILP, students, schedule))
     print("ILP nash welfare: ", nash_welfare(X_ILP, students, schedule))
     print("ILP leximin vector: ", leximin(X_ILP, students, schedule))
-
 
 
 print(PMMS_violations(X_SD, students, schedule))
