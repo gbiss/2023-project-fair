@@ -23,14 +23,10 @@ from fair.metrics import (
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan
 
-# NUM_STUDENTS = 4
-# MAX_COURSES_PER_TOPIC = 5
-# LOWER_MAX_COURSES_TOTAL = 1
-# UPPER_MAX_COURSES_TOTAL = 5
-NUM_STUDENTS = 4
-MAX_COURSES_PER_TOPIC = 15
-LOWER_MAX_COURSES_TOTAL = 5
-UPPER_MAX_COURSES_TOTAL = 10
+NUM_STUDENTS = 3
+MAX_COURSES_PER_TOPIC = 5
+LOWER_MAX_COURSES_TOTAL = 1
+UPPER_MAX_COURSES_TOTAL = 5
 EXCEL_SCHEDULE_PATH = os.path.join(
     os.path.dirname(__file__), "../resources/fall2023schedule-2-cat.xlsx"
 )
@@ -40,7 +36,7 @@ FIND_OPTIMAL = True
 # load schedule as DataFrame
 with open(EXCEL_SCHEDULE_PATH, "rb") as fd:
     df = pd.read_excel(fd)
-df = df[8:15]
+
 # construct features from DataFrame
 course = Course(df["Catalog"].astype(str).unique().tolist())
 
@@ -59,8 +55,7 @@ for idx, (_, row) in enumerate(df.iterrows()):
     topic_map[row["Categories"]].add(crs)
     slt = slots_for_time_range(row["Mtg Time"], slot.times)
     sec = row["Section"]
-    # capacity = row["CICScapacity"]
-    capacity = 2
+    capacity = row["CICScapacity"]
     dys = tuple([day.strip() for day in row["zc.days"].split(" ")])
     schedule.append(
         ScheduleItem(features, [crs, slt, dys, sec], index=idx, capacity=capacity)
@@ -91,7 +86,6 @@ for i in range(NUM_STUDENTS):
         legacy_student.student.valuation.compile()
     )
     students.append(legacy_student)
-students[3], students[2] = students[2], students[3]
 
 X_YS, _, _ = general_yankee_swap_E(students, schedule)
 print("YS utilitarian welfare: ", utilitarian_welfare(X_YS, students, schedule))

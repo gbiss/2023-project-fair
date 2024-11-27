@@ -312,8 +312,8 @@ def EF_X_agents(
 
 def create_sub_schedule(bundle_1: list[ScheduleItem], bundle_2: list[ScheduleItem]):
     """Given two subsets of the set of items, create a new sub schedule considering the items in the union of both sets.
-    Capacities of the new schedule are determined by repetitions of the items through both bundles.
-    This function is necessary to compute PMMS metric. Creates a schedule with the items currently own by two agents, in order to solve subproblem.
+    Capacities of the new schedule are determined by repetitions of the items in both bundles.
+    This function is necessary to compute PMMS metric. Creates a schedule with the items currently owned by two agents, in order to solve subproblem.
 
     Args:
         bundle_1 (list[ScheduleItem]): Items from class BaseItem
