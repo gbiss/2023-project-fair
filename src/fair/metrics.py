@@ -3,7 +3,6 @@ import numpy as np
 from .agent import BaseAgent, LegacyStudent
 from .allocation import get_bundle_from_allocation_matrix, general_yankee_swap_E
 from .constraint import CourseTimeConstraint, MutualExclusivityConstraint
-from .feature import Course
 from .item import ScheduleItem, sub_schedule
 from .simulation import SubStudent
 
@@ -88,7 +87,6 @@ def yankee_swap_sub_problem(
     agent: type[BaseAgent],
     new_schedule: list[ScheduleItem],
     course_strings: list[str],
-    course: type[Course],
 ):
     """Given an agent and information of a reduced schedule (new_schedule, course_strings, course), compute their MMS for the reduced problem,
     considering 2 identical agents competing for the items in the reduced schedule.
@@ -103,9 +101,9 @@ def yankee_swap_sub_problem(
     Returns:
         int: Agent's MMS for the subproblem
     """
-    course_time_constr = CourseTimeConstraint.from_items(
-        new_schedule, new_schedule[0].features[1], new_schedule[0].features[2]
-    )
+    course, slot, weekday, _ = new_schedule[0].features
+
+    course_time_constr = CourseTimeConstraint.from_items(new_schedule, slot, weekday)
     course_sect_constr = MutualExclusivityConstraint.from_items(new_schedule, course)
     preferred = agent.preferred_courses
     new_student = SubStudent(
@@ -154,12 +152,10 @@ def pairwise_maximin_share(
 
     PMMS = {}
 
-    new_schedule, course_strings, course = sub_schedule(
-        current_bundle_1, current_bundle_2
-    )
+    new_schedule, course_strings = sub_schedule(current_bundle_1, current_bundle_2)
 
-    PMMS[agent1] = yankee_swap_sub_problem(agent1, new_schedule, course_strings, course)
-    PMMS[agent2] = yankee_swap_sub_problem(agent2, new_schedule, course_strings, course)
+    PMMS[agent1] = yankee_swap_sub_problem(agent1, new_schedule, course_strings)
+    PMMS[agent2] = yankee_swap_sub_problem(agent2, new_schedule, course_strings)
 
     return PMMS
 

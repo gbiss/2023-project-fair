@@ -184,4 +184,4 @@ def sub_schedule(bundle_1: list[ScheduleItem], bundle_2: list[ScheduleItem]):
                 features, item.values, index=i, capacity=sub_schedule.count(item)
             )
         )
-    return new_schedule, course_strings, course
+    return new_schedule, course_strings
