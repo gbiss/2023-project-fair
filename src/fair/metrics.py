@@ -3,8 +3,8 @@ import numpy as np
 from .agent import BaseAgent, LegacyStudent
 from .allocation import get_bundle_from_allocation_matrix, general_yankee_swap_E
 from .constraint import CourseTimeConstraint, MutualExclusivityConstraint
-from .feature import Course, Section
-from .item import ScheduleItem
+from .feature import Course
+from .item import ScheduleItem, sub_schedule
 from .simulation import SubStudent
 
 
@@ -84,41 +84,6 @@ def leximin(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleIt
 # FUNCTIONS TO COMPUTE PAIRWISE MAXIMIN SHARE
 
 
-def create_sub_schedule(bundle_1: list[ScheduleItem], bundle_2: list[ScheduleItem]):
-    """Given two subsets of the set of items, create a new sub schedule considering the items in the union of both sets.
-    Capacities of the new schedule are determined by repetitions of the items in both bundles.
-    This function is necessary to compute PMMS metric. Creates a schedule with the items currently owned by two agents, in order to solve subproblem.
-
-    Args:
-        bundle_1 (list[ScheduleItem]): Items from class BaseItem
-        bundle_2 (list[ScheduleItem]): Items from class BaseItem
-
-    Returns:
-        new_schedule (list[ScheduleItem]): Items from class BaseItem, new reduced schedule
-        course_strings (list[str]): List of course strings of the new schedule
-        course (type[Course]): Course instance of the new schedule
-    """
-    sub_schedule = [*bundle_1, *bundle_2]
-    set_sub_schedule = sorted(list(set(sub_schedule)), key=lambda item: item.values[0])
-
-    course_strings = sorted([item.values[0] for item in set_sub_schedule])
-    course = Course(course_strings)
-    section = Section(sorted(list(set([item.values[3] for item in set_sub_schedule]))))
-    slot = sub_schedule[0].features[1]
-    weekday = sub_schedule[0].features[2]
-
-    features = [course, slot, weekday, section]
-
-    new_schedule = []
-    for i, item in enumerate(set_sub_schedule):
-        new_schedule.append(
-            ScheduleItem(
-                features, item.values, index=i, capacity=sub_schedule.count(item)
-            )
-        )
-    return new_schedule, course_strings, course
-
-
 def yankee_swap_sub_problem(
     agent: type[BaseAgent],
     new_schedule: list[ScheduleItem],
@@ -189,7 +154,7 @@ def pairwise_maximin_share(
 
     PMMS = {}
 
-    new_schedule, course_strings, course = create_sub_schedule(
+    new_schedule, course_strings, course = sub_schedule(
         current_bundle_1, current_bundle_2
     )
 
