@@ -8,6 +8,18 @@ from .item import ScheduleItem
 def precompute_bundles_valuations(
     X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]
 ):
+    """Precompute all agents bundles and all agent valuations for said bundles.
+    This is a step necessary to run all envy metrics.
+
+    Args:
+        X (type[np.ndarray]): Allocation matrix
+        agents (list[BaseAgent]): Agents from class BaseAgent
+        schedule (list[ScheduleItem]): Items from class BaseItem
+
+    Returns:
+        bundles (list(list[ScheduleItem])): ordered list of agnets bundles
+        valuations (type[np.ndarray]): len(agents) x len(agents) matrix, element i,j is agent's i valuation of agent's j bundle under X
+    """
     bundles = [
         get_bundle_from_allocation_matrix(X, items, i) for i in range(len(agents))
     ]
@@ -35,6 +47,7 @@ def EF_violations(
         X (type[np.ndarray]): Allocation matrix
         agents (list[BaseAgent]): Agents from class BaseAgent
         schedule (list[ScheduleItem]): Items from class BaseItem
+        valuations (type[np.ndarray]): Valuations of all agents for all bundles under X
 
     Returns:
         int: number of EF_violations
@@ -55,6 +68,7 @@ def EF_violations(
                 EF_matrix[j, i] = 1
     return np.sum(EF_matrix > 0), np.sum(np.any(EF_matrix > 0, axis=1))
 
+
 def EF1_violations(
     X: type[np.ndarray],
     agents: list[BaseAgent],
@@ -65,7 +79,7 @@ def EF1_violations(
     """Compute envy-free up to one item (EF-1) violations.
 
     Compare every agent to all other agents, fill EF1_matrix where EF1_matrix[i,j]=1 if agent of index i
-    envies agent of index j in the EF1 sense. 
+    envies agent of index j in the EF1 sense.
 
     Returns the number of EF-1 violations, and the number of envious agents in the EF1 sense.
 
@@ -73,6 +87,8 @@ def EF1_violations(
         X (type[np.ndarray]): Allocation matrix
         agents (list[BaseAgent]): Agents from class BaseAgent
         schedule (list[ScheduleItem]): Items from class BaseItem
+        bundles (list(list[ScheduleItem])): List of all agents bundles
+        valuations (type[np.ndarray]): Valuations of all agents for all bundles under X
 
     Returns:
         int: number of EF-1 violations
@@ -84,102 +100,72 @@ def EF1_violations(
 
     num_agents = len(agents)
     EF1_matrix = np.zeros((num_agents, num_agents))
-    
-    def there_is_item(i,j):
+
+    def there_is_item(i, j):
         for item in range(len(bundles[j])):
-            new_bundle=bundles[j].copy()
+            new_bundle = bundles[j].copy()
             new_bundle.pop(item)
-            if agents[i].valuation(new_bundle)<=valuations[i][i]:
+            if agents[i].valuation(new_bundle) <= valuations[i][i]:
                 return True
         return False
 
     for i in range(len(agents)):
         for j in range(i + 1, len(agents)):
             if valuations[i, i] < valuations[i, j]:
-                if not there_is_item(i,j):
-                    EF1_matrix[i,j]=1
+                if not there_is_item(i, j):
+                    EF1_matrix[i, j] = 1
             if valuations[j, j] < valuations[j, i]:
-                if not there_is_item(j,i):
+                if not there_is_item(j, i):
                     EF1_matrix[j, i] = 1
     return np.sum(EF1_matrix > 0), np.sum(np.any(EF1_matrix > 0, axis=1))
 
 
-def EF_X_count(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]):
-    """Compute EF-X count
-
-    Compare every agent to all other agents, add 1 to envy count if there is at least one
-    item that the second agents drops and the first agent still envies them.
-    NOTE: we can add 1 multiple times for the same agents if they envy multiple other agents.
-
-    Args:
-        X (type[np.ndarray]): Allocation matrix
-        agents (list[BaseAgent]): Agents from class BaseAgent
-        schedule (list[ScheduleItem]): Items from class BaseItem
-
-    Returns:
-        list[int]: utilities for all agents
-    """
-    envy_count = 0
-    for agent_index, agent in enumerate(agents):
-        current_bundle = get_bundle_from_allocation_matrix(X, items, agent_index)
-        current_utility = agent.valuation(current_bundle)
-        for agent_2_index in range(len(agents)):
-            if agent_index != agent_2_index:
-                other_bundle = get_bundle_from_allocation_matrix(
-                    X, items, agent_2_index
-                )
-                other_utility = agent.valuation(other_bundle)
-                if current_utility < other_utility:
-                    not_for_every_item = False
-                    for index, item in enumerate(other_bundle):
-                        new_bundle = other_bundle.copy()
-                        new_bundle.pop(index)
-                        new_utility = agent.valuation(new_bundle)
-                        if current_utility < new_utility:
-                            not_for_every_item = True
-                            break
-                    if not_for_every_item:
-                        envy_count += 1
-    return envy_count
-
-
-def EF_X_agents(
-    X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]
+def EFX_violations(
+    X: type[np.ndarray],
+    agents: list[BaseAgent],
+    items: list[ScheduleItem],
+    bundles: list[list[ScheduleItem]] | None = None,
+    valuations: type[np.ndarray] | None = None,
 ):
-    """Compute EF-X agent count
+    """Compute envy-free up to any item (EF-X) violations.
 
-    Compare every agent to all other agents, add 1 to envy count if there is at least one
-    item that another agent drops and the first agent still envies them.
-    NOTE: we can add 1 only once for every agent.
+    Compare every agent to all other agents, fill EF1_matrix where EFX_matrix[i,j]=1 if agent of index i
+    envies agent of index j in the EF1 sense.
+
+    Returns the number of EF-X violations, and the number of envious agents in the EF-X sense.
 
     Args:
         X (type[np.ndarray]): Allocation matrix
         agents (list[BaseAgent]): Agents from class BaseAgent
         schedule (list[ScheduleItem]): Items from class BaseItem
+        bundles (list(list[ScheduleItem])): List of all agents bundles
+        valuations (type[np.ndarray]): Valuations of all agents for all bundles under X
 
     Returns:
-        list[int]: utilities for all agents
+        int: number of EF-X violations
+        int: number of envious agents in the EF-X sense
     """
-    envy_count = 0
-    for agent_index, agent in enumerate(agents):
-        current_bundle = get_bundle_from_allocation_matrix(X, items, agent_index)
-        current_utility = agent.valuation(current_bundle)
-        for agent_2_index in range(len(agents)):
-            if agent_index != agent_2_index:
-                other_bundle = get_bundle_from_allocation_matrix(
-                    X, items, agent_2_index
-                )
-                other_utility = agent.valuation(other_bundle)
-                if current_utility < other_utility:
-                    not_for_every_item = False
-                    for index, item in enumerate(other_bundle):
-                        new_bundle = other_bundle.copy()
-                        new_bundle.pop(index)
-                        new_utility = agent.valuation(new_bundle)
-                        if current_utility < new_utility:
-                            not_for_every_item = True
-                            break
-                    if not_for_every_item:
-                        envy_count += 1
-                        break
-    return envy_count
+
+    if valuations is None:
+        bundles, valuations = precompute_bundles_valuations(X, agents, items)
+
+    num_agents = len(agents)
+    EFX_matrix = np.zeros((num_agents, num_agents))
+
+    def for_every_item(i, j):
+        for item in range(len(bundles[j])):
+            new_bundle = bundles[j].copy()
+            new_bundle.pop(item)
+            if agents[i].valuation(new_bundle) > valuations[i][i]:
+                return False
+        return True
+
+    for i in range(len(agents)):
+        for j in range(i + 1, len(agents)):
+            if valuations[i, i] < valuations[i, j]:
+                if not for_every_item(i, j):
+                    EFX_matrix[i, j] = 1
+            if valuations[j, j] < valuations[j, i]:
+                if not for_every_item(j, i):
+                    EFX_matrix[j, i] = 1
+    return np.sum(EFX_matrix > 0), np.sum(np.any(EFX_matrix > 0, axis=1))
