@@ -14,16 +14,16 @@ from fair.metrics import (
     utilitarian_welfare,
 )
 from fair.envy import (
-    EF_1_agents,
-    EF_1_count,
     EF_X_agents,
     EF_X_count,
     EF_violations,
+    EF1_violations,
+    precompute_bundles_valuations,
 )
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan
 
-NUM_STUDENTS = 4
+NUM_STUDENTS = 6
 MAX_COURSES_PER_TOPIC = 15
 LOWER_MAX_COURSES_TOTAL = 5
 UPPER_MAX_COURSES_TOTAL = 10
@@ -89,34 +89,34 @@ for i in range(NUM_STUDENTS):
     students.append(legacy_student)
 students[3], students[2] = students[2], students[3]
 X_YS, _, _ = general_yankee_swap_E(students, schedule)
+bundles, valuations = precompute_bundles_valuations(X_YS, students, schedule)
 # print("YS utilitarian welfare: ", utilitarian_welfare(X_YS, students, schedule))
 # print("YS nash welfare: ", nash_welfare(X_YS, students, schedule))
 # print("YS leximin vector: ", leximin((X_YS), students, schedule))
-print("RR EF_violations: ", EF_violations(X_YS, students, schedule)[:2])
-print("YS EF_1_count: ", EF_1_count(X_YS, students, schedule))
-print("YS EF_1_agents: ", EF_1_agents(X_YS, students, schedule))
+print("YS EF_violations: ", EF_violations(X_YS, students, schedule, valuations))
+print("YS EF1_violations: ", EF1_violations(X_YS, students, schedule, bundles, valuations))
 print("YS EF_X_count: ", EF_X_count(X_YS, students, schedule))
 print("YS EF_X_agents: ", EF_X_agents(X_YS, students, schedule))
 # print("YS PMMS violations (total, agents): ", PMMS_violations(X_YS, students, schedule))
 
 X_SD = serial_dictatorship(students, schedule)
+bundles, valuations = precompute_bundles_valuations(X_SD, students, schedule)
 # print("SD utilitarian welfare: ", utilitarian_welfare(X_SD, students, schedule))
 # print("SD nash welfare: ", nash_welfare(X_SD, students, schedule))
 # print("SD leximin vector: ", leximin(X_SD, students, schedule))
-print("SD EF_violations: ", EF_violations(X_SD, students, schedule)[:2])
-print("SD EF_1_count: ", EF_1_count(X_SD, students, schedule))
-print("SD EF_1_agents: ", EF_1_agents(X_SD, students, schedule))
+print("SD EF_violations: ", EF_violations(X_SD, students, schedule, valuations))
+print("SD EF1_violations: ", EF1_violations(X_SD, students, schedule, bundles, valuations))
 print("SD EF_X_count: ", EF_X_count(X_SD, students, schedule))
 print("SD EF_X_agents: ", EF_X_agents(X_SD, students, schedule))
 # print("SD PMMS violations (total, agents): ", PMMS_violations(X_SD, students, schedule))
 
 X_RR = round_robin(students, schedule)
+bundles, valuations = precompute_bundles_valuations(X_RR, students, schedule)
 # print("RR utilitarian welfare: ", utilitarian_welfare(X_RR, students, schedule))
 # print("RR nash welfare: ", nash_welfare(X_RR, students, schedule))
 # print("RR leximin vector: ", leximin(X_RR, students, schedule))
-print("RR EF_violations: ", EF_violations(X_RR, students, schedule)[:2])
-print("RR EF_1_count: ", EF_1_count(X_RR, students, schedule))
-print("RR EF_1_agents: ", EF_1_agents(X_RR, students, schedule))
+print("RR EF_violations: ", EF_violations(X_RR, students, schedule, valuations))
+print("RR EF1_violations: ", EF1_violations(X_RR, students, schedule, bundles, valuations))
 print("RR EF_X_count: ", EF_X_count(X_RR, students, schedule))
 print("RR EF_X_agents: ", EF_X_agents(X_RR, students, schedule))
 # print("RR PMMS violations (total, agents): ", PMMS_violations(X_RR, students, schedule))
@@ -127,12 +127,13 @@ if FIND_OPTIMAL:
     program = StudentAllocationProgram(orig_students, schedule).compile()
     opt_alloc = program.formulateUSW().solve()
     X_ILP = opt_alloc.reshape(len(students), len(schedule)).transpose()
+    bundles, valuations = precompute_bundles_valuations(X_ILP, students, schedule)
     # print("ILP utilitarian welfare: ", utilitarian_welfare(X_ILP, students, schedule))
     # print("ILP nash welfare: ", nash_welfare(X_ILP, students, schedule))
     # print("ILP leximin vector: ", leximin(X_ILP, students, schedule))
-    print("ILP EF_violations: ", EF_violations(X_ILP, students, schedule))
-    print("ILP EF_1_count: ", EF_1_count(X_ILP, students, schedule))
-    print("ILP EF_1_agents: ", EF_1_agents(X_ILP, students, schedule))
+
+    print("ILP EF_violations: ", EF_violations(X_ILP, students, schedule, valuations))
+    print("ILP EF1_violations: ", EF1_violations(X_ILP, students, schedule, bundles,valuations))
     print("ILP EF_X_count: ", EF_X_count(X_ILP, students, schedule))
     print("ILP EF_X_agents: ", EF_X_agents(X_ILP, students, schedule))
     # print(

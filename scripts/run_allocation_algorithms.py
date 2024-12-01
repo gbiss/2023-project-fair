@@ -18,7 +18,9 @@ from fair.envy import (
     EF_1_count,
     EF_X_agents,
     EF_X_count,
+    precompute_bundles_valuations,
     EF_violations,
+    EF1_violations,
 )
 from fair.optimization import StudentAllocationProgram
 from fair.simulation import RenaissanceMan
@@ -108,26 +110,30 @@ for i in range(NUM_STUDENTS):
 # )
 
 X_SD = serial_dictatorship(students, schedule)
+bundles, valuations = precompute_bundles_valuations(X_SD, students, schedule)
 # print("SD utilitarian welfare: ", utilitarian_welfare(X_SD, students, schedule))
 # print("SD nash welfare: ", nash_welfare(X_SD, students, schedule))
 # print("SD leximin vector: ", leximin(X_SD, students, schedule))
 # print("SD EF_count: ", EF_count(X_SD, students, schedule))
 # print("SD EF_agents: ", EF_agents(X_SD, students, schedule))
-print("SD EF_violations: ", EF_violations(X_SD, students, schedule)[:2])
-# print("SD EF_1_count: ", EF_1_count(X_SD, students, schedule))
-# print("SD EF_1_agents: ", EF_1_agents(X_SD, students, schedule))
+print("SD EF_violations: ", EF_violations(X_SD, students, schedule, valuations))
+print("SD EF1_violations: ", EF1_violations(X_SD, students, schedule, bundles, valuations))
+print("SD EF_1_count: ", EF_1_count(X_SD, students, schedule))
+print("SD EF_1_agents: ", EF_1_agents(X_SD, students, schedule))
 # print("SD EF_X_count: ", EF_X_count(X_SD, students, schedule))
 # print("SD EF_X_agents: ", EF_X_agents(X_SD, students, schedule))
 
 X_RR = round_robin(students, schedule)
+bundles, valuations = precompute_bundles_valuations(X_RR, students, schedule)
 # print("RR utilitarian welfare: ", utilitarian_welfare(X_RR, students, schedule))
 # print("RR nash welfare: ", nash_welfare(X_RR, students, schedule))
 # print("RR leximin vector: ", leximin(X_RR, students, schedule))
 # print("RR EF_count: ", EF_count(X_RR, students, schedule))
 # print("RR EF_agents: ", EF_agents(X_RR, students, schedule))
-print("RR EF_violations: ", EF_violations(X_RR, students, schedule)[:2])
-# print("RR EF_1_count: ", EF_1_count(X_RR, students, schedule))
-# print("RR EF_1_agents: ", EF_1_agents(X_RR, students, schedule))
+print("RR EF_violations: ", EF_violations(X_RR, students, schedule, valuations))
+print("RR EF1_violations: ", EF1_violations(X_RR, students, schedule, bundles, valuations))
+print("RR EF_1_count: ", EF_1_count(X_RR, students, schedule))
+print("RR EF_1_agents: ", EF_1_agents(X_RR, students, schedule))
 # print("RR EF_X_count: ", EF_X_count(X_RR, students, schedule))
 # print("RR EF_X_agents: ", EF_X_agents(X_RR, students, schedule))
 
@@ -140,6 +146,7 @@ if FIND_OPTIMAL:
     # print("optimal utilitarian welfare", opt_USW)
 
     opt_alloc = opt_alloc.reshape(len(students), len(schedule)).transpose()
+    bundles, valuations = precompute_bundles_valuations(opt_alloc, students, schedule)
     # print(
     #     "ILP utilitarian welfare: ", utilitarian_welfare(opt_alloc, students, schedule)
     # )
@@ -147,8 +154,9 @@ if FIND_OPTIMAL:
     # print("ILP leximin vector: ", leximin(opt_alloc, students, schedule))
     # print("ILP EF_count: ", EF_count(opt_alloc, students, schedule))
     # print("ILP EF_agents: ", EF_agents(opt_alloc, students, schedule))
-    # print("ILP EF_1_count: ", EF_1_count(opt_alloc, students, schedule))
-    # print("ILP EF_1_agents: ", EF_1_agents(opt_alloc, students, schedule))
-    print("ILP EF_violations: ", EF_violations(opt_alloc, students, schedule)[:2])
+    print("ILP EF_violations: ", EF_violations(opt_alloc, students, schedule, valuations))
+    print("RR EF1_violations: ", EF1_violations(opt_alloc, students, schedule, bundles, valuations))
+    print("ILP EF_1_count: ", EF_1_count(opt_alloc, students, schedule))
+    print("ILP EF_1_agents: ", EF_1_agents(opt_alloc, students, schedule))
     # print("ILP EF_X_count: ", EF_X_count(opt_alloc, students, schedule))
     # print("ILP EF_X_agents: ", EF_X_agents(opt_alloc, students, schedule))

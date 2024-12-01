@@ -29,7 +29,7 @@ def EF_violations(
     Compare every agent to all other agents, fill EF_matrix where EF_matrix[i,j]=1 if agent of index i
     envies agent of index j, 0 otherwise.
 
-    Returns the number of EF violations, the number of envious agents, and EF_matrix
+    Returns the number of EF violations, and the number of envious agents.
 
     Args:
         X (type[np.ndarray]): Allocation matrix
@@ -39,7 +39,6 @@ def EF_violations(
     Returns:
         int: number of EF_violations
         int: number of envious agents
-        EF_matrix (type[np.ndarray]): EF violations matrix as described above.
     """
 
     num_agents = len(agents)
@@ -56,54 +55,19 @@ def EF_violations(
                 EF_matrix[j, i] = 1
     return np.sum(EF_matrix > 0), np.sum(np.any(EF_matrix > 0, axis=1))
 
-
-def EF_1_count(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]):
-    """Compute EF-1 count
-
-    Compare every agent to all other agents, add 1 to envy count if there is no item the second agent
-    could drop that would make the first agent stop envying them.
-    NOTE: we can add 1 multiple times for the same agents if they envy multiple other agents.
-
-    Args:
-        X (type[np.ndarray]): Allocation matrix
-        agents (list[BaseAgent]): Agents from class BaseAgent
-        schedule (list[ScheduleItem]): Items from class BaseItem
-
-    Returns:
-        list[int]: utilities for all agents
-    """
-    envy_count = 0
-    for agent_index, agent in enumerate(agents):
-        current_bundle = get_bundle_from_allocation_matrix(X, items, agent_index)
-        current_utility = agent.valuation(current_bundle)
-        for agent_2_index in range(len(agents)):
-            if agent_index != agent_2_index:
-                other_bundle = get_bundle_from_allocation_matrix(
-                    X, items, agent_2_index
-                )
-                other_utility = agent.valuation(other_bundle)
-                if current_utility < other_utility:
-                    there_is_no_item = True
-                    for index, item in enumerate(other_bundle):
-                        new_bundle = other_bundle.copy()
-                        new_bundle.pop(index)
-                        new_utility = agent.valuation(new_bundle)
-                        if new_utility <= current_utility:
-                            there_is_no_item = False
-                            break
-                    if there_is_no_item:
-                        envy_count += 1
-    return envy_count
-
-
-def EF_1_agents(
-    X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]
+def EF1_violations(
+    X: type[np.ndarray],
+    agents: list[BaseAgent],
+    items: list[ScheduleItem],
+    bundles: list[list[ScheduleItem]] | None = None,
+    valuations: type[np.ndarray] | None = None,
 ):
-    """Compute EF-1 agent count
+    """Compute envy-free up to one item (EF-1) violations.
 
-    Compare every agent to all other agents, add 1 to envy count if there is no item a second agent
-    could drop that would make the first agent stop envying them.
-    NOTE: we can add 1 only once for every agent.
+    Compare every agent to all other agents, fill EF1_matrix where EF1_matrix[i,j]=1 if agent of index i
+    envies agent of index j in the EF1 sense. 
+
+    Returns the number of EF-1 violations, and the number of envious agents in the EF1 sense.
 
     Args:
         X (type[np.ndarray]): Allocation matrix
@@ -111,31 +75,33 @@ def EF_1_agents(
         schedule (list[ScheduleItem]): Items from class BaseItem
 
     Returns:
-        list[int]: utilities for all agents
+        int: number of EF-1 violations
+        int: number of envious agents in the EF-1 sense
     """
-    envy_count = 0
-    for agent_index, agent in enumerate(agents):
-        current_bundle = get_bundle_from_allocation_matrix(X, items, agent_index)
-        current_utility = agent.valuation(current_bundle)
-        for agent_2_index in range(len(agents)):
-            if agent_index != agent_2_index:
-                other_bundle = get_bundle_from_allocation_matrix(
-                    X, items, agent_2_index
-                )
-                other_utility = agent.valuation(other_bundle)
-                if current_utility < other_utility:
-                    there_is_no_item = True
-                    for index, item in enumerate(other_bundle):
-                        new_bundle = other_bundle.copy()
-                        new_bundle.pop(index)
-                        new_utility = agent.valuation(new_bundle)
-                        if new_utility <= current_utility:
-                            there_is_no_item = False
-                            break
-                    if there_is_no_item:
-                        envy_count += 1
-                        break
-    return envy_count
+
+    if valuations is None:
+        bundles, valuations = precompute_bundles_valuations(X, agents, items)
+
+    num_agents = len(agents)
+    EF1_matrix = np.zeros((num_agents, num_agents))
+    
+    def there_is_item(i,j):
+        for item in range(len(bundles[j])):
+            new_bundle=bundles[j].copy()
+            new_bundle.pop(item)
+            if agents[i].valuation(new_bundle)<=valuations[i][i]:
+                return True
+        return False
+
+    for i in range(len(agents)):
+        for j in range(i + 1, len(agents)):
+            if valuations[i, i] < valuations[i, j]:
+                if not there_is_item(i,j):
+                    EF1_matrix[i,j]=1
+            if valuations[j, j] < valuations[j, i]:
+                if not there_is_item(j,i):
+                    EF1_matrix[j, i] = 1
+    return np.sum(EF1_matrix > 0), np.sum(np.any(EF1_matrix > 0, axis=1))
 
 
 def EF_X_count(X: type[np.ndarray], agents: list[BaseAgent], items: list[ScheduleItem]):
