@@ -153,8 +153,9 @@ class ScheduleItem(BaseItem):
 
 
 def sub_schedule(bundles: list[list[ScheduleItem]]):
-    """Given two subsets of the set of items, create a new sub schedule considering the items in the union of both sets.
-    Capacities of the new schedule are determined by repetitions of the items in both bundles.
+    """Given a list of bundles, create a new sub schedule considering the items in the union of all bundles
+    Capacities of the new schedule are determined by the sum of the capacities of the items in all bundles.
+
     This function is necessary to compute PMMS metric. Creates a schedule with the items currently owned by two agents, in order to solve subproblem.
 
     Args:
