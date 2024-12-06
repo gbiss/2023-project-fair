@@ -159,8 +159,7 @@ def sub_schedule(bundles: list[list[ScheduleItem]]):
     This function is necessary to compute PMMS metric. Creates a schedule with the items currently owned by two agents, in order to solve subproblem.
 
     Args:
-        bundle_1 (list[ScheduleItem]): Items from class BaseItem
-        bundle_2 (list[ScheduleItem]): Items from class BaseItem
+        bundles (list[list[ScheduleItem]]): List of Items from class BaseItem
 
     Returns:
         new_schedule (list[ScheduleItem]): Items from class BaseItem, new reduced schedule
@@ -172,8 +171,6 @@ def sub_schedule(bundles: list[list[ScheduleItem]]):
 
     features = sub_schedule[0].features
     course_strings = sorted([item.values[0] for item in set_sub_schedule])
-    course = Course(course_strings)
-    features[0] = course
 
     new_schedule = []
     for i, item in enumerate(set_sub_schedule):
