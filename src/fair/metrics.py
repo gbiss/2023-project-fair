@@ -1,4 +1,5 @@
 import numpy as np
+import copy
 
 from .agent import BaseAgent, LegacyStudent
 from .allocation import get_bundle_from_allocation_matrix, general_yankee_swap_E
@@ -152,7 +153,14 @@ def pairwise_maximin_share(
 
     PMMS = {}
 
-    new_schedule, course_strings = sub_schedule(current_bundle_1, current_bundle_2)
+    bundle_1 = copy.deepcopy([sched for sched in current_bundle_1])
+    for sched in bundle_1:
+        sched.capacity = 1
+    bundle_2 = copy.deepcopy([sched for sched in current_bundle_2])
+    for sched in bundle_2:
+        sched.capacity = 1
+
+    new_schedule, course_strings = sub_schedule([bundle_1, bundle_2])
 
     PMMS[agent1] = yankee_swap_sub_problem(agent1, new_schedule, course_strings)
     PMMS[agent2] = yankee_swap_sub_problem(agent2, new_schedule, course_strings)

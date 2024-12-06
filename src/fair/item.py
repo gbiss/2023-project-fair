@@ -152,7 +152,7 @@ class ScheduleItem(BaseItem):
         self.category = category
 
 
-def sub_schedule(bundle_1: list[ScheduleItem], bundle_2: list[ScheduleItem]):
+def sub_schedule(bundles: list[list[ScheduleItem]]):
     """Given two subsets of the set of items, create a new sub schedule considering the items in the union of both sets.
     Capacities of the new schedule are determined by repetitions of the items in both bundles.
     This function is necessary to compute PMMS metric. Creates a schedule with the items currently owned by two agents, in order to solve subproblem.
@@ -166,22 +166,20 @@ def sub_schedule(bundle_1: list[ScheduleItem], bundle_2: list[ScheduleItem]):
         course_strings (list[str]): List of course strings of the new schedule
         course (type[Course]): Course instance of the new schedule
     """
-    sub_schedule = [*bundle_1, *bundle_2]
+    sub_schedule = [item for bundle in bundles for item in bundle]
     set_sub_schedule = sorted(list(set(sub_schedule)), key=lambda item: item.values[0])
 
+    features = sub_schedule[0].features
     course_strings = sorted([item.values[0] for item in set_sub_schedule])
     course = Course(course_strings)
-    section = Section(sorted(list(set([item.values[3] for item in set_sub_schedule]))))
-    slot = sub_schedule[0].features[1]
-    weekday = sub_schedule[0].features[2]
-
-    features = [course, slot, weekday, section]
+    features[0] = course
 
     new_schedule = []
     for i, item in enumerate(set_sub_schedule):
+        new_capacity = [
+            new_item.capacity for new_item in sub_schedule if new_item == item
+        ]
         new_schedule.append(
-            ScheduleItem(
-                features, item.values, index=i, capacity=sub_schedule.count(item)
-            )
+            ScheduleItem(features, item.values, index=i, capacity=sum(new_capacity))
         )
     return new_schedule, course_strings
