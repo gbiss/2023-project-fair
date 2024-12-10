@@ -161,7 +161,8 @@ def pairwise_maximin_share(
     for sched in bundle_2:
         sched.capacity = 1
 
-    new_schedule, course_strings = sub_schedule([bundle_1, bundle_2])
+    new_schedule = sub_schedule([bundle_1, bundle_2])
+    course_strings = sorted([item.values[0] for item in new_schedule])
 
     PMMS[agent1] = yankee_swap_sub_problem(agent1, new_schedule, course_strings)
     PMMS[agent2] = yankee_swap_sub_problem(agent2, new_schedule, course_strings)

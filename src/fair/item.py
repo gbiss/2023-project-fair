@@ -167,7 +167,6 @@ def sub_schedule(bundles: list[list[ScheduleItem]]):
     set_sub_schedule = sorted(list(set(sub_schedule)), key=lambda item: item.values[0])
 
     features = sub_schedule[0].features
-    course_strings = sorted([item.values[0] for item in set_sub_schedule])
 
     new_schedule = []
     for i, item in enumerate(set_sub_schedule):
@@ -177,4 +176,4 @@ def sub_schedule(bundles: list[list[ScheduleItem]]):
         new_schedule.append(
             ScheduleItem(features, item.values, index=i, capacity=sum(new_capacity))
         )
-    return new_schedule, course_strings
+    return new_schedule
