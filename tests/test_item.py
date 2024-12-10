@@ -1,7 +1,7 @@
 import pytest
 
-from fair.feature import Course
-from fair.item import DomainError, FeatureError, ScheduleItem
+from fair.feature import Course, Section
+from fair.item import DomainError, FeatureError, ScheduleItem, sub_schedule
 
 
 def test_item_hash(schedule_item250: ScheduleItem):
@@ -42,3 +42,27 @@ def test_schedule_excel_import(excel_schedule_path_with_cats: str):
     schedule_items = ScheduleItem.parse_excel(excel_schedule_path_with_cats)
 
     assert None not in [sched.category for sched in schedule_items]
+
+
+def test_subschedule(course: Course, section: Section):
+    sch1 = ScheduleItem([course, section], ["110", 1], 1, capacity=2)
+    sch2 = ScheduleItem([course, section], ["250", 1], 1, capacity=3)
+    sch3 = ScheduleItem([course, section], ["110", 1], 1, capacity=4)
+    sch4 = ScheduleItem([course, section], ["110", 2], 1, capacity=5)
+
+    bundles = [[sch1, sch2], [sch3], [sch4]]
+
+    expected_schedule = {
+        ScheduleItem([course, section], ["110", 1], 1, capacity=6),
+        ScheduleItem([course, section], ["110", 2], 1, capacity=5),
+        ScheduleItem([course, section], ["250", 1], 1, capacity=3),
+    }
+
+    result_schedule = sub_schedule(bundles)
+
+    assert expected_schedule == set(result_schedule)
+
+    expected_capacities = {item: item.capacity for item in expected_schedule}
+
+    for item in result_schedule:
+        assert item.capacity == expected_capacities[item]
