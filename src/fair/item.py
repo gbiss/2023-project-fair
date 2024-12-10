@@ -162,7 +162,6 @@ def sub_schedule(bundles: list[list[ScheduleItem]]):
     Returns:
         new_schedule (list[ScheduleItem]): Items from class BaseItem, new reduced schedule
         course_strings (list[str]): List of course strings of the new schedule
-        course (type[Course]): Course instance of the new schedule
     """
     sub_schedule = [item for bundle in bundles for item in bundle]
     set_sub_schedule = sorted(list(set(sub_schedule)), key=lambda item: item.values[0])
