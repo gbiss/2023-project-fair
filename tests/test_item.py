@@ -45,16 +45,16 @@ def test_schedule_excel_import(excel_schedule_path_with_cats: str):
 
 
 def test_subschedule(course: Course, section: Section):
-    sch1 = ScheduleItem([course, section], ["101", 1], 1, capacity=2)
+    sch1 = ScheduleItem([course, section], ["301", 1], 1, capacity=2)
     sch2 = ScheduleItem([course, section], ["250", 1], 1, capacity=3)
-    sch3 = ScheduleItem([course, section], ["101", 1], 1, capacity=4)
-    sch4 = ScheduleItem([course, section], ["101", 2], 1, capacity=5)
+    sch3 = ScheduleItem([course, section], ["301", 1], 1, capacity=4)
+    sch4 = ScheduleItem([course, section], ["301", 2], 1, capacity=5)
 
     bundles = [[sch1, sch2], [sch3], [sch4]]
 
     expected_schedule = {
-        ScheduleItem([course, section], ["101", 1], 1, capacity=6),
-        ScheduleItem([course, section], ["101", 2], 1, capacity=5),
+        ScheduleItem([course, section], ["301", 1], 1, capacity=6),
+        ScheduleItem([course, section], ["301", 2], 1, capacity=5),
         ScheduleItem([course, section], ["250", 1], 1, capacity=3),
     }
 
