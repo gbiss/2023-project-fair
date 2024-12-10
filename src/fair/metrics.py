@@ -5,7 +5,7 @@ from .agent import BaseAgent, LegacyStudent
 from .allocation import get_bundle_from_allocation_matrix, general_yankee_swap_E
 from .constraint import CourseTimeConstraint, MutualExclusivityConstraint
 from .item import ScheduleItem, sub_schedule
-from .simulation import RenaissanceMan
+from .simulation import SubStudent
 
 
 def utilitarian_welfare(
@@ -107,7 +107,7 @@ def yankee_swap_sub_problem(
     course_time_constr = CourseTimeConstraint.from_items(new_schedule, slot, weekday)
     course_sect_constr = MutualExclusivityConstraint.from_items(new_schedule, course)
     preferred = agent.preferred_courses
-    new_student = RenaissanceMan.from_substudent(
+    new_student = SubStudent(
         agent.student.quantities,
         [
             [item for item in pref if item in course_strings]
@@ -119,6 +119,7 @@ def yankee_swap_sub_problem(
         [course_time_constr, course_sect_constr],
         new_schedule,
     )
+
     legacy_student = LegacyStudent(new_student, new_student.preferred_courses, course)
     legacy_student.student.valuation.valuation = (
         legacy_student.student.valuation.compile()
