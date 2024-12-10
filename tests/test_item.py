@@ -53,8 +53,8 @@ def test_subschedule(course: Course, section: Section):
     bundles = [[sch1, sch2], [sch3], [sch4]]
 
     expected_schedule = {
-        ScheduleItem([course, section], ["110", 1], 1, capacity=6),
-        ScheduleItem([course, section], ["110", 2], 1, capacity=5),
+        ScheduleItem([course, section], ["101", 1], 1, capacity=6),
+        ScheduleItem([course, section], ["101", 2], 1, capacity=5),
         ScheduleItem([course, section], ["250", 1], 1, capacity=3),
     }
 
