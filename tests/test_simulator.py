@@ -106,14 +106,14 @@ def test_sub_student(
     renaissance3: RenaissanceMan,
     schedule: list[ScheduleItem],
     course: Course,
+    slot: Slot,
+    weekday: Weekday,
 ):
     bundle = [item for item in schedule if item.values[0] == "301"]
 
     reduced_schedule = sub_schedule([bundle])
 
     course_strings = sorted([item.values[0] for item in reduced_schedule])
-
-    course, slot, weekday, _ = reduced_schedule[0].features
 
     course_time_constr = CourseTimeConstraint.from_items(
         reduced_schedule, slot, weekday
