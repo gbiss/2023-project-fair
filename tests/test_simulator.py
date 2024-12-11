@@ -1,7 +1,7 @@
 from fair.constraint import CourseTimeConstraint, MutualExclusivityConstraint
 from fair.feature import Course, Section, Slot, Weekday
-from fair.item import ScheduleItem
-from fair.simulation import RenaissanceMan
+from fair.item import ScheduleItem, sub_schedule
+from fair.simulation import RenaissanceMan, SubStudent
 
 
 def test_renaissance_man(
@@ -100,3 +100,40 @@ def test_renaissance_man_memoing(
     student_with_memo.valuation.reset()
 
     assert len(student_with_memo.valuation._value_memo) == 0
+
+
+def test_sub_student(
+    renaissance3: RenaissanceMan,
+    schedule: list[ScheduleItem],
+    course: Course,
+    slot: Slot,
+    weekday: Weekday,
+):
+    bundle = [item for item in schedule if item.values[0] == "301"]
+
+    reduced_schedule = sub_schedule([bundle])
+
+    course_strings = sorted([item.values[0] for item in reduced_schedule])
+
+    course_time_constr = CourseTimeConstraint.from_items(
+        reduced_schedule, slot, weekday
+    )
+    course_sect_constr = MutualExclusivityConstraint.from_items(
+        reduced_schedule, course
+    )
+
+    new_student = SubStudent(
+        renaissance3.quantities,
+        [
+            [item for item in pref if item in course_strings]
+            for pref in renaissance3.preferred_topics
+        ],
+        list(set(course_strings) & set(renaissance3.preferred_courses)),
+        renaissance3.total_courses,
+        course,
+        [course_time_constr, course_sect_constr],
+        reduced_schedule,
+    )
+
+    assert len(new_student.preferred_courses) < len(renaissance3.preferred_courses)
+    assert new_student.value(reduced_schedule) == renaissance3.value(bundle)

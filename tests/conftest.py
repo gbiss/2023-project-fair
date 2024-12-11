@@ -257,6 +257,24 @@ def renaissance2(
 
 
 @pytest.fixture
+def renaissance3(
+    schedule: List[ScheduleItem],
+    global_constraints: List[LinearConstraint],
+    course: Course,
+):
+    return RenaissanceMan(
+        [["250", "301"], ["611"]],
+        [1, 1],
+        2,
+        3,
+        course,
+        global_constraints,
+        schedule,
+        seed=0,
+    )
+
+
+@pytest.fixture
 def student(
     simple_schedule: list[ScheduleItem],
     simple_global_constraints: list[LinearConstraint],

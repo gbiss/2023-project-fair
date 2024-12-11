@@ -150,3 +150,30 @@ class ScheduleItem(BaseItem):
         """
         super().__init__("schedule", features, values, index, capacity)
         self.category = category
+
+
+def sub_schedule(bundles: list[list[ScheduleItem]]):
+    """Given a list of bundles, create a new sub schedule considering the items in the union of all bundles
+    Capacities of the new schedule are determined by the sum of the capacities of the items in all bundles.
+
+    Args:
+        bundles (list[list[ScheduleItem]]): List of Items from class BaseItem
+
+    Returns:
+        new_schedule (list[ScheduleItem]): Items from class BaseItem, new reduced schedule
+        course_strings (list[str]): List of course strings of the new schedule
+    """
+    sub_schedule = [item for bundle in bundles for item in bundle]
+    set_sub_schedule = sorted(list(set(sub_schedule)), key=lambda item: item.values[0])
+
+    features = sub_schedule[0].features
+
+    new_schedule = []
+    for i, item in enumerate(set_sub_schedule):
+        new_capacity = [
+            new_item.capacity for new_item in sub_schedule if new_item == item
+        ]
+        new_schedule.append(
+            ScheduleItem(features, item.values, index=i, capacity=sum(new_capacity))
+        )
+    return new_schedule
